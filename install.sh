@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kuhl OS 0.3. Installer for regular Fedora Workstation (GNOME), not an OS replacement.
+# Kuhl OS 0.5. Installer for regular Fedora Workstation (GNOME), not an OS replacement.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,7 +10,7 @@ DRY_RUN=0
 NO_REBOOT=0
 usage() {
   cat <<'TXT'
-Kuhl OS v0.3 — interactive Fedora desktop installer
+Kuhl OS v0.5 — interactive Fedora desktop installer
 Usage: bash install.sh [--defaults] [--dry-run] [--no-reboot]
   (no flags)  Full-screen text UI: pick extensions, apps and system options.
   --defaults  Use recommended selections without a menu (still prompts before reboot).
@@ -42,7 +42,7 @@ if (( ! DRY_RUN )); then
   command -v dnf >/dev/null || { echo 'dnf is missing.' >&2; exit 1; }
 fi
 [[ -f "$ROOT/config/choices.json" && -f "$ROOT/scripts/menu.py" ]] || { echo 'Incomplete repository checkout. Get the full ZIP.' >&2; exit 1; }
-[[ -f "$ROOT/assets/wallpapers/kuhl-day.png" && -f "$ROOT/assets/wallpapers/kuhl-dusk.png" ]] || { echo 'Required wallpapers missing.' >&2; exit 1; }
+[[ -f "$ROOT/assets/wallpapers/kuhl-default.png" && -f "$ROOT/assets/wallpapers/kuhl-day.png" && -f "$ROOT/assets/wallpapers/kuhl-dusk.png" ]] || { echo 'Required wallpapers missing.' >&2; exit 1; }
 command -v python3 >/dev/null || { echo 'Python 3 required.' >&2; exit 1; }
 
 TMP="$(mktemp -d -t kuhl-install.XXXXXXXX)"
@@ -81,7 +81,7 @@ mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 # Save a log, but keep output visible. No passwords, tokens or personal environment dumps.
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 0.3 — APPLYING YOUR SETUP\n'
+printf '\n✳ KUHL OS 0.5 — APPLYING YOUR SETUP\n'
 printf 'Fedora %s — theme %s — %d options\n' "${VERSION_ID:-unknown}" "$THEME" "${#SELECTED[@]}"
 if [[ -r /proc/meminfo ]]; then
   mem_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
@@ -92,8 +92,12 @@ printf '\n[1/6] Installing Fedora base packages...\n'
 sudo -v
 sudo dnf install -y \
   flatpak gnome-tweaks gnome-extensions-app gnome-shell-extension-user-theme \
+  gnome-menus \
   papirus-icon-theme papirus-icon-theme-dark papirus-icon-theme-light \
   adw-gtk3-theme google-noto-sans-fonts jetbrains-mono-fonts
+if chosen background_logo; then
+  sudo dnf install -y gnome-shell-extension-background-logo
+fi
 
 printf '\n[2/6] Installing Extension Manager and optional applications...\n'
 # Flathub addition is disclosed in TUI and only affects the current user.
@@ -117,7 +121,10 @@ for app in "${FLATPAKS[@]}"; do
 done
 
 printf '\n[3/6] Applying Kuhl wallpapers, shell theme and settings...\n'
-mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_DATA/config" "$KUHL_APPS" "$HOME/.themes"
+mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_DATA/config" "$KUHL_DATA/branding" "$KUHL_APPS" "$HOME/.themes"
+install -m 644 "$ROOT/assets/wallpapers/kuhl-default.png" "$KUHL_DATA/wallpapers/kuhl-default.png"
+install -m 644 "$ROOT/assets/branding/kuhl-wallpaper-logo.svg" "$KUHL_DATA/branding/kuhl-wallpaper-logo.svg"
+install -m 755 "$ROOT/scripts/capture.py" "$KUHL_DATA/capture.py"
 install -m 644 "$ROOT/assets/wallpapers/kuhl-day.png" "$KUHL_DATA/wallpapers/kuhl-day.png"
 install -m 644 "$ROOT/assets/wallpapers/kuhl-dusk.png" "$KUHL_DATA/wallpapers/kuhl-dusk.png"
 install -m 644 "$ROOT/lib/common.sh" "$KUHL_DATA/common.sh"
@@ -147,28 +154,26 @@ if ! gnome-extensions list --enabled 2>/dev/null | grep -Fxq "$user_uuid"; then
     kuhl_warn 'User Themes may not activate until reboot.'
   fi
 fi
-kuhl_set org.gnome.desktop.background picture-uri "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-day.png")"
-kuhl_set org.gnome.desktop.background picture-uri-dark "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-dusk.png")"
+kuhl_set org.gnome.desktop.background picture-uri "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-default.png")"
+kuhl_set org.gnome.desktop.background picture-uri-dark "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-default.png")"
 kuhl_set org.gnome.desktop.interface accent-color "'orange'"
 kuhl_set org.gnome.desktop.interface cursor-theme "'Adwaita'"
 kuhl_set org.gnome.desktop.interface font-name "'Noto Sans 11'"
 kuhl_set org.gnome.desktop.interface document-font-name "'Noto Sans 11'"
 kuhl_set org.gnome.desktop.interface monospace-font-name "'JetBrains Mono 11'"
 kuhl_set org.gnome.desktop.wm.preferences titlebar-font "'Noto Sans Bold 11'"
-if kuhl_key_exists org.gnome.shell.keybindings toggle-overview; then
-  existing="$(gsettings get org.gnome.shell.keybindings toggle-overview)"
-  extra="$(python3 - "$existing" <<'PY'
-import ast,sys
-s=sys.argv[1]
-if s.startswith('@as '): s=s[4:]
-keys=ast.literal_eval(s)
-if '<Control>space' not in keys: keys.insert(0, '<Control>space')
-print(repr(keys))
-PY
-)"
-  kuhl_set org.gnome.shell.keybindings toggle-overview "$extra"
-fi
+# The Spotlight extension below owns Super+Space. We configure it only after
+# confirming its files are installed, so failed installations leave GNOME shortcuts intact.
 kuhl_theme "$THEME"
+# Background Logo is a Fedora RPM, unlike third-party downloaded GNOME extensions.
+# Point it to Kuhl's original transparent branding, not the Fedora logo.
+if chosen background_logo; then
+  logo_path="$KUHL_DATA/branding/kuhl-wallpaper-logo.svg"
+  kuhl_set org.fedorahosted.background-logo-extension logo-file "$(kuhl_quote "$logo_path")"
+  kuhl_set org.fedorahosted.background-logo-extension logo-file-dark "$(kuhl_quote "$logo_path")"
+  kuhl_set org.fedorahosted.background-logo-extension logo-always-visible true
+  kuhl_set org.fedorahosted.background-logo-extension logo-position "'bottom-right'"
+fi
 for theme in day dusk; do
   cat > "$KUHL_APPS/kuhl-$theme.desktop" <<ENTRY
 [Desktop Entry]
@@ -215,6 +220,9 @@ PY
 )
 # Only include installed extensions, never unsupported ones that failed to download.
 PRESENT=( "$user_uuid" )
+if chosen background_logo && rpm -q gnome-shell-extension-background-logo >/dev/null 2>&1; then
+  PRESENT+=( 'background-logo@fedorahosted.org' )
+fi
 for uuid in "${ADDED[@]}"; do
   if [[ -d "$HOME/.local/share/gnome-shell/extensions/$uuid" ]] || gnome-extensions info "$uuid" >/dev/null 2>&1; then
     PRESENT+=("$uuid")
@@ -234,6 +242,33 @@ print(repr(a))
 PY
 )"
   kuhl_set org.gnome.shell enabled-extensions "$merged"
+fi
+
+# Reserve Super+Space for Spotlight rather than GNOME's layout switcher.
+# Keep layout switching available via Super+Alt+Space (reverse: Shift+Super+Alt+Space).
+if chosen spotlight && { [[ -d "$HOME/.local/share/gnome-shell/extensions/spotlight@nin" ]] || gnome-extensions info spotlight@nin >/dev/null 2>&1; }; then
+  if command -v dconf >/dev/null 2>&1; then
+    shortcut_key='/org/gnome/shell/extensions/spotlight/toggle-shortcut'
+    # Preserve the pre-Kuhl key, including the absence of an explicit value.
+    if [[ ! -f "$KUHL_STATE/spotlight-original" ]]; then
+      dconf read "$shortcut_key" > "$KUHL_STATE/spotlight-original"
+      chmod 600 "$KUHL_STATE/spotlight-original"
+    fi
+    if dconf write "$shortcut_key" "['<Super>space']"; then
+      kuhl_set org.gnome.desktop.wm.keybindings switch-input-source "['<Super><Alt>space']"
+      kuhl_set org.gnome.desktop.wm.keybindings switch-input-source-backward "['<Shift><Super><Alt>space']"
+      printf 'Spotlight shortcut set to Super+Space; language switching moved to Super+Alt+Space.\n'
+    else
+      ISSUES=$((ISSUES+1))
+      kuhl_warn 'Could not set Spotlight shortcut.'
+    fi
+  else
+    ISSUES=$((ISSUES+1))
+    kuhl_warn 'dconf command is missing; Spotlight shortcut must be set manually.'
+  fi
+else
+  ISSUES=$((ISSUES+1))
+  kuhl_warn 'Spotlight was not installed. GNOME input-source shortcuts were left unchanged.'
 fi
 
 printf '\n[5/6] Applying optional GDM login branding...\n'

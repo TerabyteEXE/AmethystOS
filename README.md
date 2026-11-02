@@ -1,133 +1,118 @@
-# ✳ Kuhl OS — One-command Fedora setup (v0.3, experimental)
+# ✳ Kuhl OS v0.5 — Fedora Workstation, made cozy
 
-**Fedora Workstation, made cozy.** Kuhl is a theme and application setup for **regular Fedora Workstation** with GNOME, not a separate distribution yet.
+Kuhl is a repeatable **Fedora GNOME configuration**, not yet an independent Linux distribution. This release includes a text installer, an original default wallpaper, a **Spotlight-style launcher on Super+Space**, a selected set of GNOME extensions, and a command to **capture the extra extensions/apps from your existing desktop**.
 
-- Project website: https://terabyteexe.github.io/Kuhl-OS/main.html
-- Video reference: https://www.youtube.com/watch?v=8QSJSZdUawk
+Website: https://terabyteexe.github.io/Kuhl-OS/main.html  
+Video reference: https://www.youtube.com/watch?v=8QSJSZdUawk
 
-> **Important:** The video caption/transcript was inaccessible when this package was assembled. This ZIP implements a curated GNOME customization with many of the same types of tools, but is **not yet verified as a precise reproduction of every program or command in the video**. See `docs/VIDEO-CHECKLIST.md` to reconcile the list. The installation has not been tested on a real Fedora machine; basic syntax, menu and settings-restore tests are included. Test on a disposable Fedora install first.
+> **Release status: experimental.** Automated script checks pass, but this specific release has not been tested on a physical Fedora 44 GNOME 50 machine. GNOME Shell extensions are third-party code; version support is checked at installation, but functionality still needs a real GNOME Wayland login test. The exact contents of the reference YouTube video have not been verified.
 
-## One terminal command
+## Install with one command
 
-On a **fresh, booted, logged-in Fedora Workstation GNOME desktop**, open Terminal and paste **one line**:
+Upload the **contents** of the `Kuhl-OS/` folder in the ZIP to the `main` branch of your existing GitHub repo, preserving any existing `main.html` and `LICENSE`. Then, on a fully booted and logged-in **Fedora Workstation GNOME** desktop, open Terminal:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 ```
 
-**Upload this ZIP's contents to your GitHub repo before using that command.** It retrieves `bootstrap.sh` from your repo and downloads its full `main` branch (including wallpapers and menus). The script then launches the text-based installer interactively using `/dev/tty`. You should review scripts from a repository before running one-line network installers.
+Review remote installation scripts before running them. The bootstrap downloads the public GitHub `main` archive, then opens the installer menu. Don't run the installer with sudo; it asks for sudo only when needed. It does not support Silverblue, KDE or other ostree systems.
 
-**No systemd background daemon, no AI features, no third-party RPM repositories, and no modifications to Fedora's core update/security systems.** Internet is required for DNF, Flathub and extensions.gnome.org.
+**Already installed Kuhl v0.3 or v0.4?** Upload the updated files, then rerun the command above. It reuses existing app installations and updates the new desktop settings. Save any work before choosing reboot.
 
-If you prefer to install locally: download/extract this ZIP, then run:
+## What the installer sets up
 
-```bash
-bash install.sh
-```
+- **Base, required:** GNOME Tweaks, Extension Manager, GNOME Extensions app, Kuhl theme assets, Papirus icons, Noto Sans and JetBrains Mono fonts, and Fedora's User Themes extension.
+- **Search, required:** [Spotlight](https://extensions.gnome.org/extension/10666/spotlight/), a floating search box for apps, files, system settings and calculations. Kuhl assigns **Super+Space** to Spotlight and moves GNOME's keyboard-layout switching to **Super+Alt+Space** (reverse: **Shift+Super+Alt+Space**).
+- **Reference setup, on by default:** ArcMenu, Dash to Dock, Blur my Shell (by aunetx), and Fedora Background Logo with a Kuhl logo overlay. User Themes is required. These are the extensions confirmed from the working Kuhl desktop. GNOME Extensions is a utility, not another extension.
+- **Other selectable extensions, off by default:** Just Perfection, AppIndicator, Tiling Assistant, Caffeine and Rounded Window Corners Reborn. Enable these only if you want them.
+- **GPU effects:** Blur my Shell is on by default because it is in the reference setup; it can be disabled in the text menu. Rounded Window Corners is optional.
+- **Optional apps:** Flatseal, Pika Backup, VLC, GIMP, Inkscape, and LibreOffice. Fedora's regular apps are kept intact.
+- **Optional login branding:** Add the Kuhl logo to GDM using supported GNOME system configuration. It does not replace the GDM login wallpaper or authentication greeter.
+- **Reboot:** The installer offers to reboot after a successful installation; new extensions may only be activated after a new GNOME session.
 
-**Do not use `sudo bash install.sh`** — install as your own logged-in GNOME account. It requests sudo for Fedora packages and optional login logo only.
+There is no bundled AI, background daemon, custom package manager or disabled Fedora security service. Flathub is added to the current user to install Extension Manager and selected optional apps. Extensions are downloaded from `extensions.gnome.org` with compatibility metadata checked against the detected GNOME major version.
 
-## Text installer
+## New default wallpaper
 
-The installer displays **descriptions** for every item. Use **↑/↓** to navigate, **Space** to toggle an optional item, **T** to switch Day/Dusk, **Enter** to review, and **Y** to confirm. Required base items cannot be unchecked. There is a plain text fallback for terminals where curses does not work.
+`assets/wallpapers/kuhl-default.png` is the **new bundled default** for both light and dark GNOME backgrounds. The older Day and Dusk wallpapers remain bundled as an alternative.
 
-### Core (always selected)
-
-- Extension Manager (Flatpak `com.mattjakeman.ExtensionManager`) — graphic extension browsing and controls
-- GNOME Tweaks and GNOME Extensions — Fedora tools
-- Day/Dusk artwork, Papirus icons, fonts and shell CSS (via GNOME User Themes)
-
-### Recommended extensions (on by default)
-
-- Dash to Dock — application dock
-- Just Perfection — shell visibility and layout
-- AppIndicator — status tray icons
-- Tiling Assistant — improved window snapping
-- Caffeine — keep the computer awake when useful
-- Blur my Shell — prettier shell blur; may cost graphics resources
-- Rounded Window Corners Reborn — rounded window styling; may cost graphics resources
-
-All extensions are downloaded from **extensions.gnome.org**, checked for the installed GNOME major version, and enabled for the next login when successfully installed. Unsupported or failed extension downloads are reported; the installer does **not** disable GNOME's version checks. `Extension Manager` will then let you further adjust settings after reboot. **No claim that these seven extensions are the video's exact list.**
-
-### Optional apps (off by default)
-
-- Flatseal — Flatpak permission manager
-- Pika Backup — straightforward backups
-- VLC — media player
-- GIMP — raster image editor
-- Inkscape — vector graphics
-- LibreOffice — offline office suite
-
-Additional apps are all Flathub Flatpaks (`--user`), so the setup won't add random third-party RPM repositories. Fedora's normal apps are not removed.
-
-### Optional system choices
-
-- **Kuhl logo on the GDM login screen** (off): Supported `org.gnome.login-screen.logo` setting via `/etc/dconf/db/gdm.d/95-kuhl-logo`. **This only adds a small logo, not a replacement login theme/background**. It does not modify GDM shell CSS, patches, or authentication settings. Reversible with `kuhl uninstall`.
-- **Reboot when complete** (on): Installer asks again before rebooting. A reboot/login refresh is important because GNOME Wayland cannot load all newly installed extensions until a fresh session.
-
-## Changes made
-
-- Installs packages through `sudo dnf install` (Fedora RPMs) and Flatpak apps in the user's Flatpak installation.
-- Saves changed GSettings values to `~/.local/state/kuhl/settings.tsv` for cautious restoration.
-- Installs `~/.local/bin/kuhl`, two app-launcher theme shortcuts, and two wallpapers in `~/.local/share/kuhl/wallpapers/`.
-- Configures Day/Dusk, title/body/terminal fonts, accent, icon theme, and Ctrl+Space for the **built-in GNOME overview** (not a floating Spotlight window).
-- Installs compatible GNOME add-ons and sets their UUIDs to be enabled on next login. Extension activation can still fail if GNOME or an extension has a regression.
-- If selected, adds a Kuhl logo to GDM using the officially supported dconf key. No custom login wallpaper is attempted.
-- Logs installation to `~/.local/state/kuhl/install.log`. The log shows all failed components; **if any optional component fails, automatic reboot is suppressed** so you can diagnose it.
-
-## Commands and troubleshooting
+After installation:
 
 ```bash
-bash install.sh --dry-run             # no changes; shows default choices
-bash install.sh --defaults --no-reboot # quick install without terminal menu
-~/.local/bin/kuhl doctor              # diagnose basic GNOME + theme prerequisites
-~/.local/bin/kuhl theme day           # warm light theme
-~/.local/bin/kuhl theme dusk          # warm dark theme
-~/.local/bin/kuhl extensions list     # list Kuhl's suggested extension UUIDs
-~/.local/bin/kuhl uninstall           # restore tracked GNOME settings and assets
+~/.local/bin/kuhl wallpaper default  # new landscape
+~/.local/bin/kuhl wallpaper classic  # previous Day/Dusk pair
+~/.local/bin/kuhl theme dusk         # dark app and shell appearance
+~/.local/bin/kuhl theme day          # light app and shell appearance
 ```
 
-If **nothing seems to change**: first reboot/sign out and in, open **Extension Manager**, check that the extensions you selected show as *enabled*, and look in `~/.local/state/kuhl/install.log`. If an extension isn't compatible with your Fedora GNOME release, it will be skipped. The installer cannot guarantee upstream compatibility or wallpaper/theme behavior without running on your machine. There is no unsupported force flag. Fedora 44 uses GNOME 50; later Fedora releases may need newer extension versions.
+To customize the default for everyone, replace `assets/wallpapers/kuhl-default.png` with a PNG of your choice, commit it to GitHub and rerun Kuhl. 2560×1440 or higher is recommended. To apply an already-installed new wallpaper without reinstalling, run `kuhl wallpaper default` (full path above if `~/.local/bin` isn't in your `PATH`).
 
-If you have **very weak graphics**, deselect Blur my Shell and Rounded Window Corners. This does not require uninstalling Fedora or tweaking system security.
+## Capturing your current working setup (important)
 
-## Replacing wallpaper and adding video apps
+You said you installed extra extensions and forgot which. The **capture tool** inventories them without reading your files, history, account tokens or extension-specific preferences:
 
-- Replace `assets/wallpapers/kuhl-day.png` and `assets/wallpapers/kuhl-dusk.png` with your own PNG files before uploading to GitHub, then rerun the installer.
-- Edit `config/choices.json` to add/change optional apps. `type: flatpak` with official Flathub app ID works directly in the installer. For new GNOME extensions, add official name, UUID, URL (TAB-separated) to `config/extensions.tsv` or `config/effects.tsv` **and** add the corresponding `type: extension` choice. GNOME version checks will still apply.
-- Use `docs/VIDEO-CHECKLIST.md` to capture the video's exact apps/extension settings and update the catalog together.
-
-## Files
-
-```text
-Kuhl-OS/
-├── bootstrap.sh                 # one-line GitHub entrypoint
-├── install.sh                   # Fedora installer orchestrator
-├── uninstall.sh                 # uninstaller shortcut
-├── bin/kuhl                     # theme/status/extensions/doctor/uninstall
-├── lib/common.sh                # cautious GSettings backup
-├── config/
-│   ├── choices.json             # explained TUI choices
-│   ├── extensions.tsv           # core GNOME extension catalog
-│   └── effects.tsv              # optional graphics extensions
-├── scripts/
-│   ├── menu.py                  # Python curses text installer
-│   ├── extensions.py            # GNOME official API version-checked installs
-│   └── gdm-brand.sh             # reversible small greeter logo
-├── assets/
-│   ├── branding/kuhl-logo.svg
-│   ├── wallpapers/{kuhl-day.png,kuhl-dusk.png}
-│   └── themes/{Kuhl-Day,Kuhl-Dusk}/gnome-shell/gnome-shell.css
-├── docs/
-└── tests/validate.sh
+```bash
+~/.local/bin/kuhl capture
 ```
 
-The ZIP **does not delete your existing `main.html` or `LICENSE`**. Merge its contents into the existing `TerabyteEXE/Kuhl-OS` repository. Your website's old “4 extensions” and placeholder install command will need updating separately to avoid confusing visitors.
+This creates **`~/kuhl-capture.json`** with:
 
-## Limitations
+- Fedora/GNOME version
+- enabled/installed GNOME extension UUIDs
+- which enabled extensions are missing from Kuhl's current default list
+- installed Flatpak application IDs and (when available) user-installed Fedora RPM package names
+- a small whitelist of non-private GNOME appearance settings
 
-- Not independently verified on Fedora hardware; requires live testing on GNOME/Wayland.
-- Cannot exactly reproduce an inaccessible YouTube video without its commands, timeline, or screenshots.
-- Does not repaint libadwaita GTK4 apps, change GNOME login's full background, or install a custom Spotlight launcher yet.
-- Does not remove existing Fedora software or delete existing GNOME extension user data.
-- Third-party apps/extensions are installed from their own package sources and retain their own licenses. No AI or telemetry is bundled in Kuhl scripts.
+The JSON does **not** change the installation. **Review it before sharing it**. Upload it in a chat or inspect it locally; then the remaining extensions can be evaluated and incorporated into `config/choices.json` and `config/extensions.tsv` so the next person gets your exact setup automatically. It does not auto-install all of your personal apps onto other people's machines.
+
+For deeper, optional replication of extension preferences (dock positioning, blur intensity, sizes, etc.), you may use:
+
+```bash
+~/.local/bin/kuhl capture --with-extension-prefs --overwrite
+```
+
+This creates a separate `~/kuhl-capture.extensions.dconf` that **may include private URLs, usernames or other sensitive extension configuration**. Review and redact it before sending or putting it on a public repository. Do not copy it into GitHub unreviewed.
+
+If you're still on Kuhl v0.3, you can run the new capture script **directly from the extracted v0.5 ZIP** using `python3 scripts/capture.py` before updating anything.
+
+## Testing and diagnostics
+
+```bash
+bash tests/validate.sh                  # script and simulated GNOME tests
+bash install.sh --dry-run              # recommended selections; no changes
+bash install.sh --defaults --no-reboot # install without menu or reboot
+~/.local/bin/kuhl doctor               # check prerequisites and shortcut
+~/.local/bin/kuhl capture              # inventory this desktop
+~/.local/bin/kuhl uninstall            # restore tracked preferences
+```
+
+The installer records its status in `~/.local/state/kuhl/install.log`. An extension may be installed but not appear active until you log out and back in on GNOME Wayland. Confirm Spotlight is enabled in **Extension Manager**, and that `dconf read /org/gnome/shell/extensions/spotlight/toggle-shortcut` prints `['<Super>space']`. If it doesn't open, check for another launcher bound to that shortcut.
+
+The uninstall restores Kuhl-tracked GNOME settings only when they haven't been edited since Kuhl set them. It restores the Spotlight key when appropriate, removes Kuhl assets and removes only extensions that its installer originally installed. Fedora packages and user-selected apps are retained so unrelated software isn't broken.
+
+## Important limitations
+
+1. **Installed extension names are now captured, but not their settings.** Use `kuhl capture --with-extension-prefs --overwrite` and review the separate settings file to replicate the dock/menu appearance on another machine.
+2. **GNOME extensions are not themes for GDM.** This installer supports a small optional GDM login logo only.
+3. Compatibility metadata doesn't guarantee zero GNOME Shell bugs; always validate a clean Fedora installation before calling it stable.
+4. The website currently describes a four-extension limit, Ctrl+Space and a coming-soon script. Update it to reflect the actual release before advertising Kuhl as ready.
+
+Copyright and licenses of upstream Fedora, GNOME, Flatpak and extensions remain with their authors. Kuhl's theme and wallpaper assets are independent project assets.
+
+## Confirmed installed extensions in the reference desktop (v0.5)
+
+| What you called it | Exact extension / tool | Default |
+| --- | --- | --- |
+| Background-logo | `background-logo@fedorahosted.org` (Fedora RPM) | On |
+| User theme | `user-theme@gnome-shell-extensions.gcampax.github.com` (Fedora RPM) | On |
+| Arc menu | `arcmenu@arcmenu.com` (requires `gnome-menus`) | On |
+| Blur my shell / aunetx | `blur-my-shell@aunetx` (`aunetx` is its author) | On |
+| Dash to dock | `dash-to-dock@micxgx.gmail.com` | On |
+| GNOME Shell Extensions | `gnome-extensions-app` (utility, not a shell effect) | Installed |
+| Spotlight | `spotlight@nin` (additional requested launcher) | On |
+
+The baseline matches **installed extensions by name**, not your personalized configuration for
+ArcMenu, dock position, blur intensity, etc. To reproduce those exact visual choices, run
+`kuhl capture --with-extension-prefs --overwrite`, inspect the resulting private dconf file,
+and redact secrets or file paths before sharing. This is an experimental build that still
+needs a clean Fedora GNOME 50 installation test.

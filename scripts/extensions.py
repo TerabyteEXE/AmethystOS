@@ -33,7 +33,7 @@ def log(message: str) -> None:
 def shell_version() -> str:
     result = subprocess.run(['gnome-shell', '--version'], text=True,
                             capture_output=True, check=True)
-    match = re.search(r'(\d+)(?:\.\d+)?\s*$', result.stdout.strip())
+    match = re.search(r'GNOME\s+Shell\s+(\d+)(?:\.\d+)*', result.stdout.strip(), re.I)
     if not match:
         raise RuntimeError(f'Cannot parse GNOME Shell version: {result.stdout.strip()}')
     return match.group(1)
