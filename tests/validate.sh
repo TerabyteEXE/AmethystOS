@@ -2,10 +2,10 @@
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-for script in install.sh uninstall.sh bin/kuhl lib/common.sh tests/validate.sh; do
+for script in bootstrap.sh install.sh uninstall.sh bin/kuhl lib/common.sh scripts/gdm-brand.sh tests/validate.sh; do
   bash -n "$script"
 done
-python3 -m py_compile scripts/patch-site.py scripts/generate-wallpapers.py scripts/extensions.py
+python3 -m py_compile scripts/extensions.py scripts/menu.py
 python3 - <<'PY'
 from pathlib import Path
 from scripts.extensions import profile_items
@@ -19,9 +19,20 @@ assert len(profile_items('balanced', Path('config'))) == 5
 assert len(profile_items('full', Path('config'))) == 7
 assert (Path('assets/themes/Kuhl-Day/gnome-shell/gnome-shell.css').is_file())
 assert (Path('assets/themes/Kuhl-Dusk/gnome-shell/gnome-shell.css').is_file())
-print('[test] Wallpapers, shell themes, extension profiles: OK')
+from json import loads
+choices = loads(Path('config/choices.json').read_text())['choices']
+ids = {item['id'] for item in choices}
+assert len(ids) == len(choices)
+assert {'extension_manager','kuhl_look','gnome_tweaks','reboot','brand_gdm'} <= ids
+assert all(item.get('description') for item in choices)
+print('[test] Wallpapers, shell themes, extension profiles and TUI manifest: OK')
 PY
 
+choice_file="$(mktemp)"
+python3 scripts/menu.py --config config/choices.json --output "$choice_file" --defaults
+python3 -c 'import json,sys; r=json.load(open(sys.argv[1])); assert r["theme"] == "dusk"; assert "extension_manager" in r["selected"]; assert "brand_gdm" not in r["selected"]' "$choice_file"
+rm -f "$choice_file"
+echo '[test] Default menu selection serialization: OK'
 tmp="$(mktemp -d)"
 trap 'rm -rf -- "$tmp"' EXIT
 mkdir -p "$tmp/mockbin" "$tmp/home/.local/bin" "$tmp/data/kuhl/wallpapers"

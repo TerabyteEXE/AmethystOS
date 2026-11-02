@@ -69,7 +69,7 @@ def profile_items(profile: str, config_dir: Path) -> list[tuple[str, str, str]]:
 
 
 def fetch(url: str, maximum: int) -> bytes:
-    request = urllib.request.Request(url, headers={'User-Agent': 'Kuhl-OS/0.2 (compatible GNOME extensions)'})
+    request = urllib.request.Request(url, headers={'User-Agent': 'Kuhl-OS/0.3 (compatible GNOME extensions)'})
     with urllib.request.urlopen(request, timeout=25) as response:
         effective = urllib.parse.urlparse(response.geturl())
         if effective.scheme != 'https' or effective.hostname != HOST:
@@ -145,7 +145,7 @@ def install(profile: str, config: Path, state: Path) -> int:
                 added.remove(uuid)
                 log(f'Removed optional effect for Balanced mode: {uuid}')
         write_state(state, added)
-    new = skipped = 0
+    new = skipped = errors = 0
     for name, uuid, details in profile_items(profile, config):
         if gnome('info', uuid).returncode == 0:
             log(f'Already present; leaving user setting unchanged: {name}')
@@ -156,6 +156,7 @@ def install(profile: str, config: Path, state: Path) -> int:
             if not url:
                 log(f'NOT AVAILABLE for GNOME {major}: {name}; {details}')
                 skipped += 1
+                errors += 1
                 continue
             blob = fetch(url, MAX_DOWNLOAD)
             inspect_zip(blob, uuid, major)
@@ -166,6 +167,7 @@ def install(profile: str, config: Path, state: Path) -> int:
             if result.returncode:
                 log(f'Could not install {name}: {result.stderr.strip()}')
                 skipped += 1
+                errors += 1
                 continue
             added.add(uuid)
             write_state(state, added)
@@ -179,8 +181,9 @@ def install(profile: str, config: Path, state: Path) -> int:
                 zipfile.BadZipFile, subprocess.CalledProcessError) as exc:
             log(f'Skipped {name}: {exc}. Manual page: {details}')
             skipped += 1
-    log(f'Finished: {new} installed; {skipped} pre-existing/unavailable/skipped. Log out/in.')
-    return 0
+            errors += 1
+    log(f'Finished: {new} installed; {skipped} pre-existing/unavailable/skipped; {errors} unavailable/errors. Log out/in.')
+    return 1 if errors else 0
 
 
 def uninstall(state: Path) -> int:

@@ -1,0 +1,22 @@
+{
+  "choices": [
+    {"id": "extension_manager", "section": "Essential tools", "title": "Extension Manager", "description": "Install and update GNOME extensions with a friendly graphical app (Flathub). Core tool for Kuhl.", "default": true, "required": true, "type": "flatpak", "value": "com.mattjakeman.ExtensionManager"},
+    {"id": "gnome_tweaks", "section": "Essential tools", "title": "GNOME Tweaks + Extensions", "description": "Adjust fonts, windows and desktop preferences; GNOME Extensions handles installed add-ons.", "default": true, "required": true, "type": "dnf", "value": "gnome-tweaks gnome-extensions-app"},
+    {"id": "kuhl_look", "section": "Kuhl desktop", "title": "Kuhl Day/Dusk look", "description": "Wallpaper, Papirus icons, consistent fonts, warm accent and matching shell CSS. Includes User Themes.", "default": true, "required": true, "type": "appearance"},
+    {"id": "dock", "section": "GNOME extensions", "title": "Dash to Dock", "description": "Persistent configurable launcher dock. Can be turned off from Extension Manager.", "default": true, "type": "extension", "value": "dash-to-dock@micxgx.gmail.com"},
+    {"id": "perfection", "section": "GNOME extensions", "title": "Just Perfection", "description": "Fine-grained GNOME panel, overview and animation layout controls.", "default": true, "type": "extension", "value": "just-perfection-desktop@just-perfection"},
+    {"id": "indicators", "section": "GNOME extensions", "title": "AppIndicator", "description": "Show tray icons for apps using legacy status indicators.", "default": true, "type": "extension", "value": "appindicatorsupport@rgcjonas.gmail.com"},
+    {"id": "tiling", "section": "GNOME extensions", "title": "Tiling Assistant", "description": "More flexible window snapping, grids and tiling shortcuts.", "default": true, "type": "extension", "value": "tiling-assistant@leleat-on-github"},
+    {"id": "caffeine", "section": "GNOME extensions", "title": "Caffeine", "description": "Prevent the screen from dimming or suspending when you need it awake.", "default": true, "type": "extension", "value": "caffeine@patapon.info"},
+    {"id": "blur", "section": "Visual effects", "title": "Blur my Shell", "description": "Blurred overview, menus and shell surfaces. May use more GPU resources.", "default": true, "type": "extension", "value": "blur-my-shell@aunetx"},
+    {"id": "corners", "section": "Visual effects", "title": "Rounded Window Corners", "description": "Soft rounded corners for many windows. May conflict with other shell effects.", "default": true, "type": "extension", "value": "rounded-window-corners@fxgn"},
+    {"id": "flatseal", "section": "Optional utilities", "title": "Flatseal", "description": "View or change Flatpak app sandbox permissions with a GUI.", "default": false, "type": "flatpak", "value": "com.github.tchx84.Flatseal"},
+    {"id": "pika", "section": "Optional utilities", "title": "Pika Backup", "description": "Simple, encrypted backups to a local drive or remote location.", "default": false, "type": "flatpak", "value": "org.gnome.World.PikaBackup"},
+    {"id": "vlc", "section": "Optional applications", "title": "VLC", "description": "Media player for most common audio and video formats.", "default": false, "type": "flatpak", "value": "org.videolan.VLC"},
+    {"id": "gimp", "section": "Optional applications", "title": "GIMP", "description": "Full image editor; bigger download.", "default": false, "type": "flatpak", "value": "org.gimp.GIMP"},
+    {"id": "inkscape", "section": "Optional applications", "title": "Inkscape", "description": "Vector graphics and SVG editing.", "default": false, "type": "flatpak", "value": "org.inkscape.Inkscape"},
+    {"id": "office", "section": "Optional applications", "title": "LibreOffice", "description": "Full offline documents, spreadsheets and presentations suite; large download.", "default": false, "type": "flatpak", "value": "org.libreoffice.LibreOffice"},
+    {"id": "brand_gdm", "section": "System options", "title": "Kuhl logo on login screen", "description": "Add a small Kuhl logo to the GDM login screen via supported dconf settings. Does not theme GDM background.", "default": false, "type": "gdm"},
+    {"id": "reboot", "section": "System options", "title": "Reboot when finished", "description": "Recommended: restart GNOME so new extensions and themes become discoverable. You'll confirm again after installation.", "default": true, "type": "reboot"}
+  ]
+}

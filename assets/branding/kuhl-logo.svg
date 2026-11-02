@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="64" viewBox="0 0 280 64">
+  <rect width="280" height="64" rx="13" fill="#25262b"/>
+  <g fill="none" stroke="#e9b27b" stroke-width="4" stroke-linecap="round" transform="translate(25 32)">
+    <path d="M0 -16V16M-16 0H16M-11 -11L11 11M11 -11L-11 11"/>
+  </g>
+  <text x="58" y="43" fill="#f8ead8" font-family="sans-serif" font-size="32" font-weight="700" letter-spacing="1">kuhl os</text>
+</svg>

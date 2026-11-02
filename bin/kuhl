@@ -81,6 +81,10 @@ case "${1:-help}" in
         fi
       done < "$KUHL_SETTINGS"
     fi
+    # Remove only GDM branding created by Kuhl; other GDM changes are untouched.
+    if [[ -x "$KUHL_DATA/gdm-brand.sh" ]] && [[ -f /etc/dconf/db/gdm.d/95-kuhl-logo ]]; then
+      bash "$KUHL_DATA/gdm-brand.sh" uninstall || kuhl_warn 'GDM branding may need manual cleanup.'
+    fi
     # Only uninstall Shell extensions that the Kuhl installer originally installed.
     if [[ -f "$KUHL_DATA/extensions.py" ]]; then
       python3 "$KUHL_DATA/extensions.py" uninstall || kuhl_warn 'Some installed extensions could not be removed.'
@@ -104,7 +108,8 @@ case "${1:-help}" in
     rm -f "$KUHL_BIN"
     rm -rf -- "$KUHL_DATA/wallpapers"
     rm -f -- "$KUHL_DATA/common.sh" "$KUHL_DATA/extensions.py" \
-      "$KUHL_DATA/config/extensions.tsv" "$KUHL_DATA/config/effects.tsv"
+      "$KUHL_DATA/config/extensions.tsv" "$KUHL_DATA/config/effects.tsv" \
+      "$KUHL_DATA/config/choices.json" "$KUHL_DATA/gdm-brand.sh"
     rmdir "$KUHL_DATA/config" 2>/dev/null || true
     rmdir -- "$KUHL_DATA" 2>/dev/null || true
     # The backup is retained for inspection; do not destroy the user's history.

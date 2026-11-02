@@ -1,125 +1,152 @@
 #!/usr/bin/env bash
-# Kuhl OS v0.2 - cautious, repeatable Fedora Workstation GNOME customization.
+# Kuhl OS 0.3. Installer for regular Fedora Workstation (GNOME), not an OS replacement.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
 source "$ROOT/lib/common.sh"
 
-THEME=dusk
-PROFILE=full
-INSTALL_PACKAGES=1
+DEFAULTS=0
 DRY_RUN=0
+NO_REBOOT=0
 usage() {
-  cat <<'HELP'
-Kuhl OS installer - run as your normal user inside a Fedora GNOME session.
-
-Usage: bash install.sh [--theme day|dusk] [--profile full|balanced|none] [--no-packages] [--dry-run]
-
---theme day|dusk  First appearance (default: dusk)
---profile         full (all visual effects), balanced (lighter), or none (no add-ons)
---no-packages     Skip DNF package installation; themes may be incomplete
---dry-run         Show planned actions without changing anything
--h, --help        Show this information
-HELP
+  cat <<'TXT'
+Kuhl OS v0.3 — interactive Fedora desktop installer
+Usage: bash install.sh [--defaults] [--dry-run] [--no-reboot]
+  (no flags)  Full-screen text UI: pick extensions, apps and system options.
+  --defaults  Use recommended selections without a menu (still prompts before reboot).
+  --dry-run   Preview recommended selection; do not install anything.
+  --no-reboot Never reboot, even if selected in the menu.
+Run as your logged-in normal user in Fedora Workstation GNOME, NOT sudo.
+TXT
 }
-while (( $# )); do
+while (($#)); do
   case "$1" in
-    --theme) [[ $# -ge 2 ]] || { usage; exit 2; }; THEME="$2"; shift 2;;
-    --profile) [[ $# -ge 2 ]] || { usage; exit 2; }; PROFILE="$2"; shift 2;;
-    --no-packages) INSTALL_PACKAGES=0; shift;;
-    --dry-run) DRY_RUN=1; shift;;
+    --defaults) DEFAULTS=1;;
+    --dry-run) DRY_RUN=1; DEFAULTS=1; NO_REBOOT=1;;
+    --no-reboot) NO_REBOOT=1;;
     -h|--help) usage; exit 0;;
-    *) kuhl_error "Unknown argument: $1"; usage; exit 2;;
+    *) printf 'Unknown flag: %s\n' "$1" >&2; usage; exit 2;;
   esac
+  shift
 done
-[[ "$PROFILE" == full || "$PROFILE" == balanced || "$PROFILE" == none ]] || { kuhl_error "--profile must be full, balanced, or none"; exit 2; }
-[[ "$THEME" == day || "$THEME" == dusk ]] || { kuhl_error "--theme must be day or dusk"; exit 2; }
-[[ "$(id -u)" != 0 ]] || { kuhl_error "Do not run as root or with sudo. The script will request sudo for DNF only."; exit 1; }
-[[ "$(uname -m)" == x86_64 ]] || { kuhl_error "This Kuhl release targets x86_64 PCs only."; exit 1; }
-[[ -f /etc/os-release ]] || { kuhl_error "Could not identify the operating system."; exit 1; }
-# shellcheck source=/dev/null
+[[ $(id -u) -ne 0 ]] || { echo 'Do NOT run the whole script as root. Sudo is used only when required.' >&2; exit 1; }
+[[ $(uname -m) == x86_64 ]] || { echo 'Kuhl currently supports x86_64 systems.' >&2; exit 1; }
+[[ -f /etc/os-release ]] || { echo 'Cannot read /etc/os-release.' >&2; exit 1; }
+# shellcheck disable=SC1091
 source /etc/os-release
-[[ "${ID:-}" == fedora ]] || { kuhl_error "This installer requires Fedora Workstation."; exit 1; }
-[[ "${VARIANT_ID:-workstation}" == workstation || "${VARIANT_ID:-}" == "" ]] || kuhl_warn "This does not appear to be Fedora Workstation."
-if command -v rpm-ostree >/dev/null 2>&1 && [[ -f /run/ostree-booted ]]; then
-  kuhl_error "Fedora Atomic desktops use rpm-ostree; install regular Fedora Workstation instead."
-  exit 1
+[[ ${ID:-} == fedora ]] || { echo 'Regular Fedora Workstation is required.' >&2; exit 1; }
+[[ ! -e /run/ostree-booted ]] || { echo 'Fedora Silverblue/Kinoite use rpm-ostree, not this installer.' >&2; exit 1; }
+if (( ! DRY_RUN )); then
+  [[ ${XDG_CURRENT_DESKTOP:-} == *GNOME* ]] || { echo 'Log into Fedora GNOME before installing.' >&2; exit 1; }
+  command -v gsettings >/dev/null || { echo 'gsettings is missing.' >&2; exit 1; }
+  command -v dnf >/dev/null || { echo 'dnf is missing.' >&2; exit 1; }
 fi
-if [[ "${XDG_CURRENT_DESKTOP:-}" != *GNOME* ]]; then
-  kuhl_error "Log into your GNOME desktop session before installing. XDG_CURRENT_DESKTOP=${XDG_CURRENT_DESKTOP:-unset}"
-  exit 1
+[[ -f "$ROOT/config/choices.json" && -f "$ROOT/scripts/menu.py" ]] || { echo 'Incomplete repository checkout. Get the full ZIP.' >&2; exit 1; }
+[[ -f "$ROOT/assets/wallpapers/kuhl-day.png" && -f "$ROOT/assets/wallpapers/kuhl-dusk.png" ]] || { echo 'Required wallpapers missing.' >&2; exit 1; }
+command -v python3 >/dev/null || { echo 'Python 3 required.' >&2; exit 1; }
+
+TMP="$(mktemp -d -t kuhl-install.XXXXXXXX)"
+trap 'rm -rf -- "$TMP"' EXIT
+if (( DEFAULTS )); then
+  python3 "$ROOT/scripts/menu.py" --config "$ROOT/config/choices.json" --output "$TMP/choices.json" --defaults
+else
+  python3 "$ROOT/scripts/menu.py" --config "$ROOT/config/choices.json" --output "$TMP/choices.json" || { echo 'Installer cancelled. No changes made.'; exit 2; }
 fi
-command -v gsettings >/dev/null || { kuhl_error "gsettings not found."; exit 1; }
-command -v python3 >/dev/null || { kuhl_error "python3 is required."; exit 1; }
-command -v dnf >/dev/null || { kuhl_error "dnf is required."; exit 1; }
-if [[ ! -d "$ROOT/assets/wallpapers" ]] || [[ ! -f "$ROOT/assets/wallpapers/kuhl-day.png" ]] || [[ ! -f "$ROOT/assets/wallpapers/kuhl-dusk.png" ]]; then
-  kuhl_error "Missing wallpaper assets. Download/extract the entire repository, not only install.sh."
-  exit 1
-fi
-if [[ -r /proc/meminfo ]]; then
-  mem_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
-  (( mem_kib >= 7*1024*1024 )) || kuhl_warn "This system has under ~8 GB RAM; Kuhl recommends 8 GB or more."
-fi
-kuhl_info "Fedora ${VERSION_ID:-unknown} / GNOME / ${THEME^} theme"
+# Parse ONLY IDs present in the repository manifest; no user-entered shell code.
+mapfile -t SELECTED < <(python3 - "$TMP/choices.json" "$ROOT/config/choices.json" <<'PY'
+import json, sys
+r=json.load(open(sys.argv[1])); options=json.load(open(sys.argv[2]))['choices']
+valid={p['id'] for p in options}; chosen=set(r['selected'])
+if not chosen <= valid: raise SystemExit('Unknown menu choice')
+if not all(p['id'] in chosen for p in options if p.get('required')): raise SystemExit('Missing required choice')
+for x in sorted(chosen): print(x)
+PY
+)
+THEME="$(python3 - "$TMP/choices.json" <<'PY'
+import json,sys
+s=json.load(open(sys.argv[1]))['theme']
+assert s in ('day','dusk')
+print(s)
+PY
+)"
+chosen() { local name="$1" i; for i in "${SELECTED[@]}"; do [[ "$i" != "$name" ]] || return 0; done; return 1; }
 if (( DRY_RUN )); then
-  cat <<'PLAN'
-DRY RUN — no changes will be made.
-  1. Install fonts, Papirus icons and GTK3 compatibility theme via Fedora DNF.
-  2. Copy two Kuhl wallpapers into ~/.local/share/kuhl/.
-  3. Save previous GNOME settings under ~/.local/state/kuhl/.
-  4. Set Day/Dusk wallpaper pair, fonts, icons and warm accent.
-  5. Add Ctrl+Space to GNOME's built-in Overview search shortcut.
-  6. Install `kuhl` CLI and two desktop theme switchers.
-  7. Install Kuhl Shell CSS via GNOME User Themes, plus compatible extensions
-     (select --profile balanced/none to reduce add-ons).
-  No apps or packages are removed. Fedora security settings are untouched.
-PLAN
+  printf '\nDRY RUN — Kuhl OS install: %s theme\n' "$THEME"
+  printf '  %s\n' "${SELECTED[@]}"
+  printf 'Nothing changed. Run without --dry-run to launch the text UI.\n'
   exit 0
 fi
 
-if (( INSTALL_PACKAGES )); then
-  kuhl_info "Installing a small set of Fedora packages (sudo is required for this step)..."
-  sudo dnf install -y \
-    papirus-icon-theme papirus-icon-theme-dark papirus-icon-theme-light \
-    adw-gtk3-theme google-noto-sans-fonts jetbrains-mono-fonts \
-    gnome-extensions-app gnome-shell-extension-user-theme
-else
-  kuhl_warn "Skipping package installation by request; install packages later for best results."
+mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
+LOG="$KUHL_STATE/install.log"
+# Save a log, but keep output visible. No passwords, tokens or personal environment dumps.
+exec > >(tee -a "$LOG") 2>&1
+printf '\n✳ KUHL OS 0.3 — APPLYING YOUR SETUP\n'
+printf 'Fedora %s — theme %s — %d options\n' "${VERSION_ID:-unknown}" "$THEME" "${#SELECTED[@]}"
+if [[ -r /proc/meminfo ]]; then
+  mem_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+  (( mem_kib >= 7*1024*1024 )) || kuhl_warn 'Below the recommended ~8 GB RAM. Visual effects might feel sluggish.'
 fi
+printf '\n[1/6] Installing Fedora base packages...\n'
+# GNOME User Themes is a Fedora RPM, no third-party shell patches.
+sudo -v
+sudo dnf install -y \
+  flatpak gnome-tweaks gnome-extensions-app gnome-shell-extension-user-theme \
+  papirus-icon-theme papirus-icon-theme-dark papirus-icon-theme-light \
+  adw-gtk3-theme google-noto-sans-fonts jetbrains-mono-fonts
 
-mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_STATE" "$HOME/.local/bin" "$KUHL_APPS" "$KUHL_DATA/config"
+printf '\n[2/6] Installing Extension Manager and optional applications...\n'
+# Flathub addition is disclosed in TUI and only affects the current user.
+flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# Packages are from the local checked-out manifest, not arbitrary menu text.
+mapfile -t FLATPAKS < <(python3 - "$ROOT/config/choices.json" "$TMP/choices.json" <<'PY'
+import json,sys
+items=json.load(open(sys.argv[1]))['choices']; selection=set(json.load(open(sys.argv[2]))['selected'])
+for p in items:
+ if p['id'] in selection and p['type']=='flatpak': print(p['value'])
+PY
+)
+ISSUES=0
+for app in "${FLATPAKS[@]}"; do
+  if flatpak info --user "$app" >/dev/null 2>&1; then
+    printf 'Already installed: %s\n' "$app"
+  elif ! flatpak install --user --noninteractive -y flathub "$app"; then
+    printf 'FAILED Flatpak: %s (see %s)\n' "$app" "$LOG"
+    ISSUES=$((ISSUES+1))
+  fi
+done
+
+printf '\n[3/6] Applying Kuhl wallpapers, shell theme and settings...\n'
+mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_DATA/config" "$KUHL_APPS" "$HOME/.themes"
 install -m 644 "$ROOT/assets/wallpapers/kuhl-day.png" "$KUHL_DATA/wallpapers/kuhl-day.png"
 install -m 644 "$ROOT/assets/wallpapers/kuhl-dusk.png" "$KUHL_DATA/wallpapers/kuhl-dusk.png"
 install -m 644 "$ROOT/lib/common.sh" "$KUHL_DATA/common.sh"
 install -m 755 "$ROOT/bin/kuhl" "$KUHL_BIN"
 install -m 755 "$ROOT/scripts/extensions.py" "$KUHL_DATA/extensions.py"
+install -m 755 "$ROOT/scripts/gdm-brand.sh" "$KUHL_DATA/gdm-brand.sh"
 install -m 644 "$ROOT/config/extensions.tsv" "$KUHL_DATA/config/extensions.tsv"
 install -m 644 "$ROOT/config/effects.tsv" "$KUHL_DATA/config/effects.tsv"
-# Kuhl theme files are original CSS, not downloaded third-party code.
+install -m 644 "$ROOT/config/choices.json" "$KUHL_DATA/config/choices.json"
 for name in Day Dusk; do
   target="$HOME/.themes/Kuhl-$name"
   if [[ -d "$target" && ! -f "$target/.kuhl-owned" ]]; then
-    kuhl_warn "A theme already exists at $target; leaving it intact."
+    kuhl_warn "A preexisting theme at $target was not replaced."
     continue
   fi
   mkdir -p "$target/gnome-shell"
   install -m 644 "$ROOT/assets/themes/Kuhl-$name/gnome-shell/gnome-shell.css" "$target/gnome-shell/gnome-shell.css"
   touch "$target/.kuhl-owned"
 done
-# User Themes is an official Fedora extension provided by DNF; on some sessions
-# GNOME will not see it until the next login. Save the change we made to its status.
-if (( INSTALL_PACKAGES )) && command -v gnome-extensions >/dev/null 2>&1; then
-  uuid='user-theme@gnome-shell-extensions.gcampax.github.com'
-  if ! gnome-extensions list --enabled 2>/dev/null | grep -Fxq "$uuid"; then
-    if gnome-extensions enable "$uuid" 2>/dev/null; then
-      printf '%s\n' "$uuid" > "$KUHL_STATE/enabled-user-theme.txt"
-    else
-      kuhl_warn 'User Themes may need to be enabled in Extensions after logging out/in.'
-    fi
+
+# Fedora package may not appear in GNOME's process until fresh login; pre-register enabled UUID.
+user_uuid='user-theme@gnome-shell-extensions.gcampax.github.com'
+if ! gnome-extensions list --enabled 2>/dev/null | grep -Fxq "$user_uuid"; then
+  if gnome-extensions enable "$user_uuid" 2>/dev/null; then
+    printf '%s\n' "$user_uuid" > "$KUHL_STATE/enabled-user-theme.txt"
+  else
+    kuhl_warn 'User Themes may not activate until reboot.'
   fi
 fi
-
-kuhl_info "Applying GNOME preferences (original settings are backed up)..."
 kuhl_set org.gnome.desktop.background picture-uri "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-day.png")"
 kuhl_set org.gnome.desktop.background picture-uri-dark "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-dusk.png")"
 kuhl_set org.gnome.desktop.interface accent-color "'orange'"
@@ -128,46 +155,124 @@ kuhl_set org.gnome.desktop.interface font-name "'Noto Sans 11'"
 kuhl_set org.gnome.desktop.interface document-font-name "'Noto Sans 11'"
 kuhl_set org.gnome.desktop.interface monospace-font-name "'JetBrains Mono 11'"
 kuhl_set org.gnome.desktop.wm.preferences titlebar-font "'Noto Sans Bold 11'"
-
-# Use GNOME's native Overview rather than relying on a GNOME Shell extension.
-# Preserve the user's existing shortcuts while adding Ctrl+Space.
 if kuhl_key_exists org.gnome.shell.keybindings toggle-overview; then
-  old_keys="$(gsettings get org.gnome.shell.keybindings toggle-overview)"
-  new_keys="$(python3 - "$old_keys" <<'PY'
-import ast, sys
-keys = ast.literal_eval(sys.argv[1])
-assert isinstance(keys, list)
-if '<Control>space' not in keys:
-    keys.insert(0, '<Control>space')
+  existing="$(gsettings get org.gnome.shell.keybindings toggle-overview)"
+  extra="$(python3 - "$existing" <<'PY'
+import ast,sys
+s=sys.argv[1]
+if s.startswith('@as '): s=s[4:]
+keys=ast.literal_eval(s)
+if '<Control>space' not in keys: keys.insert(0, '<Control>space')
 print(repr(keys))
 PY
 )"
-  kuhl_set org.gnome.shell.keybindings toggle-overview "$new_keys"
-else
-  kuhl_warn "Could not enable Ctrl+Space: no toggle-overview key available."
+  kuhl_set org.gnome.shell.keybindings toggle-overview "$extra"
 fi
 kuhl_theme "$THEME"
-if [[ "$PROFILE" != none ]]; then
-  kuhl_info "Installing compatible GNOME extensions ($PROFILE profile); they run as your user."
-  python3 "$KUHL_DATA/extensions.py" install --profile "$PROFILE" --config "$KUHL_DATA/config" || \
-    kuhl_warn 'Some extensions could not be installed; the base desktop still works.'
-fi
-
-# Simple app-launcher entries: no background services or extensions.
 for theme in day dusk; do
-  display="${theme^}"
   cat > "$KUHL_APPS/kuhl-$theme.desktop" <<ENTRY
 [Desktop Entry]
 Type=Application
-Name=Kuhl $display
-GenericName=Kuhl OS appearance
-Comment=Switch Kuhl OS to its $display look
-Exec="$KUHL_BIN" theme $theme
+Name=Kuhl ${theme^}
+Comment=Switch to the Kuhl ${theme^} color palette
+Exec=$KUHL_BIN theme $theme
 Icon=preferences-desktop-theme
 Terminal=false
 Categories=Settings;DesktopSettings;
-Keywords=Kuhl;Theme;$display;
 ENTRY
 done
-kuhl_info "Installed Kuhl OS ($THEME / $PROFILE). Run: ~/.local/bin/kuhl doctor"
-kuhl_info "Log out and back in, then open Extensions to confirm the add-ons are enabled."
+
+printf '\n[4/6] Installing GNOME Shell extensions...\n'
+# Only selected extension UUIDs from the reviewed project catalog are installed.
+mkdir -p "$TMP/extension-config"
+python3 - "$ROOT/config" "$ROOT/config/choices.json" "$TMP/choices.json" "$TMP/extension-config/extensions.tsv" <<'PY'
+import json,sys
+from pathlib import Path
+source=Path(sys.argv[1]); meta=json.load(open(sys.argv[2]))['choices']; selected=set(json.load(open(sys.argv[3]))['selected'])
+ids={x['value'] for x in meta if x['type']=='extension' and x['id'] in selected}
+records=[]
+for file in ('extensions.tsv','effects.tsv'):
+ for line in (source/file).read_text().splitlines():
+  if line and not line.startswith('#') and line.split('\t')[1] in ids: records.append(line)
+if len(records)!=len(ids): raise SystemExit('Missing extension definition for selected extension')
+Path(sys.argv[4]).write_text('\n'.join(records)+'\n')
+PY
+: > "$TMP/extension-config/effects.tsv"
+if [[ -s "$TMP/extension-config/extensions.tsv" ]]; then
+  if ! python3 "$KUHL_DATA/extensions.py" install --profile balanced --config "$TMP/extension-config"; then
+    ISSUES=$((ISSUES+1))
+    kuhl_warn 'The extension installer reported an error; check Extension Manager after reboot.'
+  fi
+fi
+# Installing a ZIP on running Wayland GNOME may not activate it right away.
+# Request activation in persistent GNOME settings for the next login.
+mapfile -t ADDED < <(python3 - "$ROOT/config/choices.json" "$TMP/choices.json" <<'PY'
+import json,sys
+items=json.load(open(sys.argv[1]))['choices']; selected=set(json.load(open(sys.argv[2]))['selected'])
+for p in items:
+ if p['id'] in selected and p['type']=='extension': print(p['value'])
+PY
+)
+# Only include installed extensions, never unsupported ones that failed to download.
+PRESENT=( "$user_uuid" )
+for uuid in "${ADDED[@]}"; do
+  if [[ -d "$HOME/.local/share/gnome-shell/extensions/$uuid" ]] || gnome-extensions info "$uuid" >/dev/null 2>&1; then
+    PRESENT+=("$uuid")
+  fi
+done
+if kuhl_key_exists org.gnome.shell enabled-extensions; then
+  current="$(gsettings get org.gnome.shell enabled-extensions)"
+  merged="$(python3 - "$current" "${PRESENT[@]}" <<'PY'
+import ast,sys
+value=sys.argv[1]
+if value.startswith('@as '): value=value[4:]
+a=ast.literal_eval(value)
+if not isinstance(a,list): raise ValueError('Expected GNOME extension list')
+for uuid in sys.argv[2:]:
+ if uuid not in a:a.append(uuid)
+print(repr(a))
+PY
+)"
+  kuhl_set org.gnome.shell enabled-extensions "$merged"
+fi
+
+printf '\n[5/6] Applying optional GDM login branding...\n'
+if chosen brand_gdm; then
+  if ! bash "$ROOT/scripts/gdm-brand.sh" install "$ROOT/assets/branding/kuhl-logo.svg"; then
+    ISSUES=$((ISSUES+1))
+    kuhl_warn 'GDM logo could not be applied; this does not block GNOME login.'
+  fi
+else
+  printf 'Login logo not selected. GDM configuration unchanged.\n'
+fi
+
+printf '\n[6/6] Finalizing and checking...\n'
+cp -f "$TMP/choices.json" "$KUHL_STATE/last-selection.json"
+chmod 600 "$KUHL_STATE/last-selection.json"
+# Do not treat optional missing extensions as proof of a successful complete desktop.
+"$KUHL_BIN" doctor || kuhl_warn 'A doctor check needs attention; inspect the log and Extension Manager.'
+printf '\nKuhl OS setup finished. Issues reported: %d\n' "$ISSUES"
+printf 'Log: %s\n' "$LOG"
+printf 'Desktop configuration takes effect fully after sign-out/reboot.\n'
+printf 'Manage extensions using Extension Manager after the next login.\n'
+if (( ISSUES > 0 )); then
+  printf 'Some optional installations failed. Review the log; reboot is not automatic when failures occurred.\n'
+  exit 1
+fi
+if chosen reboot && (( ! NO_REBOOT )); then
+  if [[ -t 0 ]]; then
+    printf '\nReboot now to finish Kuhl setup? [Y/n] '
+    IFS= read -r answer || answer='n'
+    if [[ -z "$answer" || "$answer" == y || "$answer" == Y ]]; then
+      printf 'Rebooting... save any work first (Ctrl+C to stop within 5 seconds).\n'
+      sleep 5
+      systemctl reboot || kuhl_warn 'Could not trigger reboot. Please reboot manually.'
+    else
+      printf 'Reboot postponed. Restart your computer when convenient.\n'
+    fi
+  else
+    printf 'No interactive terminal; please reboot manually.\n'
+  fi
+else
+  printf 'Reboot disabled in this run; restart later to load the installed extensions.\n'
+fi
