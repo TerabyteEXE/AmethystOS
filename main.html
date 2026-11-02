@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f8f2e8">
+  <meta name="description" content="Kuhl OS is a lean, cozy Fedora Workstation setup with warm themes, a simple launcher, and no bundled AI extras. Designed for PCs with 8 GB RAM or more.">
+  <title>Kuhl OS — Fedora, tidied up and made warm.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght,SOFT,WONK@9..144,600,50,1;9..144,700,50,1;9..144,800,50,1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f8f2e8; --paper: #fffaf2; --ink: #263329; --muted: #677267;
+      --dark: #273e32; --dark-ink: #fff8e9; --line: #dddccc;
+      --orange: #e5a35f; --coral: #e9a18e; --lime: #dce7c8;
+      --sage: #cbd9c7; --blue: #d1dfe0;
+      --scene-sky-top:#9ac1c4; --scene-sky-bottom:#f4cfab; --scene-far:#9dbbaf;
+      --scene-mid:#648b78; --scene-near:#3e675b; --scene-wall:#f4dec2;
+      --scene-floor:#bf846a; --scene-sun:#ffe1a1; --scene-screen:#314b48;
+      --scene-stars:0; --scene-glow:.3;
+      --shadow: 0 18px 55px rgba(50,56,35,.09);
+      font-synthesis: none;
+    }
+    :root[data-theme="dusk"] {
+      color-scheme:dark;
+      --bg:#191f23; --paper:#252d2e; --ink:#f4eada; --muted:#b4b8ae;
+      --dark:#d8c89f; --dark-ink:#262820; --line:#47504b;
+      --orange:#eeb674; --coral:#d99786; --lime:#384a40;
+      --sage:#364a41; --blue:#344b50;
+      --scene-sky-top:#39496b; --scene-sky-bottom:#a87683; --scene-far:#657d84;
+      --scene-mid:#4d6376; --scene-near:#344b57; --scene-wall:#665267;
+      --scene-floor:#775367; --scene-sun:#f4d49c; --scene-screen:#253846;
+      --scene-stars:1; --scene-glow:.65;
+      --shadow:0 18px 55px rgba(0,0,0,.2);
+    }
+    *, *::before, *::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:108px}
+    body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.65 'DM Sans',system-ui,sans-serif;transition:background .25s,color .25s;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    button, input{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    :focus-visible{outline:3px solid var(--orange);outline-offset:4px}
+    ::selection{background:var(--orange);color:#292e22}
+    .shell{width:min(1340px,calc(100% - 80px));margin-inline:auto}
+    .skip{position:absolute;left:18px;top:-70px;background:var(--paper);padding:12px 18px;z-index:1000;border-radius:8px}
+    .skip:focus{top:15px}
+    .eyebrow{display:inline-flex;align-items:center;gap:10px;font:700 11px/1.4 'JetBrains Mono',monospace;letter-spacing:.11em;text-transform:uppercase}
+    .eyebrow .dot{height:8px;width:8px;background:var(--orange);border-radius:50%;flex:none}
+    .button{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:53px;border:1px solid transparent;border-radius:100px;padding:13px 24px;text-decoration:none;background:var(--dark);color:var(--dark-ink);font:700 14px/1.1 'DM Sans',sans-serif;transition:transform .2s,background .2s,box-shadow .2s;white-space:nowrap}
+    .button:hover{transform:translateY(-2px);box-shadow:0 9px 16px #00000014}
+    .button:active{transform:translateY(0)}
+    .button svg{width:17px;height:17px}
+    .button.outline{color:var(--ink);background:transparent;border-color:var(--line)}
+    .button.small{min-height:42px;padding:10px 19px;font-size:13px}
+    .site-top{padding:15px 0 0}
+    .notice{display:flex;align-items:center;justify-content:center;gap:13px;min-height:35px;color:var(--muted);font-size:12px}
+    .notice .asterisk{font:800 18px/1 'Fraunces',Georgia,serif;color:#b8744d}
+    .nav-wrap{position:relative;z-index:20;border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;gap:35px;min-height:90px}
+    .brand{display:inline-flex;gap:11px;align-items:center;flex:none;text-decoration:none;font:800 29px/1 'Fraunces',Georgia,serif;letter-spacing:-.065em}
+    .brand-mark{position:relative;display:grid;place-items:center;width:37px;height:37px;border:2px solid var(--ink);border-radius:12px 12px 13px 13px;background:var(--orange);transform:rotate(-7deg)}
+    .brand-mark::before{content:"";position:absolute;inset:7px;border:2px solid #2d3830;border-radius:6px}
+    .brand-mark::after{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:#fff8df;top:11px;left:12px;box-shadow:7px 8px 0 -3px #263329}
+    .nav-links{margin-left:auto;display:flex;align-items:center;gap:33px}
+    .nav-links a{font-size:13px;font-weight:700;text-decoration:none;color:var(--muted);transition:color .2s}
+    .nav-links a:hover{color:var(--ink)}
+    .theme-toggle{height:43px;display:flex;gap:5px;padding:4px;background:var(--paper);border:1px solid var(--line);border-radius:100px}
+    .theme-toggle button{min-width:70px;border:0;border-radius:100px;background:transparent;color:var(--muted);font:700 12px 'DM Sans',sans-serif}
+    .theme-toggle button[aria-pressed="true"]{background:var(--dark);color:var(--dark-ink);box-shadow:0 2px 5px #00000012}
+    .header-demo{display:none}
+    .hero{display:grid;grid-template-columns:minmax(0,.90fr) minmax(0,1.10fr);gap:4.5%;align-items:center;padding:70px 0 98px;min-height:650px}
+    .hero-copy{padding:28px 0 38px}
+    .hero .eyebrow{margin-bottom:28px}
+    h1,h2,h3,p{margin-top:0}
+    h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:800}
+    h1{max-width:650px;margin:0 0 26px;font-size:clamp(58px,5.75vw,104px);line-height:1.01;letter-spacing:-.065em}
+    h1 em{font-weight:700;font-style:italic;color:#a77356;letter-spacing:-.055em}
+    [data-theme="dusk"] h1 em{color:#e8b58b}
+    .lead{max-width:490px;margin-bottom:30px;color:var(--muted);font-size:clamp(16px,1.45vw,19px);line-height:1.76}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:11px}
+    .hero-foot{display:flex;align-items:center;gap:13px;margin-top:26px;color:var(--muted);font-size:12px}
+    kbd{display:inline-block;padding:4px 7px;background:var(--paper);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;font:500 11px 'JetBrains Mono',monospace;color:var(--ink)}
+    .visual-wrap{position:relative;min-width:0;padding:12px 4px 23px 0}
+    .hero-art{position:relative;display:block;width:100%;aspect-ratio:760 / 630;background:var(--scene-wall);border:9px solid var(--paper);border-radius:30px;box-shadow:var(--shadow),0 0 0 1px var(--line);overflow:hidden;transform:rotate(1.1deg)}
+    .hero-art svg{display:block;width:100%;height:100%}
+    .art-label{position:absolute;left:-26px;top:53px;z-index:2;transform:rotate(-9deg);padding:14px 20px;border-radius:10px;background:#ffedbf;color:#4c4c38;box-shadow:0 6px 15px #2c2b281c;font:700 13px 'Fraunces',Georgia,serif}
+    .art-label::before{content:"✳";color:#b16a50;margin-right:8px}
+    .art-stamp{position:absolute;right:-17px;bottom:-12px;z-index:3;width:110px;aspect-ratio:1;border-radius:50%;background:#dca067;color:#2f392b;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(12deg);box-shadow:0 8px 25px #0002;font:700 12px/1.35 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.02em;border:5px solid var(--bg)}
+    .art-stamp span{display:block;max-width:73px}
+    .art-stamp span::before{content:"✳";display:block;font-size:23px;line-height:1.1;margin-bottom:4px}
+    .floating-leaf{position:absolute;left:-16px;bottom:43px;color:#a6b9a0;font:800 72px/1 'Fraunces',Georgia,serif;transform:rotate(-30deg);pointer-events:none}
+    .floaty{animation:floaty 7s ease-in-out infinite}
+    .steam{animation:steam 4s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
+    .steam.two{animation-delay:1.7s}
+    .lamp-light{animation:breathe 5s ease-in-out infinite;transform-origin:center}
+    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes steam{0%,100%{opacity:.13;transform:translateY(3px)}50%{opacity:.77;transform:translateY(-7px)}}
+    @keyframes breathe{0%,100%{opacity:.18}50%{opacity:.53}}
+    .content-section{padding:76px 0}
+    .section-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.52fr);gap:38px;align-items:end;margin-bottom:35px}
+    .section-top h2{max-width:710px;font-size:clamp(40px,4.1vw,65px);line-height:1.07;letter-spacing:-.055em;margin:12px 0 0}
+    .section-top p{max-width:350px;margin:0;color:var(--muted);line-height:1.8;font-size:15px}
+    .features{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:15px}
+    .feature{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:25px;min-height:265px;padding:31px 32px 28px;background:var(--paper);display:flex;flex-direction:column}
+    .feature h3{font-size:27px;letter-spacing:-.035em;line-height:1.12;margin:8px 0 10px}
+    .feature p{max-width:42ch;margin:0;color:var(--muted);font-size:14px;line-height:1.78}
+    .feature .number{font:600 11px 'JetBrains Mono',monospace;opacity:.65;letter-spacing:.07em}
+    .feature .icon-bubble{position:absolute;top:19px;right:21px;display:grid;place-items:center;width:59px;height:59px;border-radius:18px;transform:rotate(-8deg);border:1px solid #00000013}
+    .feature .icon-bubble svg{width:29px;height:29px;stroke:#304735;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .feature.look{grid-column:span 5;background:var(--sage)}
+    .feature.look p{color:var(--ink)}
+    .feature.look .icon-bubble{background:#fff1c8}
+    .feature.launcher{grid-column:span 7;background:var(--blue);display:grid;grid-template-columns:1fr 218px;gap:16px}
+    .feature.launcher p{color:var(--ink)}
+    .feature.launcher .number{color:var(--ink)}
+    .mini-window{align-self:center;justify-self:end;width:100%;padding:12px;background:#263d38;border-radius:15px;box-shadow:0 14px 22px #182e2d33;transform:rotate(3deg);color:#eeeadd}
+    .mini-title{display:flex;align-items:center;gap:5px;margin:0 0 10px}
+    .mini-title span{width:5px;height:5px;border-radius:50%;background:#dca46b}
+    .mini-search{padding:8px 9px;border-radius:7px;background:#f7ebd9;color:#41564e;font:600 10px 'DM Sans',sans-serif;white-space:nowrap}
+    .mini-item{margin-top:7px;display:flex;justify-content:space-between;font:500 9px 'JetBrains Mono',monospace;color:#c7d5cc;padding:5px 6px}
+    .mini-item.sel{color:#263c36;background:#ecb774;border-radius:5px}
+    .mini-window button{border:0;display:block;margin-top:9px;padding:5px 0 0;background:transparent;color:#f3c58f;font:600 10px 'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px}
+    .feature.extensions,.feature.security,.feature.removed{grid-column:span 4;min-height:248px}
+    .feature.extensions{background:#f2dfcb;color:#30372d}.feature.extensions p{color:#5d6156}
+    .feature.security{background:var(--paper)}
+    .feature.removed{background:var(--lime)}
+    .feature.extensions .icon-bubble{background:#f8eddf}
+    .feature.security .icon-bubble{background:var(--sage)}
+    .feature.removed .icon-bubble{background:#eebf86}
+    .philosophy{padding:60px 0 65px}
+    .philosophy-card{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:42px;align-items:center;padding:65px 7%;background:var(--dark);color:var(--dark-ink);border-radius:30px;overflow:hidden}
+    .philosophy-card::before{content:"✳";position:absolute;right:15px;top:-136px;color:currentColor;opacity:.06;font:800 480px/1 'Fraunces',Georgia,serif;pointer-events:none}
+    .philosophy-card h2{font-size:clamp(41px,4vw,67px);line-height:1.09;letter-spacing:-.05em;max-width:570px;margin:15px 0 18px}
+    .philosophy-card p{max-width:445px;opacity:.78;font-size:15px;line-height:1.85}
+    .philosophy-card .eyebrow .dot{background:var(--orange)}
+    .note-stack{position:relative;display:grid;gap:14px;max-width:370px;justify-self:end;width:100%}
+    .note{display:flex;align-items:center;gap:12px;padding:18px 20px;border-radius:14px;background:#f3e5cc;color:#334233;box-shadow:0 8px 22px #1116;font-size:13px;font-weight:700;transform:rotate(-2deg)}
+    .note:nth-child(2){background:#d4e0cf;transform:translateX(-17px) rotate(2deg)}
+    .note:nth-child(3){background:#ecc59d;transform:rotate(-1deg)}
+    .note svg{flex:none;width:21px;height:21px;stroke:#355849;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    /* Hardware requirements: same Fedora base, with a clear 8 GB Kuhl baseline. */
+    .requirements{padding-top:70px;padding-bottom:76px}
+    .requirements .section-top{margin-bottom:29px}
+    .requirements .section-top h2{max-width:720px}
+    .spec-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .spec{min-width:0;display:flex;flex-direction:column;gap:0;min-height:221px;padding:26px 26px 25px;background:var(--paper);border:1px solid var(--line);border-radius:23px}
+    .spec:nth-child(1){background:var(--sage)}
+    .spec:nth-child(2){background:var(--blue)}
+    .spec:nth-child(4){background:var(--lime)}
+    .spec-kicker{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.06em;opacity:.77;text-transform:uppercase}
+    .spec-value{display:block;margin:21px 0 10px;font:800 clamp(28px,3vw,42px)/1.04 'Fraunces',Georgia,serif;letter-spacing:-.055em}
+    .spec p{max-width:28ch;margin:auto 0 0;font-size:13px;line-height:1.7;color:var(--muted)}
+    .spec:nth-child(1) p,.spec:nth-child(2) p,.spec:nth-child(4) p{color:var(--ink);opacity:.81}
+    .spec-caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 22px;margin:18px 2px 0;color:var(--muted);font-size:12px;line-height:1.8}
+    .spec-caption p{margin:0}
+    .spec-caption a{text-decoration-thickness:1px;text-underline-offset:3px}
+    .spec-caption a:hover{color:var(--ink)}
+    .install{padding:78px 0 112px}
+    .install-grid{display:grid;grid-template-columns:.88fr 1.12fr;gap:8%;align-items:center}
+    .install h2{font-size:clamp(44px,4.5vw,70px);line-height:1.08;letter-spacing:-.06em;margin:15px 0 17px}
+    .install p{color:var(--muted);line-height:1.85;max-width:440px}
+    .install .small-note{font-size:12px;margin-top:25px;color:var(--muted)}
+    .terminal{overflow:hidden;background:#232d2b;color:#e8ecdd;border-radius:19px;box-shadow:0 20px 42px #00000016}
+    .terminal-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 19px;border-bottom:1px solid #ffffff20;font:500 11px 'JetBrains Mono',monospace;color:#c2cbbd}
+    .terminal-dots{display:flex;gap:7px}
+    .terminal-dots i{display:block;width:9px;height:9px;border-radius:50%;background:#e7a28c}.terminal-dots i:nth-child(2){background:#e4c082}.terminal-dots i:nth-child(3){background:#a8c5a6}
+    .terminal-body{padding:28px 25px 30px;min-height:182px;font:500 clamp(11px,1.15vw,14px)/1.95 'JetBrains Mono',monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .terminal-body .comment{color:#9eb3a8}.terminal-body .prompt{color:#f0bc7d}
+    .terminal-bottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px 17px;border-top:1px solid #ffffff20}
+    .terminal-bottom span{color:#bfc9ba;font:500 11px 'JetBrains Mono',monospace}
+    .terminal-bottom button{border:1px solid #a3ab9d;background:transparent;color:#e3eadb;border-radius:100px;padding:9px 14px;font:700 11px 'DM Sans',sans-serif;transition:background .2s}
+    .terminal-bottom button:hover{background:#ffffff17}
+    footer{border-top:1px solid var(--line);padding:32px 0 45px}
+    .footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:25px}
+    footer .brand{font-size:24px}footer .brand-mark{transform:rotate(-7deg) scale(.85);margin-right:-4px}
+    footer p{max-width:665px;font-size:12px;color:var(--muted);line-height:1.85;margin:0}
+    #overlay{position:fixed;inset:0;z-index:100;background:#121916b9;backdrop-filter:blur(12px);display:none;align-items:flex-start;justify-content:center;padding:clamp(70px,15vh,170px) 20px 30px;overflow:auto}
+    #overlay.on{display:flex}
+    .launcher-dialog{width:min(580px,100%);background:#fdf7ed;color:#2c3c31;border:1px solid #ffffffb8;border-radius:21px;box-shadow:0 32px 95px #111b16b0;overflow:hidden;animation:launcher-in .18s ease-out}
+    @keyframes launcher-in{from{opacity:0;transform:translateY(-9px) scale(.98)}to{opacity:1;transform:none}}
+    .launcher-header{display:flex;gap:10px;align-items:center;padding:15px 18px 12px;border-bottom:1px solid #e3ddd0}
+    .launcher-icon{display:grid;place-items:center;flex:none;height:36px;width:36px;border-radius:10px;background:#e7b176;color:#344c3f;font:800 19px 'Fraunces',Georgia,serif}
+    .launcher-header input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:#263c31;font:600 18px 'DM Sans',sans-serif}
+    .launcher-header input::placeholder{color:#8c968a}
+    .launcher-header kbd{flex:none;background:#eae8df;border-color:#d6d9cb;color:#667065}
+    #results{list-style:none;max-height:55vh;overflow-y:auto;margin:0;padding:10px}
+    #results li{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0;padding:13px 15px;border-radius:11px;cursor:pointer;font-size:14px;font-weight:700}
+    #results li small{font-size:12px;color:#7c897b;font-weight:500}
+    #results li.selected{background:#eec78e;color:#344033}#results li.selected small{color:#5e654f}
+    #results li.empty{cursor:default;color:#778276;font-weight:500}
+    .launcher-footer{padding:14px 18px;background:#f3ebdc;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#687c6a;font-size:11px}
+    .launcher-footer strong{font-weight:700;color:#344d3a}
+    #toast{position:fixed;z-index:120;left:50%;bottom:max(25px,env(safe-area-inset-bottom));max-width:calc(100vw - 30px);transform:translate(-50%,15px);opacity:0;pointer-events:none;background:#283d31;color:#fff9eb;border:1px solid #ffffff30;border-radius:100px;padding:13px 20px;text-align:center;box-shadow:0 14px 42px #0003;font:700 13px 'DM Sans',sans-serif;transition:opacity .2s,transform .2s}
+    #toast.on{transform:translate(-50%,0);opacity:1}
+    @media(max-width:1110px){.shell{width:min(100% - 52px,1140px)}.nav-links{gap:18px}.hero{gap:30px}.hero h1{font-size:clamp(54px,6vw,81px)}.feature.launcher{grid-template-columns:1fr 160px}.feature{padding:26px}.mini-window{padding:9px}}
+    @media(max-width:800px){.shell{width:calc(100% - 40px)}.nav{min-height:77px}.nav-links{display:none}.theme-toggle{margin-left:auto}.header-demo{display:inline-flex}.hero{grid-template-columns:1fr;padding:44px 0 70px;gap:32px;min-height:auto}.hero-copy{padding:10px 0}.hero h1{max-width:700px;font-size:clamp(57px,9vw,85px)}.lead{max-width:610px}.visual-wrap{width:min(640px,96%);justify-self:center}.section-top{grid-template-columns:1fr;gap:15px}.section-top p{max-width:590px}.content-section{padding:60px 0}.features .feature.look,.features .feature.launcher{grid-column:span 6}.feature.launcher{grid-template-columns:1fr;min-height:265px}.mini-window{display:none}.feature.extensions,.feature.security,.feature.removed{grid-column:span 4}.philosophy-card{padding:45px 6%;gap:25px}.spec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.spec{min-height:205px}.install-grid{grid-template-columns:1fr;gap:32px}.install{padding:45px 0 80px}.install p{max-width:700px}}
+    @media(max-width:590px){.shell{width:calc(100% - 34px)}.notice{font-size:10px;gap:7px;text-align:center}.brand{font-size:25px}.brand-mark{width:32px;height:32px}.brand-mark::before{inset:6px}.brand-mark::after{top:9px;left:10px}.theme-toggle button{min-width:53px}.header-demo{display:none}.nav{gap:10px}.hero{padding-top:40px;gap:22px}.hero .eyebrow{margin-bottom:22px}.hero h1{font-size:clamp(50px,12vw,70px);margin-bottom:18px}.hero .lead{font-size:16px}.button{min-height:49px;padding:12px 18px}.hero-actions{gap:9px}.visual-wrap{width:95%;padding-bottom:15px}.hero-art{border-width:6px;border-radius:21px}.art-label{font-size:10px;padding:10px 13px;left:-15px;top:28px}.art-stamp{width:76px;font-size:9px;bottom:-4px;right:-10px;border-width:3px}.art-stamp span{max-width:55px}.art-stamp span::before{font-size:18px}.floating-leaf{display:none}.section-top h2,.philosophy-card h2{font-size:clamp(40px,10vw,55px)}.section-top{margin-bottom:24px}.features .feature.look,.features .feature.launcher,.features .feature.extensions,.features .feature.security,.features .feature.removed{grid-column:span 12}.feature{min-height:190px!important;border-radius:21px;padding:26px}.feature h3{font-size:27px}.feature p{max-width:90%}.features{gap:12px}.philosophy{padding:42px 0}.philosophy-card{grid-template-columns:1fr;padding:40px 30px 46px;border-radius:24px}.note-stack{max-width:340px;justify-self:start;margin-top:9px}.note{padding:14px 16px}.requirements{padding-top:44px;padding-bottom:44px}.spec-grid{grid-template-columns:1fr;gap:11px}.spec{min-height:0;padding:23px 25px}.spec-value{margin:12px 0}.spec p{margin:0}.spec-caption{margin-top:16px}.install h2{font-size:53px}.footer-inner{flex-direction:column}.terminal-body{font-size:11px;padding:24px 17px;min-height:152px}.launcher-footer{font-size:10px}.launcher-header input{font-size:15px}#results li{padding:11px 9px}#results li small{font-size:10px}#overlay{padding-top:12vh}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <div class="site-top shell">
+    <div class="notice"><span class="asterisk" aria-hidden="true">✳</span> Made for slower mornings, later nights, and everything in between.</div>
+  </div>
+  <div class="nav-wrap">
+    <nav class="nav shell" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Kuhl OS — back to top"><span class="brand-mark" aria-hidden="true"></span>Kuhl OS</a>
+      <div class="nav-links"><a href="#idea">The idea</a><a href="#features">What's inside</a><a href="#requirements">Requirements</a><a href="#install">Install</a></div>
+      <div class="theme-toggle" role="group" aria-label="Website preview color theme">
+        <button type="button" id="day" aria-pressed="true" title="Day palette">Day</button>
+        <button type="button" id="dusk" aria-pressed="false" title="Dusk palette">Dusk</button>
+      </div>
+      <button class="button small header-demo" type="button" data-launcher-open>Try launcher <span aria-hidden="true">↗</span></button>
+    </nav>
+  </div>
+
+  <main id="content">
+    <section class="shell hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span>A softer side of Fedora</span>
+        <h1 id="hero-title">Fedora, tidied up <em>and made warm.</em></h1>
+        <p class="lead">Kuhl is a small customization for Fedora Workstation: warm colors, one consistent font, a Ctrl+Space launcher, and fewer unnecessary extras. No bundled AI features or complicated layers.</p>
+        <div class="hero-actions">
+          <button type="button" class="button" data-launcher-open>Try the launcher
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+          </button>
+          <a class="button outline" href="#install">How to install <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-foot"><span>Or press</span><span><kbd>Ctrl</kbd> + <kbd>Space</kbd></span><span>to take a peek.</span></div>
+      </div>
+      <div class="visual-wrap">
+        <div class="art-label">a little room to breathe</div>
+        <div class="hero-art">
+          <!-- Original vector illustration, created for this page. No borrowed Chillhop artwork. -->
+          <svg viewBox="0 0 760 630" role="img" aria-label="A cozy illustrated Fedora workstation at a wooden desk, overlooking mountains in a golden evening sky, with a lamp, plant and warm mug">
+            <defs>
+              <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--scene-sky-top)"/><stop offset="1" stop-color="var(--scene-sky-bottom)"/></linearGradient>
+              <radialGradient id="lampglow"><stop offset="0" stop-color="#ffe5a8" stop-opacity=".72"/><stop offset="1" stop-color="#ffe5a8" stop-opacity="0"/></radialGradient>
+              <linearGradient id="desk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a97259"/><stop offset="1" stop-color="#885e52"/></linearGradient>
+              <clipPath id="windowClip"><rect x="64" y="47" width="632" height="396" rx="22"/></clipPath>
+            </defs>
+            <!-- room -->
+            <rect width="760" height="630" fill="var(--scene-wall)"/>
+            <rect x="44" y="29" width="672" height="435" rx="30" fill="#4b514b" opacity=".36"/>
+            <!-- landscape behind the window -->
+            <g clip-path="url(#windowClip)">
+              <rect x="64" y="47" width="632" height="396" fill="url(#sky)"/>
+              <g opacity="var(--scene-stars)" fill="#fff1c6"><circle cx="137" cy="89" r="2"/><circle cx="256" cy="112" r="2"/><circle cx="359" cy="83" r="1.7"/><circle cx="600" cy="123" r="2"/><circle cx="647" cy="93" r="1.5"/><circle cx="473" cy="66" r="2"/><circle cx="307" cy="163" r="1.5"/><circle cx="536" cy="155" r="1.7"/></g>
+              <circle cx="558" cy="155" r="64" fill="var(--scene-sun)"/>
+              <g fill="#fff3d8" opacity=".5"><path d="M98 151c14-20 50-20 64 0h52c22 0 23 17 0 18H89c-16 0-14-18 9-18z"/><path d="M319 102c10-12 29-12 39 0h40c15 0 15 12 0 12H305c-13 0-10-12 14-12z"/></g>
+              <path d="M53 298C106 278 148 260 198 274c53-67 112-90 174-47 40-34 92-34 135-10 74-49 138-34 215 20l30 112H53Z" fill="var(--scene-far)"/>
+              <path d="M50 340c75-73 140-93 200-52 53-51 118-48 175 8 78-65 144-36 198 9 51-29 97-6 135 39v125H50Z" fill="var(--scene-mid)"/>
+              <path d="M46 377c75-27 127-16 191 19 55-31 123-30 192-3 94-66 175-45 290-9v82H46Z" fill="var(--scene-near)"/>
+              <path d="M64 383c112-7 183 25 291 19 105-5 173-43 341-11v68H64Z" fill="#b1b6a0" opacity=".43"/>
+              <g stroke="#325247" stroke-width="7" stroke-linecap="round" opacity=".7"><path d="M98 408v-65m0 10-22 25m22-18 20 20"/><path d="M134 415v-83m0 14-24 31m24-15 21 29"/><path d="M637 422v-88m0 16-21 25m21-15 24 31"/><path d="M672 416v-65m0 10-22 24m22-17 15 16"/></g>
+            </g>
+            <!-- window frame and light -->
+            <rect x="64" y="47" width="632" height="396" rx="22" fill="none" stroke="#f4e6d0" stroke-width="13"/>
+            <path d="M380 49v388" stroke="#e6d4bd" stroke-width="13"/>
+            <path d="M70 315h620" stroke="#e6d4bd" stroke-width="10"/>
+            <path d="M81 73v214" stroke="#fff8ee" stroke-width="4" opacity=".33"/>
+            <!-- curtains -->
+            <path d="M0 0h100c-11 60 22 104-4 162C68 224 90 284 47 329L0 357Z" fill="#d3a188" opacity=".89"/>
+            <path d="M760 0h-100c13 66-16 120 9 166 34 63 9 122 49 182l42 20Z" fill="#d3a188" opacity=".89"/>
+            <path d="M25 0C62 87 30 202 50 315M732 0c-40 109 1 235-30 322" fill="none" stroke="#e6bd9c" stroke-width="9" opacity=".5"/>
+            <!-- front wall, floor and desk -->
+            <rect x="0" y="450" width="760" height="180" fill="var(--scene-floor)"/>
+            <path d="M0 456h760" stroke="#e1b296" stroke-width="11"/>
+            <path d="M0 557c143-34 270-38 420-7 140 31 233 21 340-8v88H0Z" fill="#986d60" opacity=".32"/>
+            <ellipse cx="384" cy="578" rx="322" ry="36" fill="#4b3937" opacity=".22"/>
+            <rect x="18" y="496" width="724" height="28" rx="11" fill="url(#desk)"/>
+            <rect x="42" y="520" width="24" height="110" rx="5" fill="#795647"/>
+            <rect x="694" y="520" width="24" height="110" rx="5" fill="#795647"/>
+            <path d="M24 503h710" stroke="#e0af89" stroke-width="4" opacity=".8"/>
+            <!-- poster on interior wall -->
+            <rect x="90" y="351" width="91" height="106" rx="4" fill="#eed6af" stroke="#aa7964" stroke-width="7"/>
+            <circle cx="134" cy="394" r="19" fill="#d6a67d"/>
+            <path d="M101 431c21-32 51-31 70 1" fill="#738b73"/>
+            <!-- plant -->
+            <path d="M89 495l-13-67h77l-13 67z" fill="#d68a6e"/>
+            <path d="M84 428h65" stroke="#b56554" stroke-width="6"/>
+            <g fill="#4b7b67"><ellipse cx="114" cy="394" rx="16" ry="50" transform="rotate(-26 114 394)"/><ellipse cx="127" cy="379" rx="16" ry="54" transform="rotate(16 127 379)"/><ellipse cx="98" cy="404" rx="15" ry="39" transform="rotate(-57 98 404)"/><ellipse cx="145" cy="404" rx="14" ry="35" transform="rotate(44 145 404)"/></g>
+            <path d="M117 428v-79" stroke="#b3ca9d" stroke-width="4" fill="none"/>
+            <!-- laptop -->
+            <path d="M228 483l26-188a16 16 0 0 1 16-13h260a16 16 0 0 1 16 13l27 188Z" fill="#293e3a" stroke="#e6c49e" stroke-width="8" stroke-linejoin="round"/>
+            <rect x="267" y="307" width="244" height="157" rx="10" fill="var(--scene-screen)"/>
+            <rect x="282" y="323" width="214" height="128" rx="7" fill="#65877c"/>
+            <circle cx="443" cy="350" r="22" fill="#e6bb88"/>
+            <path d="M282 414c61-59 110-49 153-17 28-20 47-17 61-2v56H282Z" fill="#395d53"/>
+            <rect x="307" y="345" width="161" height="84" rx="9" fill="#f6efdd" opacity=".98"/>
+            <circle cx="322" cy="358" r="3" fill="#b87761"/><circle cx="332" cy="358" r="3" fill="#e2b06e"/><circle cx="342" cy="358" r="3" fill="#8ba997"/>
+            <rect x="320" y="370" width="133" height="21" rx="8" fill="#e1e8da"/>
+            <circle cx="331" cy="380.5" r="4" fill="#6d8171"/>
+            <rect x="342" y="378" width="78" height="5" rx="2.5" fill="#8b9a85"/>
+            <rect x="320" y="398" width="80" height="5" rx="2.5" fill="#a9ba9d"/>
+            <rect x="320" y="410" width="105" height="5" rx="2.5" fill="#d0bc9a"/>
+            <path d="M224 484h356l27 13c4 2 1 8-5 8H203c-8 0-9-6-3-9Z" fill="#ddc7aa"/>
+            <rect x="356" y="485" width="78" height="8" rx="4" fill="#bba388"/>
+            <!-- laptop sticker -->
+            <path d="M401 295h15" stroke="#edd8b8" stroke-width="4" stroke-linecap="round"/>
+            <!-- desk lamp and glow -->
+            <ellipse class="lamp-light" cx="626" cy="389" rx="137" ry="121" fill="url(#lampglow)"/>
+            <path d="M645 492v-95l-32-44" fill="none" stroke="#f5d6a2" stroke-width="11" stroke-linecap="round"/>
+            <path d="M592 358l40-49 40 37-15 20-51 13z" fill="#e4ab77" stroke="#b87d63" stroke-width="5" stroke-linejoin="round"/>
+            <rect x="617" y="488" width="57" height="9" rx="4" fill="#e7c79d"/>
+            <!-- mug -->
+            <ellipse cx="575" cy="485" rx="44" ry="9" fill="#654944" opacity=".25"/>
+            <rect x="538" y="442" width="54" height="47" rx="11" fill="#f4c49a"/>
+            <path d="M590 454c28-8 31 22 3 23" stroke="#f4c49a" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <ellipse cx="565" cy="445" rx="25" ry="5" fill="#8b6155"/>
+            <g stroke="#fff2d3" stroke-width="5" fill="none" stroke-linecap="round"><path class="steam" d="M558 427c-12-18 7-21 0-38"/><path class="steam two" d="M575 425c-11-19 8-20 1-37"/></g>
+            <!-- little notebook and pen -->
+            <path d="M172 481l78-9 17 22-75 8Z" fill="#ecd3af"/>
+            <path d="M181 484l68-7" stroke="#c4997a" stroke-width="2"/>
+            <path d="M206 476l55-14" stroke="#415e50" stroke-width="5" stroke-linecap="round"/>
+            <!-- environmental finishing accents -->
+            <path d="M26 544h120M620 544h104" stroke="#e3ae87" stroke-width="3" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="art-stamp"><span>your space, your pace</span></div>
+        <span class="floating-leaf" aria-hidden="true">❧</span>
+      </div>
+    </section>
+
+    <section class="shell content-section" id="idea" aria-labelledby="idea-title">
+      <div class="section-top">
+        <div><span class="eyebrow"><span class="dot"></span>01 / The idea</span><h2 id="idea-title">A familiar desktop.<br>A better feeling.</h2></div>
+        <p>No big reinvention. Just a few thoughtful changes to make a fresh Fedora Workstation feel a little more like home.</p>
+      </div>
+      <div class="features" id="features">
+        <article class="feature look">
+          <span class="number">01 / LOOK & FEEL</span>
+          <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="6"/><path d="M16 2v5m0 18v5M2 16h5m18 0h5M6 6l4 4m12 12 4 4M26 6l-4 4M10 22l-4 4"/></svg></span>
+          <div style="margin-top:auto;padding-top:65px"><h3>Look</h3><p>A warm dark theme (light variant too), matching icons and cursor, one font family, a few wallpapers.</p></div>
+        </article>
+        <article class="feature launcher">
+          <div style="display:flex;flex-direction:column"><span class="number">02 / ONE SIMPLE SHORTCUT</span><div style="margin-top:auto;padding-top:59px"><h3>Launcher</h3><p>Ctrl+Space opens one search box for apps, files and settings.</p></div></div>
+          <div class="mini-window" aria-label="Decorative preview of the Kuhl launcher">
+            <div class="mini-title"><span></span><span></span><span></span></div>
+            <div class="mini-search">⌕&nbsp; Search anything...</div>
+            <div class="mini-item sel">Firefox <span>↗</span></div><div class="mini-item">Files <span>↗</span></div><div class="mini-item">Terminal <span>↗</span></div>
+            <button type="button" data-launcher-open>Try it yourself →</button>
+          </div>
+        </article>
+        <article class="feature extensions">
+          <span class="number">03 / KEEP IT SMALL</span>
+          <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M12 4H5v9h5a4 4 0 0 1 0 6H5v9h9v-5a4 4 0 0 1 6 0v5h8v-9h-5a4 4 0 0 1 0-6h5V4h-9v5a4 4 0 0 1-6 0V4z"/></svg></span>
+          <div style="margin-top:auto;padding-top:65px"><h3>Extensions</h3><p>Four or fewer. Extensions are what breaks when GNOME updates, so the list stays short.</p></div>
+        </article>
+        <article class="feature security">
+          <span class="number">04 / STAY PROTECTED</span>
+          <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3 27 7v8c0 8-5 12-11 14C10 27 5 23 5 15V7z"/><path d="m11 16 3 3 7-7"/></svg></span>
+          <div style="margin-top:auto;padding-top:65px"><h3>Security</h3><p>Nothing is turned off or replaced. SELinux, the firewall and Fedora’s update system stay as shipped.</p></div>
+        </article>
+        <article class="feature removed">
+          <span class="number">05 / NO UNNECESSARY EXTRAS</span>
+          <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M6 10h20m-18 0 2 18h12l2-18M12 6h8M13 14v10m6-10v10"/></svg></span>
+          <div style="margin-top:auto;padding-top:65px"><h3>Less bloat. No AI.</h3><p>No bundled AI assistants, chatbots or background AI services. The planned setup trims optional apps without removing Fedora’s essential tools. Add what you want with Flatpak.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="shell philosophy" aria-labelledby="philosophy-title">
+      <div class="philosophy-card">
+        <div><span class="eyebrow"><span class="dot"></span>Made to feel familiar</span><h2 id="philosophy-title">The little things make a place feel yours.</h2><p>Kuhl is still Fedora underneath. It isn't a new distribution, a replacement update system or a complicated stack of modifications. It stays close to stock Fedora — just cleaner and cozier.</p></div>
+        <div class="note-stack" aria-label="Kuhl design principles">
+          <div class="note"><svg viewBox="0 0 24 24"><path d="M4 12h16m-8-8v16"/></svg>Small changes, thoughtfully picked</div>
+          <div class="note"><svg viewBox="0 0 24 24"><path d="M4 12 9 17 20 6"/></svg>Fedora security left alone</div>
+          <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 13c2 3 6 3 8 0M9 9h.01M15 9h.01"/></svg>No AI integrations or bundled clutter</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell content-section requirements" id="requirements" aria-labelledby="requirements-title">
+      <div class="section-top">
+        <div><span class="eyebrow"><span class="dot"></span>02 / Before you begin</span><h2 id="requirements-title">A little room to run.</h2></div>
+        <p>Kuhl follows Fedora Workstation’s hardware compatibility, with an 8 GB memory baseline for a comfortable everyday desktop.</p>
+      </div>
+      <div class="spec-grid" aria-label="Kuhl OS target system requirements">
+        <article class="spec"><span class="spec-kicker">Memory · Kuhl minimum</span><strong class="spec-value">8 GB RAM</strong><p>16 GB is a nice upgrade if you keep lots of apps and browser tabs open.</p></article>
+        <article class="spec"><span class="spec-kicker">Free storage</span><strong class="spec-value">40 GB</strong><p>80 GB or more and an SSD are recommended for extra space and speed.</p></article>
+        <article class="spec"><span class="spec-kicker">Processor</span><strong class="spec-value">64-bit PC</strong><p>Compatible Intel or AMD x86_64 hardware, suitable for Fedora Workstation.</p></article>
+        <article class="spec"><span class="spec-kicker">Graphics &amp; display</span><strong class="spec-value">Fedora-ready</strong><p>Graphics capable of running the Fedora GNOME desktop. Hardware support varies.</p></article>
+      </div>
+      <div class="spec-caption">
+        <p>To install Fedora, also have an internet connection and a 4 GB or larger USB drive for the installer.</p>
+        <p>8 GB RAM is <strong>Kuhl’s chosen minimum</strong>, not Fedora’s absolute minimum. <a href="https://fedoraproject.org/workstation/download/" target="_blank" rel="noopener noreferrer">Check Fedora’s official requirements ↗</a></p>
+      </div>
+    </section>
+
+    <section class="shell install" id="install" aria-labelledby="install-title">
+      <div class="install-grid">
+        <div><span class="eyebrow"><span class="dot"></span>03 / Get settled in</span><h2 id="install-title">Make yourself at home.</h2><p>Start from a fresh Fedora Workstation on a compatible PC with at least 8 GB of RAM. When the Kuhl setup script is released, follow its instructions to apply the theme, launcher and lean app defaults.</p><p class="small-note">Kuhl’s setup script and app-removal steps are still planned, not available yet. The command shown is only an example — do not run it.</p></div>
+        <div class="terminal" aria-label="Future installation terminal example">
+          <div class="terminal-bar"><div class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>kuhl ~ terminal</span><span>● preview</span></div>
+          <div class="terminal-body"><span class="comment"># The installation script is coming soon.</span>
+<span class="comment"># Example only — do not run this command:</span>
+<span class="prompt">$</span> curl -fsSL kuhl.example/install.sh | bash
+
+<span class="comment"># Check back for the official release. ✳</span></div>
+          <div class="terminal-bottom"><span>Not published yet · demo only</span><button type="button" id="copy-example">Copy example</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell footer-inner"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kuhl OS</a><p>Kuhl OS is a Fedora Workstation customization. It isn’t affiliated with or endorsed by the Fedora Project or Red Hat. Fedora is a trademark of Red Hat, Inc.</p></div></footer>
+
+  <div id="overlay" role="dialog" aria-modal="true" aria-label="App launcher demo" aria-hidden="true">
+    <div class="launcher-dialog">
+      <div class="launcher-header"><span class="launcher-icon" aria-hidden="true">✳</span><input id="search" aria-label="Search the sample app launcher" aria-controls="results" aria-activedescendant="" role="combobox" aria-autocomplete="list" aria-expanded="true" placeholder="Search apps, files, settings..." autocomplete="off" spellcheck="false"><kbd>ESC</kbd></div>
+      <ul id="results" role="listbox" aria-label="Launcher results"></ul>
+      <div class="launcher-footer"><span><strong>↑ ↓</strong> Move &nbsp; <strong>Enter</strong> Select &nbsp; <strong>Esc</strong> Close</span><span>Interactive preview</span></div>
+    </div>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+  (() => {
+    'use strict';
+    const root = document.documentElement;
+    const overlay = document.getElementById('overlay');
+    const search = document.getElementById('search');
+    const results = document.getElementById('results');
+    const toast = document.getElementById('toast');
+    const day = document.getElementById('day');
+    const dusk = document.getElementById('dusk');
+    const items = [
+      ['Files','Browse your folders'],['Terminal','Kitty'],['Firefox','Web browser'],
+      ['Lo-fi Radio','Play something calm'],['Notes','Quick notes'],['Settings','System'],
+      ['Theme: Dark','Appearance'],['Theme: Light','Appearance'],
+      ['Update Kuhl','Re-run the script'],['Lock screen','Take a break']
+    ];
+    let filtered = items.slice();
+    let selected = 0;
+    let lastFocused = null;
+    let toastTimeout;
+    const availableTheme = theme => theme === 'dusk' ? 'dusk' : 'day';
+    function setTheme(theme, save = true) {
+      theme = availableTheme(theme);
+      if (theme === 'dusk') root.dataset.theme = 'dusk';
+      else root.removeAttribute('data-theme');
+      day.setAttribute('aria-pressed', String(theme === 'day'));
+      dusk.setAttribute('aria-pressed', String(theme === 'dusk'));
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dusk' ? '#191f23' : '#f8f2e8');
+      if (save) { try { localStorage.setItem('kuhl-site-theme', theme); } catch (_) {} }
+    }
+    try { setTheme(availableTheme(localStorage.getItem('kuhl-site-theme')), false); } catch (_) { setTheme('day', false); }
+    day.addEventListener('click', () => setTheme('day'));
+    dusk.addEventListener('click', () => setTheme('dusk'));
+
+    function announce(message) {
+      toast.textContent = message;
+      toast.classList.add('on');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('on'), 2400);
+    }
+    function mark() {
+      for (let i = 0; i < results.children.length; i++) {
+        const node = results.children[i];
+        const isSelected = Boolean(filtered.length) && i === selected;
+        node.classList.toggle('selected', isSelected);
+        node.setAttribute('aria-selected', String(isSelected));
+      }
+      search.setAttribute('aria-activedescendant', filtered.length ? `result-${selected}` : '');
+      const current = results.children[selected];
+      if (current) current.scrollIntoView({ block:'nearest' });
+    }
+    function render() {
+      const text = search.value.trim().toLowerCase();
+      filtered = items.filter(item => item[0].toLowerCase().includes(text) || item[1].toLowerCase().includes(text));
+      selected = Math.max(0, Math.min(selected, filtered.length - 1));
+      results.replaceChildren();
+      if (!filtered.length) {
+        const empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.setAttribute('role','presentation');
+        empty.textContent = 'Nothing found. Try “files” or “theme”.';
+        results.append(empty);
+        search.removeAttribute('aria-activedescendant');
+        return;
+      }
+      filtered.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.id = `result-${index}`;
+        li.setAttribute('role','option');
+        const name = document.createElement('span');
+        const description = document.createElement('small');
+        name.textContent = item[0];
+        description.textContent = item[1];
+        li.append(name, description);
+        li.addEventListener('mouseenter', () => { selected = index; mark(); });
+        li.addEventListener('click', () => activate(item));
+        results.append(li);
+      });
+      mark();
+    }
+    function openLauncher() {
+      if (overlay.classList.contains('on')) return;
+      lastFocused = document.activeElement;
+      overlay.classList.add('on');
+      overlay.setAttribute('aria-hidden','false');
+      search.setAttribute('aria-expanded','true');
+      document.body.style.overflow = 'hidden';
+      search.value = '';
+      selected = 0;
+      render();
+      search.focus();
+    }
+    function closeLauncher() {
+      if (!overlay.classList.contains('on')) return;
+      overlay.classList.remove('on');
+      overlay.setAttribute('aria-hidden','true');
+      document.body.style.overflow = '';
+      search.setAttribute('aria-expanded','false');
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    }
+    function activate(item) {
+      closeLauncher();
+      const match = /^Theme: (Dark|Light)$/.exec(item[0]);
+      if (match) {
+        setTheme(match[1] === 'Dark' ? 'dusk' : 'day');
+        announce(`Switched to ${match[1].toLowerCase()} preview.`);
+      } else {
+        announce(`This is a demo — ${item[0]} would open here.`);
+      }
+    }
+    document.querySelectorAll('[data-launcher-open]').forEach(btn => btn.addEventListener('click', openLauncher));
+    search.addEventListener('input', () => { selected = 0; render(); });
+    document.addEventListener('keydown', event => {
+      if (event.ctrlKey && !event.altKey && !event.metaKey && event.code === 'Space') {
+        event.preventDefault();
+        overlay.classList.contains('on') ? closeLauncher() : openLauncher();
+        return;
+      }
+      if (!overlay.classList.contains('on')) return;
+      if (event.key === 'Escape') { event.preventDefault(); closeLauncher(); }
+      else if (event.key === 'ArrowDown') { event.preventDefault(); selected = Math.min(selected + 1, filtered.length - 1); mark(); }
+      else if (event.key === 'ArrowUp') { event.preventDefault(); selected = Math.max(selected - 1, 0); mark(); }
+      else if (event.key === 'Enter' && filtered[selected]) { event.preventDefault(); activate(filtered[selected]); }
+      else if (event.key === 'Tab') { event.preventDefault(); search.focus(); }
+    });
+    overlay.addEventListener('pointerdown', event => { if (event.target === overlay) closeLauncher(); });
+    const sample = '# Example only — not a published installer:\n# curl -fsSL kuhl.example/install.sh | bash';
+    document.getElementById('copy-example').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(sample);
+        announce('Example copied. This is not a working installer.');
+      } catch (_) {
+        // File:// pages can deny clipboard access; the fallback supports local previews.
+        const temp = document.createElement('textarea');
+        temp.value = sample;
+        temp.style.position='fixed'; temp.style.opacity='0';
+        document.body.append(temp);
+        temp.select();
+        const copied = document.execCommand('copy');
+        temp.remove();
+        announce(copied ? 'Example copied. This is not a working installer.' : 'Clipboard unavailable. Select the example in the terminal.');
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
