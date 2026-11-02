@@ -1,0 +1,21 @@
+@import url("resource:///org/gnome/shell/theme/gnome-shell.css");
+/* Kuhl OS Day — light-touch GNOME Shell styling. */
+stage { font-family: 'Noto Sans', sans-serif; }
+#panel {
+  background-color: rgba(250, 243, 224, 0.94);
+  color: #374943;
+  border-bottom: 1px solid rgba(74, 85, 66, 0.12);
+}
+#panel .panel-button { color: #374943; }
+#panel .panel-button:hover, #panel .panel-button:active {
+  background-color: rgba(164, 121, 84, 0.13);
+  border-radius: 10px;
+}
+.popup-menu-content, .quick-settings, .calendar, .message-list {
+  border-radius: 16px;
+}
+#dash .dash-background {
+  background-color: rgba(244, 234, 211, 0.86);
+  border: 1px solid rgba(87, 90, 72, 0.14);
+  border-radius: 20px;
+}

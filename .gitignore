@@ -1,0 +1,5 @@
+*.bak
+*.pre-kuhl.bak
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# Kuhl OS CLI.  Installed to ~/.local/bin/kuhl; no resident background process.
+set -Eeuo pipefail
+KUHL_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/kuhl"
+if [[ ! -f "$KUHL_DATA/common.sh" ]]; then
+  printf 'Kuhl OS is not installed. Run bash install.sh first.\n' >&2
+  exit 1
+fi
+# shellcheck source=lib/common.sh
+source "$KUHL_DATA/common.sh"
+
+case "${1:-help}" in
+  theme)
+    [[ $# -eq 2 ]] || { kuhl_error "Usage: kuhl theme day|dusk"; exit 2; }
+    [[ -f "$KUHL_DATA/wallpapers/kuhl-day.png" && -f "$KUHL_DATA/wallpapers/kuhl-dusk.png" ]] || { kuhl_error "Wallpapers are missing; rerun install.sh."; exit 1; }
+    kuhl_theme "$2"
+    ;;
+  extensions)
+    action="${2:-list}"
+    case "$action" in
+      list) python3 "$KUHL_DATA/extensions.py" list --profile "${3:-full}" --config "$KUHL_DATA/config" ;;
+      install) python3 "$KUHL_DATA/extensions.py" install --profile "${3:-full}" --config "$KUHL_DATA/config" ;;
+      uninstall) python3 "$KUHL_DATA/extensions.py" uninstall ;;
+      *) kuhl_error 'Usage: kuhl extensions list|install [full|balanced] OR kuhl extensions uninstall'; exit 2;;
+    esac
+    ;;
+  status)
+    printf 'Kuhl OS\n'
+    if kuhl_key_exists org.gnome.desktop.interface color-scheme; then
+      printf '  Appearance: %s\n' "$(gsettings get org.gnome.desktop.interface color-scheme)"
+    fi
+    printf '  Wallpapers: %s\n' "$KUHL_DATA/wallpapers"
+    printf '  Backup:     %s\n' "$KUHL_SETTINGS"
+    printf '  Extensions: %s\n' "$KUHL_DATA/config/extensions.tsv"
+    ;;
+  doctor)
+    problems=0
+    [[ -e /etc/fedora-release ]] && kuhl_info 'Fedora detected' || { kuhl_warn 'Not running on Fedora'; problems=$((problems+1)); }
+    [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]] && kuhl_info 'GNOME session detected' || { kuhl_warn 'Not currently in GNOME'; problems=$((problems+1)); }
+    for pkg in papirus-icon-theme papirus-icon-theme-light papirus-icon-theme-dark adw-gtk3-theme google-noto-sans-fonts jetbrains-mono-fonts; do
+      if command -v rpm >/dev/null && rpm -q "$pkg" >/dev/null 2>&1; then
+        kuhl_info "Installed package: $pkg"
+      else
+        kuhl_warn "Missing package: $pkg"; problems=$((problems+1))
+      fi
+    done
+    if kuhl_key_exists org.gnome.shell.keybindings toggle-overview; then
+      keys="$(gsettings get org.gnome.shell.keybindings toggle-overview)"
+      [[ "$keys" == *'<Control>space'* ]] && kuhl_info 'Ctrl+Space overview binding present' || { kuhl_warn 'Ctrl+Space overview binding missing'; problems=$((problems+1)); }
+    else
+      kuhl_warn 'GNOME overview shortcut schema not found'; problems=$((problems+1))
+    fi
+    if command -v gnome-extensions >/dev/null 2>&1; then
+      kuhl_info "Enabled extensions: $(gnome-extensions list --enabled 2>/dev/null | wc -l)"
+      gnome-extensions list --enabled 2>/dev/null | grep -Fxq user-theme@gnome-shell-extensions.gcampax.github.com || \
+        kuhl_warn 'User Themes not enabled; Kuhl Shell style may need another login.'
+    fi
+    [[ -f "$KUHL_SETTINGS" ]] && kuhl_info 'Previous settings backed up' || { kuhl_warn 'No saved settings'; problems=$((problems+1)); }
+    if (( problems > 0 )); then
+      kuhl_warn "$problems checks require attention"
+      exit 1
+    fi
+    kuhl_info 'All basic checks passed'
+    ;;
+  uninstall)
+    [[ $# -eq 1 ]] || { kuhl_error "Usage: kuhl uninstall"; exit 2; }
+    kuhl_info 'Restoring previous GNOME settings where Kuhl values are still unchanged...'
+    if [[ -f "$KUHL_SETTINGS" ]]; then
+      while IFS=$'\t' read -r schema key original applied || [[ -n "${schema:-}" ]]; do
+        [[ -z "$schema" ]] && continue
+        if kuhl_key_exists "$schema" "$key"; then
+          current="$(gsettings get "$schema" "$key")"
+          if [[ "$current" == "$applied" ]]; then
+            if ! gsettings set "$schema" "$key" "$original"; then
+              kuhl_warn "Couldn't restore $schema $key"
+              continue
+            fi
+          else
+            kuhl_warn "Keeping user-edited setting: $schema $key"
+          fi
+        fi
+      done < "$KUHL_SETTINGS"
+    fi
+    # Only uninstall Shell extensions that the Kuhl installer originally installed.
+    if [[ -f "$KUHL_DATA/extensions.py" ]]; then
+      python3 "$KUHL_DATA/extensions.py" uninstall || kuhl_warn 'Some installed extensions could not be removed.'
+    fi
+    if [[ -f "$KUHL_STATE/enabled-user-theme.txt" ]]; then
+      if command -v gnome-extensions >/dev/null 2>&1; then
+        gnome-extensions disable user-theme@gnome-shell-extensions.gcampax.github.com 2>/dev/null || \
+          kuhl_warn 'Could not disable Kuhl-enabled User Themes.'
+      fi
+      rm -f "$KUHL_STATE/enabled-user-theme.txt"
+    fi
+    for name in Day Dusk; do
+      target="$HOME/.themes/Kuhl-$name"
+      if [[ -f "$target/.kuhl-owned" ]]; then
+        rm -f "$target/gnome-shell/gnome-shell.css" "$target/.kuhl-owned"
+        rmdir "$target/gnome-shell" "$target" 2>/dev/null || true
+      fi
+    done
+    rm -f "$KUHL_APPS/kuhl-day.desktop" "$KUHL_APPS/kuhl-dusk.desktop"
+    # Keep installed Fedora packages: they might be used by other programs.
+    rm -f "$KUHL_BIN"
+    rm -rf -- "$KUHL_DATA/wallpapers"
+    rm -f -- "$KUHL_DATA/common.sh" "$KUHL_DATA/extensions.py" \
+      "$KUHL_DATA/config/extensions.tsv" "$KUHL_DATA/config/effects.tsv"
+    rmdir "$KUHL_DATA/config" 2>/dev/null || true
+    rmdir -- "$KUHL_DATA" 2>/dev/null || true
+    # The backup is retained for inspection; do not destroy the user's history.
+    kuhl_info "Removed Kuhl files; previous settings restored where possible."
+    kuhl_info "Saved setting history remains at $KUHL_SETTINGS. Fedora packages were not removed."
+    ;;
+  help|-h|--help)
+    cat <<'HELP'
+Kuhl OS — a cozy Fedora desktop
+
+  kuhl theme day    Switch to the light look
+  kuhl theme dusk   Switch to the dark look
+  kuhl status       Show installed paths and current mode
+  kuhl extensions list [full|balanced]
+  kuhl extensions install [full|balanced]
+  kuhl extensions uninstall    Remove only Kuhl-installed extensions
+  kuhl doctor       Check GNOME shortcut and installed components
+  kuhl uninstall    Restore saved preferences and remove Kuhl assets
+
+No AI services, telemetry, custom update services, or third-party RPM repos.
+HELP
+    ;;
+  *) kuhl_error "Unknown command: $1"; exit 2;;
+esac

@@ -1,0 +1,13 @@
+name: Validate Kuhl OS scripts
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  basic-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell scripts and assets (no system changes)
+        run: bash tests/validate.sh

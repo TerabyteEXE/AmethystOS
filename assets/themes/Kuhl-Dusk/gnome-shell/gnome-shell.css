@@ -1,0 +1,22 @@
+@import url("resource:///org/gnome/shell/theme/gnome-shell.css");
+/* Kuhl OS Dusk — light-touch GNOME Shell styling, no imported external theme.
+ * Everything else stays with the GNOME Shell stock theme. */
+stage { font-family: 'Noto Sans', sans-serif; }
+#panel {
+  background-color: rgba(29, 39, 52, 0.91);
+  color: #f5eadb;
+  border-bottom: 1px solid rgba(228, 176, 148, 0.15);
+}
+#panel .panel-button { color: #f5eadb; }
+#panel .panel-button:hover, #panel .panel-button:active {
+  background-color: rgba(227, 179, 156, 0.13);
+  border-radius: 10px;
+}
+.popup-menu-content, .quick-settings, .calendar, .message-list {
+  border-radius: 16px;
+}
+#dash .dash-background {
+  background-color: rgba(28, 42, 56, 0.78);
+  border: 1px solid rgba(251, 230, 207, 0.12);
+  border-radius: 20px;
+}
