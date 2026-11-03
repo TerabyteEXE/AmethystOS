@@ -44,10 +44,18 @@ assert 'listview,' not in (p/'configs/rofi/power.rasi').read_text()
 assert '"modules-left": ["pulseaudio", "battery", "niri/language"]' in (p/'configs/waybar/config.jsonc').read_text()
 assert 'font-size: 30px' in (p/'configs/waybar/style.css').read_text()
 assert 'alacritty' in (p/'install.sh').read_text()
-site=(p/'main.html').read_text()
+# GitHub Pages serves index.html. main.html is only an optional convenience copy
+# and may be absent from repositories uploaded through the GitHub website.
+website = p / 'index.html'
+assert website.is_file(), 'index.html is required for GitHub Pages'
+site = website.read_text(encoding='utf-8')
 for token in ('KyleOS','PrisonerCoin','AI-assisted','niri','Kuhl OS','copyInstall','bootstrap.sh','CC BY-NC-SA','GitHub'):
     assert token.lower() in site.lower(),token
-assert (p/'main.html').read_bytes()==(p/'index.html').read_bytes()
+legacy_website = p / 'main.html'
+if legacy_website.is_file():
+    assert legacy_website.read_bytes() == website.read_bytes(), 'main.html and index.html differ'
+else:
+    print('[test] Optional main.html absent; index.html is the canonical website')
 assert 'MIT License' in (p/'third_party/KyleOS-MIT.txt').read_text()
 assert 'CC BY-NC-SA' in (p/'docs/CREDITS.md').read_text()
 print('[test] Direct KyleOS config port, images, website, license, manifest: OK')

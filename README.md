@@ -10,7 +10,7 @@ The desktop incorporates MIT-licensed dotfiles from **[KyleOS](https://github.co
 
 **Artwork has a different license:** Kuhl includes *static PNG first-frame conversions AND the original GIF files* of four wallpapers from KyleOS, originally illustrated by **[PrisonerCoin](https://prisonercoin.newgrounds.com/)**. Those images are **CC BY-NC-SA 3.0, NOT MIT** and carry non-commercial and share-alike obligations. Their original artwork URLs and modification notes are in [`docs/CREDITS.md`](docs/CREDITS.md). The unlicensed `Survey` artwork and the massive third-party icon/GTK directories from KyleOS were **not** carried over. The original KyleOS font families are not bundled, so font metrics and some icons may differ until you install them yourself. The default `swaybg` wallpaper is static; exact KyleOS animated GIF playback needs optional `awww`, set via `KUHL_ANIMATED_WALLPAPER=1`, which Kuhl does not install automatically. The older Kuhl Day/Dusk palettes and wallpapers remain available. 
 
-The new `main.html` / `index.html` website is a pared-down, GitHub Pages-friendly landing page. Its desktop composition is **illustrative** rather than a live screenshot.
+The `index.html` website is a pared-down, GitHub Pages-friendly landing page (`main.html` is an optional duplicate, not required for tests or hosting). Its desktop composition is **illustrative** rather than a live screenshot.
 
 ## One-command installation
 
