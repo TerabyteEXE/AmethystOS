@@ -12,15 +12,15 @@ All internal links are relative so the site works from a GitHub Pages project su
 
 ## Keep the wiki accurate
 
-Every active shortcut in `payload/niri/keybinds.kdl` appears on the generated `wiki/keybinds.html` page. After adding or changing bindings:
+Every active shortcut in `payload/niri/keybinds.kdl` appears on the generated `wiki/keybinds.html` page. The plain home page is generated from `site_templates/home.html`. After adding or changing bindings:
 
 ```bash
 python3 scripts/build_site.py
 bash tests/validate.sh
 ```
 
-`--check` is used by CI to catch stale generated pages. Don't manually edit the generated HTML pages; update `scripts/build_site.py` instead.
+`--check` is used by CI to catch stale generated pages. Don't manually edit the generated HTML pages; edit `site_templates/home.html` for homepage content or `scripts/build_site.py` for the remaining pages.
 
 ## Website philosophy
 
-The v1 site deliberately uses the rice's near-black background and muted cyan accents. There are no external fonts, JavaScript frameworks, stock mockups, tracking pixels, or fake desktop screenshots.
+The v1 site uses a Debian-style, documentation-first layout with the rice's near-black background and muted cyan accents. Its CSS is original; Debian website code and imagery were not copied. There are no external fonts, JavaScript frameworks, stock mockups, tracking pixels, or fake desktop screenshots.

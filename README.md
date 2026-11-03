@@ -1,6 +1,6 @@
 # Kuhl OS
 
-**A quieter way to use Linux.**
+**A straightforward Fedora + Niri desktop.**
 
 Kuhl OS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a small, guided installer. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
 
@@ -70,12 +70,14 @@ Backups live at `~/.local/state/kuhl-base-v1/backups/`. Restore deliberately pro
 
 ## Website and docs
 
-The website is **static, dependency-free HTML/CSS/JavaScript**, ready for GitHub Pages. Its routes are `index.html`, `install.html`, `wiki/index.html`, `wiki/keybinds.html`, `wiki/customization.html`, and `wiki/troubleshooting.html`.
+The website is a **simple, documentation-first static site** using dependency-free HTML, CSS and JavaScript, ready for GitHub Pages. Its routes are `index.html`, `install.html`, `wiki/index.html`, `wiki/keybinds.html`, `wiki/customization.html`, and `wiki/troubleshooting.html`.
 
 ```bash
-python3 scripts/build_site.py         # regenerate the site & keybinding reference
+python3 scripts/build_site.py         # regenerate the pages and keybinding reference
 python3 scripts/build_site.py --check # ensure generated pages aren't stale
 ```
+
+The homepage source lives in `site_templates/home.html`; edit that template rather than editing generated `index.html`.
 
 To publish it, go to **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`. See [`docs/GITHUB_PAGES.md`](docs/GITHUB_PAGES.md).
 

@@ -17,7 +17,7 @@ UPSTREAM='https://github.com/youngcoder45/New-Niri-minimal-dots'
 def escape(x): return html.escape(x,quote=True)
 
 def nav(rel,active):
-    menu=[('Home',rel+'index.html','home'),('Install',rel+'install.html','install'),('Wiki',rel+'wiki/index.html','wiki'),('Keybinds',rel+'wiki/keybinds.html','keys')]
+    menu=[('Home',rel+'index.html','home'),('Install',rel+'install.html','install'),('Documentation',rel+'wiki/index.html','wiki'),('Keybindings',rel+'wiki/keybinds.html','keys')]
     links=''.join(f'<a href="{u}"'+(' aria-current="page"' if id==active else '')+f'>{t}</a>' for t,u,id in menu)
     return f'''<header class="topbar"><div class="wrap nav-inner">
 <a href="{rel}index.html" class="brand" aria-label="Kuhl OS home"><span class="brand-mark" aria-hidden="true">K</span>Kuhl OS</a>
@@ -34,8 +34,8 @@ def page(title,description,rel,active,body):
 <body><a class="skip-link" href="#content">Skip to content</a>
 {nav(rel,active)}<main id="content">{body}</main>
 <footer class="footer"><div class="wrap footer-inner"><div>
-<p><strong style="color:var(--text)">Kuhl OS</strong> · Fedora + Niri. Independent community project, not affiliated with Fedora, Niri or Omarchy.</p>
-<p>Desktop config adapted from <a href="{UPSTREAM}">New Niri Minimal Dots</a> by Aditya Verma (MIT). AI-assisted project; inspect code before installing. No separate ISO is offered.</p></div>
+<p><strong>Kuhl OS</strong> · An independent Fedora + Niri desktop project. Not affiliated with Fedora, Niri, or Omarchy.</p>
+<p>Adapted from <a href="{UPSTREAM}">New Niri Minimal Dots</a> (MIT). AI-assisted, experimental, and not independently security-audited. Review the source before installation.</p></div>
 <div class="footer-links"><a href="{rel}wiki/index.html">Documentation</a><a href="{rel}wiki/troubleshooting.html">Support</a><a href="{GITHUB}">Source code</a></div>
 </div></footer></body></html>'''
 
@@ -53,39 +53,9 @@ def doc_page(title,sub,active,body):
     return page(title,sub,'../','keys' if active=='keys' else 'wiki',f'''<div class="wrap"><div class="page-title"><p class="eyebrow">Kuhl OS / Documentation</p><h1>{escape(title)}</h1><p class="lead">{escape(sub)}</p></div>
 <div class="doc-shell">{sidebar(active)}<article class="doc-content">{body}</article></div></div>''')
 
-home=f'''<div class="wrap"><section class="hero"><div>
-<p class="eyebrow">Fedora Workstation &nbsp;/&nbsp; Niri desktop</p>
-<h1>A quieter way to <span class="accent">use Linux.</span></h1>
-<p class="lead">Kuhl OS is a thoughtfully configured Niri desktop for Fedora. Fast to set up, comfortable to navigate, and simple to make your own.</p>
-<div class="actions"><a class="action" href="install.html">Get started ↗</a><a class="action secondary" href="wiki/index.html">Read the wiki</a></div>
-<p class="hero-note">Fedora first. No custom ISO, disk formatting, or replacing GNOME.</p>
-</div><div class="terminal" aria-label="Example Kuhl OS terminal installer output"><div class="terminal-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>kuhl · install</span><span>↗</span></div><div class="terminal-body">
-<div><span class="term-prompt">$</span> <span class="term-strong">bash install.sh</span></div>
-<div class="term-rule"></div>
-<div class="term-strong">KUHL OS &nbsp;/&nbsp; BASE v1</div><div>Fedora + Niri</div>
-<div class="term-rule"></div>
-<div class="term-row"><span><span class="term-ok">✓</span> System and source checks</span><span>1/5</span></div>
-<div class="term-row"><span><span class="term-ok">✓</span> Fedora software</span><span>2/5</span></div>
-<div class="term-row"><span><span class="term-ok">✓</span> Configuration protection</span><span>3/5</span></div>
-<div class="term-row"><span><span class="term-ok">✓</span> Niri validation and deploy</span><span>4/5</span></div>
-<div class="term-row"><span><span class="term-ok">✓</span> Finished</span><span>5/5</span></div>
-<div class="term-rule"></div>
-<div class="term-muted">Log out and choose Niri at sign-in.</div>
-</div></div></section></div>
-<section class="section"><div class="wrap"><div class="section-head"><h2>Just the desktop.</h2><p>No extra desktop shell to learn, no patched system image, no unnecessary stack of features.</p></div>
-<div class="feature-grid">
-<div class="feature"><span class="feature-num">01 /</span><h3>Scrollable tiling</h3><p>Niri keeps windows organized in columns you can move through without micromanaging a grid.</p></div>
-<div class="feature"><span class="feature-num">02 /</span><h3>Keyboard friendly</h3><p>Open apps, move between windows, navigate workspaces, and manage the desktop with predictable shortcuts.</p></div>
-<div class="feature"><span class="feature-num">03 /</span><h3>One-command setup</h3><p>The Fedora installer installs the desktop packages and configuration, then guides you into your first Niri session.</p></div>
-<div class="feature"><span class="feature-num">04 /</span><h3>Familiar tools</h3><p>Waybar, Fuzzel, Mako, Alacritty and other lightweight apps working together.</p></div>
-<div class="feature"><span class="feature-num">05 /</span><h3>Recoverable changes</h3><p>Existing dotfiles are protected, with opt-in replacement and backups. GNOME remains a fallback.</p></div>
-<div class="feature"><span class="feature-num">06 /</span><h3>Open and inspectable</h3><p>The repository documents its source, modifications, installer behavior, and security limitations.</p></div>
-</div></div></section>
-<section class="section"><div class="wrap"><div class="section-head"><h2>Start here.</h2><p>Installation, the full shortcut reference, and practical guidance are in the same small site.</p></div>
-<div class="links-grid">{linkpanel('Install Kuhl OS','Requirements, installation and recovery','install.html')}{linkpanel('Documentation','Get familiar with your desktop','wiki/index.html')}{linkpanel('Keybinding reference','Search the actual shipped Niri shortcuts','wiki/keybinds.html')}{linkpanel('Troubleshooting','Common Fedora and Niri fixes','wiki/troubleshooting.html')}</div></div></section>
-<section class="section"><div class="wrap"><div class="section-head"><h2>Built on open work.</h2><p>Kuhl OS starts with the MIT-licensed New Niri Minimal Dots configuration by Aditya Verma. Credit and source history remain in the repository.</p></div>
-<p style="color:var(--muted);max-width:800px;font-size:14px;">Kuhl OS is AI-assisted and is not security audited. The remote install command executes code from GitHub; read it before running, verify the repository, and back up your files. This release is a Fedora configuration and installer—not a bootable operating-system image. <a href="wiki/troubleshooting.html" style="color:var(--accent);text-decoration:underline;">Read the safety notes ↗</a></p>
-</div></section>'''
+# The landing-page content is maintained as ordinary HTML so the plain site
+# cannot be overwritten with an outdated mockup when docs are regenerated.
+home=(ROOT/'site_templates/home.html').read_text()
 
 install_body=f'''<div class="wrap"><div class="page-title"><p class="eyebrow">Kuhl OS / Setup</p><h1>Install Kuhl OS.</h1><p class="lead">Start with Fedora Workstation. Add Kuhl OS as a separate Niri session. Keep GNOME available if you need it.</p></div><div class="doc-shell">
 <aside class="side-nav"><p class="side-label">On this page</p><a href="#requirements">Requirements</a><a href="#command">One-command setup</a><a href="#manual">Manual install</a><a href="#after">After installation</a><a href="#restore">Restore or remove</a><a href="wiki/index.html">Open wiki ↗</a></aside>
@@ -292,7 +262,7 @@ def generate_keys():
     return doc_page('Keybindings','Search the shortcuts that actually ship with Kuhl OS.', 'keys', body)
 
 files={
- 'index.html':page('A quieter way to use Linux','Kuhl OS is a focused Fedora Workstation + Niri desktop setup.','', 'home',home),
+ 'index.html':page('Fedora + Niri','Kuhl OS is a Fedora Workstation desktop setup based on Niri with a simple installer and documentation.','', 'home',home),
  'install.html':page('Installation','Install Kuhl OS on Fedora Workstation with one command.','', 'install',install_body),
  'wiki/index.html':doc_page('The Kuhl OS wiki','A straightforward guide to your Fedora + Niri desktop.','home',wiki_home),
  'wiki/keybinds.html':generate_keys(),
