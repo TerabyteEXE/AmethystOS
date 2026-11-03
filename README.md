@@ -1,4 +1,4 @@
-# Kuhl OS 0.6 — Fedora + Niri
+# Kuhl OS 0.6.1 — Fedora + Niri
 
 A warm, keyboard-first **Fedora Workstation + Niri desktop experience**. Kuhl is **not** a separate distribution, ISO, modified kernel, or package manager. It adds a Niri scrolling-tiling session to Fedora while keeping GNOME as a fallback.
 
@@ -90,11 +90,11 @@ To return to automatic theme-based wallpaper switching, remove `~/.local/state/k
 
 ## Safety and recovery
 
-If Niri fails to start, use GDM's gear/session menu to log into **GNOME** instead. Review `~/.local/state/kuhl/install.log`, run `niri validate` and `kuhl doctor` from GNOME. If your existing Niri dotfiles conflicted, the installer intentionally left them in place; review the warning and decide whether to use `--replace-configs`. An installer validation failure triggers removal/restoration of Kuhl-tracked config files.
+If Niri fails to start, use GDM's gear/session menu to log into **GNOME** instead. Review `~/.local/state/kuhl/install.log`, run `niri validate` and `kuhl doctor` from GNOME. If your existing Niri dotfiles conflicted, the installer intentionally left them in place; review the warning and decide whether to use `--replace-configs`. The installer validates both bundled Niri themes in isolation before deploying configs. If the active user Niri configuration is invalid afterwards, it stops without automatically deleting previously managed files. Use `kuhl uninstall` to restore tracked, unmodified files if needed.
 
 `kuhl uninstall` removes or restores Kuhl-managed config files **only if they have not been modified since Kuhl generated them**. It retains RPMs, any enabled COPR, Flatpaks, the GNOME fallback, installed wallpapers, and backup/state logs to avoid deleting unrelated work. See `docs/RECOVERY.md` for manual cleanup.
 
-For changes to the repo, start with `bash tests/validate.sh`. CI executes these checks on every push/PR. A real Fedora guest is required to test login, workspace animations, portal screen sharing, input devices, notifications, suspend, X11 apps and battery behavior. See `docs/TESTING.md`.
+For changes to the repo, start with `bash tests/validate.sh`. On Fedora, additionally run `python3 scripts/validate_niri.py`; this validates both themes with the real Niri parser, without touching user dotfiles. CI executes the Fedora/Niri check on every push/PR. A real Fedora guest is required to test login, workspace animations, portal screen sharing, input devices, notifications, suspend, X11 apps and battery behavior. See `docs/TESTING.md`.
 
 ## Project structure
 
@@ -113,6 +113,7 @@ Kuhl-OS/
 ├── main.html                 # Website, interactive launcher demo
 ├── scripts/menu.py           # Curses TUI
 ├── scripts/render.py         # Safe, manifest-backed config deployment
+├── scripts/validate_niri.py  # Real Niri validation before config deployment
 └── tests/validate.sh         # Static + isolated functional tests
 ```
 

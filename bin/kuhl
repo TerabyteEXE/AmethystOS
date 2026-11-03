@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED - Kuhl OS 0.6 management command
+# KUHL-MANAGED - Kuhl OS 0.6.1 management command
 set -Eeuo pipefail
 ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/kuhl"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/kuhl"
@@ -77,7 +77,7 @@ KUHL OS · KEYBOARD
 TXT
     ;;
   status)
-    echo 'Kuhl OS 0.6 — Fedora + Niri desktop edition'
+    echo 'Kuhl OS 0.6.1 — Fedora + Niri desktop edition'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
     echo "Launcher: $(command -v vicinae >/dev/null && echo Vicinae || echo 'Fuzzel fallback')"
@@ -109,7 +109,7 @@ TXT
     ;;
   help|-h|--help)
     cat <<'TXT'
-KUHL OS 0.6 · Fedora + Niri
+KUHL OS 0.6.1 · Fedora + Niri
   kuhl theme day|dusk        Apply matching Waybar, Niri, Kitty and Mako palette
   kuhl wallpaper day|dusk|default|apply
   kuhl launcher               Vicinae search, or Fuzzel fallback

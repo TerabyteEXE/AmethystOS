@@ -1,4 +1,4 @@
-# Recovery and uninstall — Kuhl OS 0.6
+# Recovery and uninstall — Kuhl OS 0.6.1
 
 Kuhl keeps stock Fedora Workstation and GNOME installed. The Niri compositor is a separate login session.
 

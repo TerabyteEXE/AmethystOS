@@ -104,7 +104,7 @@ def menu(screen, items):
         paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
         for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
             paint(row, 3, part)
-        paint(height-2, 3, f'{cursor+1}/{len(items)}   •   Kuhl 0.6 preview   •   Q to exit', muted)
+        paint(height-2, 3, f'{cursor+1}/{len(items)}   •   Kuhl 0.6.1 preview   •   Q to exit', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
@@ -130,7 +130,7 @@ def menu(screen, items):
 
 def plain(items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
-    print('\n✳ KUHL OS 0.6  /  FEDORA + NIRI  /  TEXT MODE')
+    print('\n✳ KUHL OS 0.6.1  /  FEDORA + NIRI  /  TEXT MODE')
     for index, item in enumerate(items, 1):
         marker = 'x' if item['id'] in selected else ' '
         lock = ' [required]' if item.get('required') else ''

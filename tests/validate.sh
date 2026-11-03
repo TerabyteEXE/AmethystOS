@@ -3,7 +3,7 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 for f in bootstrap.sh install.sh uninstall.sh bin/kuhl lib/common.sh tests/validate.sh; do bash -n "$f"; done
-python3 -m py_compile scripts/menu.py scripts/render.py
+python3 -m py_compile scripts/menu.py scripts/render.py scripts/validate_niri.py
 python3 - <<'PY'
 import json,re,struct
 from pathlib import Path
@@ -21,6 +21,8 @@ for p in Path('assets/wallpapers').glob('*.png'):
 conf=Path('configs/niri/config.kdl').read_text()
 assert 'include "kuhl-theme.kdl"' in conf and 'Mod+Space repeat=false' in conf
 assert 'Mod+Shift+E { quit;' in conf
+assert 'keyboard {\n        numlock\n    }' in conf
+assert 'keyboard { numlock }' not in conf
 site=Path('main.html').read_text()
 assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','bash install.sh','Kuhl OS'])
 assert 'kuhl.example' not in site and 'coming soon' not in site.lower()
@@ -65,4 +67,9 @@ python3 scripts/render.py uninstall >/dev/null || true
 grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
 [[ ! -e "$XDG_CONFIG_HOME/kitty/colors.conf" ]]
 echo '[test] Config protection, theme, backup restore, uninstall: OK'
+if command -v niri >/dev/null 2>&1; then
+  python3 scripts/validate_niri.py
+else
+  echo '[test] SKIPPED native Niri validation (niri not installed; Fedora CI checks both themes)'
+fi
 echo '[test] All checks passed'

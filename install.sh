@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — Kuhl OS 0.6, Fedora + Niri edition (not a Linux distro/ISO).
+# KUHL-MANAGED — Kuhl OS 0.6.1, Fedora + Niri edition (not a Linux distro/ISO).
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,7 +10,7 @@ REPLACE_CONFIGS=0
 NO_REBOOT=1
 usage() {
   cat <<'TXT'
-Kuhl OS 0.6 — Fedora Workstation + Niri
+Kuhl OS 0.6.1 — Fedora Workstation + Niri
 Usage: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
   --defaults         Use default choices without opening the text UI.
   --dry-run          Preview choices; never installs anything (works on any OS).
@@ -99,7 +99,7 @@ fi
 mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 0.6 — FEDORA + NIRI\n'
+printf '\n✳ KUHL OS 0.6.1 — FEDORA + NIRI\n'
 printf 'Fedora %s / Kuhl %s\n' "${VERSION_ID:-unknown}" "$THEME"
 [[ $(awk '/MemTotal:/ {print $2}' /proc/meminfo) -ge 7340032 ]] || kuhl_warn 'Recommended memory: 8 GB+ for comfortable use.'
 printf '\n[1/5] Fedora packages (official repos)...\n'
@@ -112,6 +112,8 @@ if chosen desktop_helpers; then
   sudo dnf install -y network-manager-applet blueman pavucontrol brightnessctl playerctl
 fi
 ISSUES=0
+printf '\n[preflight] Validating both Kuhl Niri themes before writing personal dotfiles...\n'
+python3 "$ROOT/scripts/validate_niri.py" || { kuhl_warn 'Bundled Niri config failed validation. Nothing in your personal config was changed.'; exit 1; }
 printf '\n[2/5] Optional launcher and applications...\n'
 if chosen vicinae; then
   if sudo dnf copr enable -y quadratech188/vicinae && sudo dnf install -y vicinae; then
@@ -162,8 +164,10 @@ mkdir -p "$KUHL_STATE"
 if [[ ! -s "$KUHL_STATE/wallpaper-choice" ]]; then printf 'auto\n' > "$KUHL_STATE/wallpaper-choice"; fi
 printf '\n[5/5] Verifying Niri setup...\n'
 if ! niri validate; then
-  kuhl_warn 'Niri rejected the new configuration. Restoring Kuhl-managed files for safety.'
-  python3 "$KUHL_DATA/render.py" uninstall || true
+  kuhl_warn 'The active Niri config is invalid (possibly an existing user config).'
+  kuhl_warn 'Both bundled Kuhl themes passed isolated native validation before deployment.'
+  kuhl_warn 'Existing files and Kuhl-managed configs are preserved for manual diagnosis.'
+  kuhl_warn 'Run niri validate to inspect the active file; use kuhl uninstall if you want to undo Kuhl-managed configs.'
   exit 1
 fi
 if ! grep -q 'KUHL-MANAGED' "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl"; then

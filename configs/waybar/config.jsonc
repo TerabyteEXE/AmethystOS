@@ -1,5 +1,5 @@
 {
-  "// kuhl-managed": "Kuhl OS 0.6 Waybar layout",
+  "// kuhl-managed": "Kuhl OS 0.6.1 Waybar layout",
   "layer": "top",
   "reload_style_on_change": true,
   "position": "top",

@@ -4,16 +4,31 @@
 prefer-no-csd
 
 input {
-    keyboard { numlock }
-    touchpad { tap; natural-scroll; }
+    keyboard {
+        numlock
+    }
+    touchpad {
+        tap
+        natural-scroll
+    }
 }
 
 layout {
     gaps 12
-    default-column-width { proportion 0.5; }
-    preset-column-widths { proportion 0.33333; proportion 0.5; proportion 0.66667; }
-    focus-ring { width 2; }
-    border { off; }
+    default-column-width {
+        proportion 0.5
+    }
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    focus-ring {
+        width 2
+    }
+    border {
+        off
+    }
 }
 
 window-rule {
@@ -29,7 +44,9 @@ spawn-at-startup "sh" "-c" "command -v vicinae >/dev/null 2>&1 && exec vicinae s
 spawn-at-startup "sh" "-c" "command -v nm-applet >/dev/null 2>&1 && exec nm-applet --indicator || true"
 spawn-at-startup "swayidle" "-w" "timeout" "900" "swaylock -f -c 191f23" "before-sleep" "swaylock -f -c 191f23"
 
-hotkey-overlay { skip-at-startup; }
+hotkey-overlay {
+    skip-at-startup
+}
 
 binds {
     Mod+Space repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl launcher"; }
