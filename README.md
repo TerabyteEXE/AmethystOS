@@ -1,4 +1,4 @@
-# ✳ Kuhl OS v0.5 — Fedora Workstation, made cozy
+# Kuhl OS v0.5 — Fedora Workstation, made cozy
 
 Kuhl is a repeatable **Fedora GNOME configuration**, not yet an independent Linux distribution. This release includes a text installer, an original default wallpaper, a **Spotlight-style launcher on Super+Space**, a selected set of GNOME extensions, and a command to **capture the extra extensions/apps from your existing desktop**.
 
