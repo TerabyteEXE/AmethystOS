@@ -1,4 +1,4 @@
-# Kuhl OS 0.6 — Fedora, made to flow
+# Kuhl OS 0.6 — Fedora + Niri
 
 A warm, keyboard-first **Fedora Workstation + Niri desktop experience**. Kuhl is **not** a separate distribution, ISO, modified kernel, or package manager. It adds a Niri scrolling-tiling session to Fedora while keeping GNOME as a fallback.
 
