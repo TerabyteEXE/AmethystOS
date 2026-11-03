@@ -1,0 +1,75 @@
+// KUHL-MANAGED - Kuhl OS 0.6 / Niri (minimum 25.11)
+// This file is Kuhl-managed. Put personal overrides at the very end in custom.kdl.
+// An existing non-Kuhl config is NEVER replaced automatically.
+prefer-no-csd
+
+input {
+    keyboard { numlock }
+    touchpad { tap; natural-scroll; }
+}
+
+layout {
+    gaps 12
+    default-column-width { proportion 0.5; }
+    preset-column-widths { proportion 0.33333; proportion 0.5; proportion 0.66667; }
+    focus-ring { width 2; }
+    border { off; }
+}
+
+window-rule {
+    geometry-corner-radius 12
+    clip-to-geometry true
+}
+
+// All session components launch only inside Niri, not in GNOME.
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "sh" "-c" "$HOME/.local/bin/kuhl wallpaper apply"
+spawn-at-startup "sh" "-c" "command -v vicinae >/dev/null 2>&1 && exec vicinae server || true"
+spawn-at-startup "sh" "-c" "command -v nm-applet >/dev/null 2>&1 && exec nm-applet --indicator || true"
+spawn-at-startup "swayidle" "-w" "timeout" "900" "swaylock -f -c 191f23" "before-sleep" "swaylock -f -c 191f23"
+
+hotkey-overlay { skip-at-startup; }
+
+binds {
+    Mod+Space repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl launcher"; }
+    Mod+Return { spawn "kitty"; }
+    Mod+T { spawn "kitty"; }
+    Mod+E { spawn "thunar"; }
+    Mod+Shift+L { spawn "swaylock" "-f" "-c" "191f23"; }
+    Mod+Shift+Q { close-window; }
+    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+    Mod+Ctrl+H { move-column-left; }
+    Mod+Ctrl+L { move-column-right; }
+    Mod+Ctrl+J { move-window-down; }
+    Mod+Ctrl+K { move-window-up; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+R { switch-preset-window-height; }
+    Mod+V { toggle-window-floating; }
+    Mod+Shift+E { quit; }
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Print { screenshot; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+}
+
+// Theme is replaced independently of keybindings and layout.
+include "kuhl-theme.kdl"
+// Created by you, not overwritten by Kuhl (optional, from niri >= 26.04).
+// To use a custom file: add `include "custom.kdl"` here manually.

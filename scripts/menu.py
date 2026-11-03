@@ -1,72 +1,117 @@
 #!/usr/bin/env python3
-"""Kuhl's dependency-free Python curses installer chooser.
+"""Kuhl OS's dependency-free, keyboard-driven terminal installer selector.
 
-Output is a JSON file consumed by install.sh; user input never executes as shell.
+This produces a reviewed JSON choice plan, never shell code. Installation is
+handled by install.sh only after the user approves this screen.
 """
 import argparse
 import curses
 import json
-import os
 import sys
 import textwrap
 from pathlib import Path
 
 
 def rows(config):
-    source = json.loads(Path(config).read_text(encoding='utf-8'))
-    items = source['choices']
+    items = json.loads(Path(config).read_text(encoding='utf-8'))['choices']
     ids = [item['id'] for item in items]
-    assert len(ids) == len(set(ids)), 'Duplicate option IDs'
+    if len(ids) != len(set(ids)) or not all(i.get('description') for i in items):
+        raise ValueError('Invalid or duplicate option IDs')
     return items
 
 
 def menu(screen, items):
     curses.curs_set(0)
     screen.keypad(True)
-    selected = {row['id'] for row in items if row.get('default') or row.get('required')}
-    cursor, offset = 0, 0
+    if curses.has_colors():
+        curses.start_color()
+        try:
+            curses.use_default_colors()
+        except curses.error:
+            pass
+        curses.init_pair(1, curses.COLOR_YELLOW, -1)
+        curses.init_pair(2, curses.COLOR_CYAN, -1)
+        curses.init_pair(3, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+        curses.init_pair(4, curses.COLOR_GREEN, -1)
+    accent = curses.color_pair(1) if curses.has_colors() else curses.A_BOLD
+    muted = curses.color_pair(2) if curses.has_colors() else 0
+    active = curses.color_pair(3) | curses.A_BOLD if curses.has_colors() else curses.A_REVERSE
+    good = curses.color_pair(4) if curses.has_colors() else curses.A_BOLD
+
+    selected = {r['id'] for r in items if r.get('default') or r.get('required')}
+    cursor = 0
+    offset = 0
     theme = 'dusk'
+
+    def paint(row, col, content, style=0):
+        height, width = screen.getmaxyx()
+        if 0 <= row < height and col < width:
+            screen.addnstr(row, col, content, max(0, width-col-1), style)
+
+    def review():
+        while True:
+            screen.erase()
+            height, width = screen.getmaxyx()
+            paint(1, 3, '✳  KUHL OS  /  REVIEW', accent | curses.A_BOLD)
+            paint(3, 3, f'Palette   {theme.upper()}     |     {len(selected)} selected components', good)
+            start = 5
+            selected_items = [i for i in items if i['id'] in selected]
+            for index, item in enumerate(selected_items[:max(0, height - 12)]):
+                paint(start + index, 4, f'• {item["title"]}')
+            warning_line = min(height - 6, start + len(selected_items) + 1)
+            paint(warning_line, 3, 'Existing dotfiles are preserved. GNOME stays installed.', muted)
+            if 'vicinae' in selected:
+                paint(warning_line + 1, 3, 'Vicinae requires separate COPR consent in the installer.', accent)
+            paint(height - 3, 3, 'Y  Install    N  Back to choices    Q  Cancel', curses.A_BOLD)
+            screen.refresh()
+            key = screen.getch()
+            if key in (ord('y'), ord('Y')):
+                return {'theme': theme, 'selected': sorted(selected)}
+            if key in (ord('q'), ord('Q'), 27):
+                return None
+            if key in (ord('n'), ord('N'), 10, 13):
+                return 'back'
+
     while True:
         screen.erase()
         height, width = screen.getmaxyx()
-        if height < 14 or width < 55:
-            screen.addnstr(0, 0, 'Resize terminal to at least 55 x 14 (q to quit)', max(1, width-1))
+        if height < 18 or width < 62:
+            paint(0, 0, 'Resize terminal to at least 62 x 18 (Q to exit).')
             screen.refresh()
-            if screen.getch() in (ord('q'), 27):
+            if screen.getch() in (ord('q'), ord('Q'), 27):
                 return None
             continue
-        def write(row, text, bold=False):
-            screen.addnstr(row, 2, text, width - 4, curses.A_BOLD if bold else 0)
-        write(0, '✳  KUHL OS  /  SETUP', True)
-        write(1, 'Space = toggle   ↑↓ = move   T = theme   Enter = review   Q = exit')
-        write(2, f'Theme: {theme.upper()}     Selected: {len(selected)} options (base items are required)')
-        screen.hline(3, 2, curses.ACS_HLINE, width - 4)
-        visible = max(1, height - 12)
+        paint(1, 3, '✳  K U H L  O S', accent | curses.A_BOLD)
+        paint(2, 3, 'F E D O R A    /    N I R I    /    S E T U P', muted)
+        paint(4, 3, 'Pick your desktop. Nothing changes until you confirm.', curses.A_BOLD)
+        paint(5, 3, 'UP/DOWN  navigate    SPACE  select    T  Day/Dusk    ENTER  review', muted)
+        paint(7, 3, f'THEME  {theme.upper():<6}     COMPONENTS  {len(selected):02} / {len(items):02}', accent)
+        screen.hline(8, 3, curses.ACS_HLINE, width-6)
+        visible = max(1, height - 18)
         if cursor < offset:
             offset = cursor
         if cursor >= offset + visible:
-            offset = cursor - visible + 1
-        for screenrow, index in enumerate(range(offset, min(len(items), offset + visible)), 4):
+            offset = cursor-visible+1
+        for row, index in enumerate(range(offset, min(len(items), offset+visible)), start=9):
             item = items[index]
-            tick = 'x' if item['id'] in selected else ' '
-            locked = ' • base' if item.get('required') else ''
-            line = f"{'›' if cursor == index else ' '} [{tick}] {item['title']}{locked}"
-            flags = curses.A_REVERSE if cursor == index else 0
-            screen.addnstr(screenrow, 2, line, width-4, flags)
+            tick = '●' if item['id'] in selected else '○'
+            lock = '  [required]' if item.get('required') else ''
+            line = f' {tick}  {item["title"]}{lock}'
+            paint(row, 3, line, active if index == cursor else good if item['id'] in selected else 0)
+        detail_y = height - 8
+        screen.hline(detail_y, 3, curses.ACS_HLINE, width-6)
         current = items[cursor]
-        screen.hline(height-7, 2, curses.ACS_HLINE, width - 4)
-        write(height-6, f"{current['section']} · {current['title']}", True)
-        desc = textwrap.wrap(current['description'], width - 4)
-        for n, line in enumerate(desc[:3]):
-            write(height-5+n, line)
-        write(height-1, f'{cursor+1}/{len(items)}    Review with Enter  •  Nothing installs before approval')
+        paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
+        for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
+            paint(row, 3, part)
+        paint(height-2, 3, f'{cursor+1}/{len(items)}   •   Kuhl 0.6 preview   •   Q to exit', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
-            cursor = min(len(items) - 1, cursor + 1)
+            cursor = min(len(items)-1, cursor+1)
         elif key in (curses.KEY_UP, ord('k')):
-            cursor = max(0, cursor - 1)
-        elif key in (ord(' '),):
+            cursor = max(0, cursor-1)
+        elif key == ord(' '):
             item = items[cursor]
             if not item.get('required'):
                 if item['id'] in selected:
@@ -78,69 +123,61 @@ def menu(screen, items):
         elif key in (ord('q'), ord('Q'), 27):
             return None
         elif key in (10, 13, curses.KEY_ENTER):
-            screen.erase()
-            write(1, 'READY TO INSTALL KUHL OS', True)
-            write(3, f'Theme: {theme.upper()}')
-            write(4, f'Selected: {len(selected)} options including essential desktop tools')
-            write(6, 'Fedora packages, Flathub apps and compatible GNOME extensions')
-            write(7, 'may be installed. Your GNOME preferences are backed up first.')
-            write(9, 'Continue?    Y = begin installation    N = return    Q = quit', True)
-            screen.refresh()
-            while True:
-                answer = screen.getch()
-                if answer in (ord('y'), ord('Y')):
-                    return {'theme': theme, 'selected': sorted(selected)}
-                if answer in (ord('q'), ord('Q'), 27):
-                    return None
-                if answer in (ord('n'), ord('N'), 10, 13):
-                    break
+            answer = review()
+            if answer != 'back':
+                return answer
 
 
 def plain(items):
-    selected = {row['id'] for row in items if row.get('default') or row.get('required')}
-    print('\n✳ KUHL OS — simple text installer (fallback)')
-    for i, item in enumerate(items, 1):
-        status = 'x' if item['id'] in selected else ' '
-        locked = ' (required)' if item.get('required') else ''
-        print(f'{i:2}. [{status}] {item["title"]}{locked}\n    {item["description"]}')
-    print('Type option numbers separated by commas to toggle, or press Enter to keep defaults.')
-    answer = input('Options to toggle: ').strip()
+    selected = {r['id'] for r in items if r.get('default') or r.get('required')}
+    print('\n✳ KUHL OS 0.6  /  FEDORA + NIRI  /  TEXT MODE')
+    for index, item in enumerate(items, 1):
+        marker = 'x' if item['id'] in selected else ' '
+        lock = ' [required]' if item.get('required') else ''
+        print(f'{index:2}. [{marker}] {item["title"]}{lock}\n    {item["description"]}')
+    print('\nToggle options by number, separated by commas, or press Enter for defaults.')
+    answer = input('Numbers: ').strip()
     for part in answer.split(','):
         if not part.strip():
             continue
-        pos = int(part) - 1
+        pos = int(part)-1
+        if not 0 <= pos < len(items):
+            raise ValueError('Invalid option number')
         item = items[pos]
         if not item.get('required'):
             if item['id'] in selected:
                 selected.remove(item['id'])
             else:
                 selected.add(item['id'])
-    theme = input('Choose wallpaper theme: [dusk]/day: ').strip().lower() or 'dusk'
+    theme = input('Palette: [dusk]/day: ').strip().lower() or 'dusk'
     if theme not in ('day', 'dusk'):
-        raise ValueError('Unknown theme')
-    answer = input(f'Install {len(selected)} options now? [y/N] ').strip().lower()
+        raise ValueError('Unknown palette')
+    print('GNOME is retained. Existing personal configurations are preserved.')
+    if 'vicinae' in selected:
+        print('Vicinae requires separate third-party COPR consent.')
+    answer = input(f'Apply Kuhl {theme.upper()} with {len(selected)} components? [y/N] ').strip().lower()
     return {'theme': theme, 'selected': sorted(selected)} if answer == 'y' else None
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--defaults', action='store_true')
     args = parser.parse_args()
     items = rows(args.config)
     if args.defaults:
-        result = {'theme': 'dusk', 'selected': sorted(row['id'] for row in items if row.get('default') or row.get('required'))}
+        result = {'theme': 'dusk', 'selected': sorted(r['id'] for r in items if r.get('default') or r.get('required'))}
     else:
         if not sys.stdin.isatty() or not sys.stdout.isatty():
-            raise RuntimeError('Interactive setup needs a terminal. Use --defaults for unattended selection.')
+            raise RuntimeError('Interactive installation requires a terminal. Use --defaults for automation.')
         try:
             result = curses.wrapper(menu, items)
         except curses.error:
             result = plain(items)
     if result is None:
         return 2
-    Path(args.output).write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+    Path(args.output).write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
     print(f'Kuhl plan saved: {len(result["selected"])} choices, {result["theme"]} theme.')
     return 0
 

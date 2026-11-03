@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f8f2e8">
-  <meta name="description" content="Kuhl OS is a clean, cozy Fedora Workstation setup with warm themes, a simple launcher, and no bundled AI bloat. Designed around reasonable PCs with 8 GB RAM.">
-  <title>Kuhl OS — Fedora, a little spit polish and wallpapers.</title>
+  <meta name="description" content="Kuhl OS is a keyboard-first Fedora Workstation desktop built on Niri. Beautiful scrolling tiling, coherent Day/Dusk themes, a Spotlight-style launcher, and an honest terminal installer.">
+  <title>Kuhl OS — Fedora underneath. A whole new flow.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght,SOFT,WONK@9..144,600,50,1;9..144,700,50,1;9..144,800,50,1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -198,17 +198,39 @@
     @media(max-width:800px){.shell{width:calc(100% - 40px)}.nav{min-height:77px}.nav-links{display:none}.theme-toggle{margin-left:auto}.header-demo{display:inline-flex}.hero{grid-template-columns:1fr;padding:44px 0 70px;gap:32px;min-height:auto}.hero-copy{padding:10px 0}.hero h1{max-width:700px;font-size:clamp(57px,9vw,85px)}.lead{max-width:610px}.visual-wrap{width:min(640px,96%);justify-self:center}.section-top{grid-template-columns:1fr;gap:15px}.section-top p{max-width:590px}.content-section{padding:60px 0}.features .feature.look,.features .feature.launcher{grid-column:span 6}.feature.launcher{grid-template-columns:1fr;min-height:265px}.mini-window{display:none}.feature.extensions,.feature.security,.feature.removed{grid-column:span 4}.philosophy-card{padding:45px 6%;gap:25px}.spec-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.spec{min-height:205px}.install-grid{grid-template-columns:1fr;gap:32px}.install{padding:45px 0 80px}.install p{max-width:700px}}
     @media(max-width:590px){.shell{width:calc(100% - 34px)}.notice{font-size:10px;gap:7px;text-align:center}.brand{font-size:25px}.brand-mark{width:32px;height:32px}.brand-mark::before{inset:6px}.brand-mark::after{top:9px;left:10px}.theme-toggle button{min-width:53px}.header-demo{display:none}.nav{gap:10px}.hero{padding-top:40px;gap:22px}.hero .eyebrow{margin-bottom:22px}.hero h1{font-size:clamp(50px,12vw,70px);margin-bottom:18px}.hero .lead{font-size:16px}.button{min-height:49px;padding:12px 18px}.hero-actions{gap:9px}.visual-wrap{width:95%;padding-bottom:15px}.hero-art{border-width:6px;border-radius:21px}.art-label{font-size:10px;padding:10px 13px;left:-15px;top:28px}.art-stamp{width:76px;font-size:9px;bottom:-4px;right:-10px;border-width:3px}.art-stamp span{max-width:55px}.art-stamp span::before{font-size:18px}.floating-leaf{display:none}.section-top h2,.philosophy-card h2{font-size:clamp(40px,10vw,55px)}.section-top{margin-bottom:24px}.features .feature.look,.features .feature.launcher,.features .feature.extensions,.features .feature.security,.features .feature.removed{grid-column:span 12}.feature{min-height:190px!important;border-radius:21px;padding:26px}.feature h3{font-size:27px}.feature p{max-width:90%}.features{gap:12px}.philosophy{padding:42px 0}.philosophy-card{grid-template-columns:1fr;padding:40px 30px 46px;border-radius:24px}.note-stack{max-width:340px;justify-self:start;margin-top:9px}.note{padding:14px 16px}.requirements{padding-top:44px;padding-bottom:44px}.spec-grid{grid-template-columns:1fr;gap:11px}.spec{min-height:0;padding:23px 25px}.spec-value{margin:12px 0}.spec p{margin:0}.spec-caption{margin-top:16px}.install h2{font-size:53px}.footer-inner{flex-direction:column}.terminal-body{font-size:11px;padding:24px 17px;min-height:152px}.launcher-footer{font-size:10px}.launcher-header input{font-size:15px}#results li{padding:11px 9px}#results li small{font-size:10px}#overlay{padding-top:12vh}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+
+    /* An original responsive Kuhl + Niri concept mockup, not a real desktop screenshot. */
+    .desktop-showcase{padding:74px 0 45px}
+    .desktop-showcase .eyebrow{margin-bottom:15px}
+    .desktop-showcase h2{font-size:clamp(40px,4.5vw,66px);line-height:1.1;letter-spacing:-.05em;margin-bottom:12px}
+    .desktop-showcase .intro{max-width:720px;color:var(--muted);margin-bottom:26px}
+    .mock-desktop{position:relative;min-height:450px;padding:18px;border:9px solid var(--paper);border-radius:26px;background:linear-gradient(150deg,#273c42 0%,#3e5d5b 40%,#a77c80 83%,#edc5a0 100%);overflow:hidden;box-shadow:var(--shadow),0 0 0 1px var(--line);font-family:'JetBrains Mono',monospace;color:#f4eddd}
+    .mock-desktop:before{content:'';position:absolute;inset:90px -20px -100px;background:linear-gradient(150deg,#152d36,#385353);clip-path:polygon(0 45%,25% 18%,44% 51%,70% 12%,100% 58%,100% 100%,0 100%);opacity:.55}
+    .mock-bar{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:15px;background:#1c282cdd;border:1px solid #ffffff33;border-radius:13px;padding:10px 17px;font-size:11px;backdrop-filter:blur(10px)}
+    .mock-bar .pill{display:inline-block;background:#eeb674;color:#1b292b;border-radius:7px;padding:3px 9px;font-weight:700}
+    .mock-window-row{position:relative;z-index:1;display:grid;grid-template-columns:.98fr 1.1fr;gap:18px;margin:34px auto 0;max-width:920px}
+    .mock-window{min-width:0;background:#1b2529f2;border:1px solid #81928d77;border-radius:15px;box-shadow:0 15px 45px #111d2570;overflow:hidden;min-height:300px}
+    .mock-window .head{padding:12px 15px;background:#324044;color:#c2ccc4;border-bottom:1px solid #61716b55;font-size:11px}
+    .mock-window pre{margin:0;padding:22px;font:12px/1.95 'JetBrains Mono',monospace;color:#dce4d8;white-space:pre-wrap}
+    .mock-window .accent{color:#eeb674}.mock-window .calm{color:#92b7a6}
+    .mock-files{padding:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:11px;color:#d5e3d7}
+    .mock-files span{padding:21px 9px;text-align:center;border:1px solid #647a745b;background:#293a3c;border-radius:10px;font:11px 'DM Sans',sans-serif}
+    .mock-search{position:absolute;z-index:3;top:36%;left:50%;transform:translateX(-50%);width:min(450px,76%);background:#f7efe2;color:#2a3933;border:1px solid #fff;border-radius:15px;padding:16px;box-shadow:0 20px 55px #0007;font:600 13px 'DM Sans',sans-serif}
+    .mock-search strong{display:block;font-weight:700;padding-bottom:12px;border-bottom:1px solid #dcd7cb}
+    .mock-search small{display:block;padding:11px 3px;color:#596b63;font-weight:500}
+    .mock-caption{margin-top:13px;color:var(--muted);font:500 11px/1.6 'JetBrains Mono',monospace}
+    @media(max-width:700px){.mock-window-row{grid-template-columns:1fr}.mock-window:nth-child(2){display:none}.mock-desktop{min-height:380px}.mock-search{top:45%;width:86%}}
   </style>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
   <div class="site-top shell">
-    <div class="notice"><span class="asterisk" aria-hidden="true">✳</span> Made for normal people who want the base of Fedora Workstaton but has a visual theme that doesnt look like hot garbage.</div>
+    <div class="notice"><span class="asterisk" aria-hidden="true">✳</span> Fedora Workstation foundations · Niri scrolling tiling · a little more room to breathe.</div>
   </div>
   <div class="nav-wrap">
     <nav class="nav shell" aria-label="Main navigation">
       <a class="brand" href="#top" aria-label="Kuhl OS — back to top"><span class="brand-mark" aria-hidden="true"></span>Kuhl OS</a>
-      <div class="nav-links"><a href="#idea">The idea</a><a href="#features">What's inside</a><a href="#requirements">Requirements</a><a href="#install">Install</a></div>
+      <div class="nav-links"><a href="#idea">The idea</a><a href="#features">What's inside</a><a href="#desktop">Desktop</a><a href="#requirements">Requirements</a><a href="#install">Install</a></div>
       <div class="theme-toggle" role="group" aria-label="Website preview color theme">
         <button type="button" id="day" aria-pressed="true" title="Day palette">Day</button>
         <button type="button" id="dusk" aria-pressed="false" title="Dusk palette">Dusk</button>
@@ -220,16 +242,16 @@
   <main id="content">
     <section class="shell hero" id="top" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <span class="eyebrow"><span class="dot"></span>A softer twist of Fedora</span>
-        <h1 id="hero-title">Fedora, spit polished <em>and made cozy.</em></h1>
-        <p class="lead">Kuhl is a twist on Fedora Workstation: warm colors, one consistent font, a Ctrl+Space launcher, and fewer unnecessary extras. No bundled AI features or extra plugins and more bloat.</p>
+        <span class="eyebrow"><span class="dot"></span>A new kind of Fedora desktop</span>
+        <h1 id="hero-title">Fedora underneath. <em>Freedom on top.</em></h1>
+        <p class="lead">Meet Kuhl: a cozy, keyboard-driven Fedora experience powered by Niri. Flow between windows, summon search with Super+Space, and make the desktop your own. Without AI clutter or replacing Fedora itself.</p>
         <div class="hero-actions">
           <button type="button" class="button" data-launcher-open>Try the launcher
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
           </button>
           <a class="button outline" href="#install">How to install <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="hero-foot"><span>Or press</span><span><kbd>Ctrl</kbd> + <kbd>Space</kbd></span><span>to take a peek.</span></div>
+        <div class="hero-foot"><span>Or press</span><span><kbd>Super</kbd> + <kbd>Space</kbd></span><span>or tap the button to try the website preview.</span></div>
       </div>
       <div class="visual-wrap">
         <div class="art-label">a little room to breathe</div>
@@ -327,17 +349,17 @@
 
     <section class="shell content-section" id="idea" aria-labelledby="idea-title">
       <div class="section-top">
-        <div><span class="eyebrow"><span class="dot"></span>01 / The idea</span><h2 id="idea-title">A familiar desktop.<br>A better design.</h2></div>
-        <p>Kuhl OS is a simple script(and eventually and ISO) that is built on Fedora. I wanted a linux distro that looked good(like Omarchy or all those amazing Arch rices) but was dependable and not a bleeding edge release.</p>
+        <div><span class="eyebrow"><span class="dot"></span>01 / The idea</span><h2 id="idea-title">A calm desktop.<br>A natural flow.</h2></div>
+        <p>Kuhl turns Fedora Workstation into a carefully designed Niri session. Think scrolling window columns, comforting Day/Dusk palettes and one keyboard-first workflow. It is an installer and desktop configuration, not a separate distribution or ISO.</p>
       </div>
       <div class="features" id="features">
         <article class="feature look">
           <span class="number">01 / LOOK & FEEL</span>
           <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="6"/><path d="M16 2v5m0 18v5M2 16h5m18 0h5M6 6l4 4m12 12 4 4M26 6l-4 4M10 22l-4 4"/></svg></span>
-          <div style="margin-top:auto;padding-top:65px"><h3>Look</h3><p>A warm dark theme (light variant too), matching icons and cursor, one font family, a few wallpapers.</p></div>
+          <div style="margin-top:auto;padding-top:65px"><h3>Look</h3><p>Day and Dusk: coordinated Niri accents, Waybar, Kitty, Mako, typography and Kuhl wallpapers.</p></div>
         </article>
         <article class="feature launcher">
-          <div style="display:flex;flex-direction:column"><span class="number">02 / BUILT AROUND CTRL+SPACE</span><div style="margin-top:auto;padding-top:59px"><h3>Launcher</h3><p>Ctrl+Space opens one search box for apps, files and settings.</p></div></div>
+          <div style="display:flex;flex-direction:column"><span class="number">02 / SUPER + SPACE</span><div style="margin-top:auto;padding-top:59px"><h3>Launcher</h3><p>Super+Space opens Fuzzel immediately. Opt in to Vicinae for richer Spotlight-style search, clipboard tools and file indexing.</p></div></div>
           <div class="mini-window" aria-label="Decorative preview of the Kuhl launcher">
             <div class="mini-title"><span></span><span></span><span></span></div>
             <div class="mini-search">⌕&nbsp; Search anything...</div>
@@ -346,30 +368,48 @@
           </div>
         </article>
         <article class="feature extensions">
-          <span class="number">03 / K.I.S.S</span>
+          <span class="number">03 / SCROLLING TILING</span>
           <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M12 4H5v9h5a4 4 0 0 1 0 6H5v9h9v-5a4 4 0 0 1 6 0v5h8v-9h-5a4 4 0 0 1 0-6h5V4h-9v5a4 4 0 0 1-6 0V4z"/></svg></span>
-          <div style="margin-top:auto;padding-top:65px"><h3>Extensions</h3><p>Four or fewer. Extensions are what breaks when GNOME updates, so the list stays short.</p></div>
+          <div style="margin-top:auto;padding-top:65px"><h3>Niri</h3><p>Windows flow in scrollable columns instead of stacking into a mess. Native animations, rounded corners and quick workspace controls.</p></div>
         </article>
         <article class="feature security">
           <span class="number">04 / STAY PROTECTED</span>
           <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3 27 7v8c0 8-5 12-11 14C10 27 5 23 5 15V7z"/><path d="m11 16 3 3 7-7"/></svg></span>
-          <div style="margin-top:auto;padding-top:65px"><h3>Security</h3><p>Nothing is turned off or replaced. SELinux, the firewall and Fedora’s update system stay as shipped.</p></div>
+          <div style="margin-top:auto;padding-top:65px"><h3>Security</h3><p>SELinux, Fedora updates and your GNOME fallback remain intact. The installer backs up configs you explicitly choose to replace.</p></div>
         </article>
         <article class="feature removed">
           <span class="number">05 / NO UNNECESSARY EXTRAS</span>
           <span class="icon-bubble" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M6 10h20m-18 0 2 18h12l2-18M12 6h8M13 14v10m6-10v10"/></svg></span>
-          <div style="margin-top:auto;padding-top:65px"><h3>Less bloat. No AI.</h3><p>No bundled AI assistants, chatbots or background AI services. The planned setup trims optional apps without removing Fedora’s essential tools. Add what you want with Flatpak.</p></div>
+          <div style="margin-top:auto;padding-top:65px"><h3>Less bloat. No AI.</h3><p>No AI assistants, unnecessary background services or forced third-party repos. You choose optional apps and the advanced launcher during setup.</p></div>
         </article>
       </div>
     </section>
 
+
+    <section class="shell desktop-showcase" id="desktop" aria-labelledby="desktop-title">
+      <span class="eyebrow"><span class="dot"></span>Kuhl on Niri</span>
+      <h2 id="desktop-title">Stay in your flow.</h2>
+      <p class="intro">Scrollable tiling keeps your windows at a comfortable size. A small bar, a warm terminal and one search shortcut let the work take center stage.</p>
+      <div class="mock-desktop" role="img" aria-label="Concept illustration of a Kuhl Niri session with a top bar, terminal, file manager and centered search launcher">
+        <div class="mock-bar"><div><span class="pill">✳ kuhl</span> &nbsp; 1 &nbsp; 2 &nbsp; 3</div><div>Tue · 09:41 &nbsp; ◌ wifi &nbsp; ⌁ audio</div></div>
+        <div class="mock-window-row"><div class="mock-window"><div class="head">kitty · ~/projects</div><pre><span class="accent">✳ kuhl</span> <span class="calm">~</span> status
+Fedora Workstation
+Niri · scrolling tiling
+Day / Dusk · ready
+
+<span class="accent">❯</span> kuhl keys</pre></div><div class="mock-window"><div class="head">files · Home</div><div class="mock-files"><span>▤ Documents</span><span>◈ Projects</span><span>♫ Music</span><span>▧ Pictures</span><span>⌘ Downloads</span><span>✳ Kuhl</span></div></div></div>
+        <div class="mock-search"><strong>⌕ &nbsp; Search apps, files, actions...</strong><small>✳ &nbsp; Kuhl theme · Dusk</small><small>⌘ &nbsp; Kitty Terminal</small><small>▤ &nbsp; File Manager</small></div>
+      </div>
+      <p class="mock-caption">Concept preview of Kuhl's visual direction, not a screenshot or a guarantee of an identical setup. Vicinae is optional; Fuzzel is the default launcher.</p>
+    </section>
+
     <section class="shell philosophy" aria-labelledby="philosophy-title">
       <div class="philosophy-card">
-        <div><span class="eyebrow"><span class="dot"></span>Made to feel familiar</span><h2 id="philosophy-title">The made to feel like a dependable pleasing setup.</h2><p>Kuhl is still Fedora underneath. It isn't a new distribution, a replacement update system or a complicated stack of modifications. It stays close to stock Fedora — just cleaner and cozier.</p></div>
+        <div><span class="eyebrow"><span class="dot"></span>A deliberate stack</span><h2 id="philosophy-title">Made to look different. Built to stay familiar.</h2><p>Kuhl is still Fedora underneath, with Niri as a separate session. Your existing GNOME desktop stays available at login. Kuhl adds a considered layout, not a custom package manager or an entirely new operating system.</p></div>
         <div class="note-stack" aria-label="Kuhl design principles">
-          <div class="note"><svg viewBox="0 0 24 24"><path d="M4 12h16m-8-8v16"/></svg>Small changes, thoughtfully picked</div>
+          <div class="note"><svg viewBox="0 0 24 24"><path d="M4 12h16m-8-8v16"/></svg>An entire desktop, thoughtfully integrated</div>
           <div class="note"><svg viewBox="0 0 24 24"><path d="M4 12 9 17 20 6"/></svg>Fedora security left alone</div>
-          <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 13c2 3 6 3 8 0M9 9h.01M15 9h.01"/></svg>No AI integrations or bundled clutter OMARCHY Cough*</div>
+          <div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 13c2 3 6 3 8 0M9 9h.01M15 9h.01"/></svg>No bundled AI or opaque install magic</div>
         </div>
       </div>
     </section>
@@ -377,43 +417,45 @@
     <section class="shell content-section requirements" id="requirements" aria-labelledby="requirements-title">
       <div class="section-top">
         <div><span class="eyebrow"><span class="dot"></span>02 / Before you begin</span><h2 id="requirements-title">A little room to run.</h2></div>
-        <p>Kuhl follows Fedora Workstation’s hardware compatibility, with an 8 GB memory baseline for a comfortable everyday desktop.</p>
+        <p>Kuhl targets modern x86_64 PCs running regular Fedora Workstation 43 or newer. We recommend 8 GB RAM for comfortable daily use.</p>
       </div>
       <div class="spec-grid" aria-label="Kuhl OS target system requirements">
         <article class="spec"><span class="spec-kicker">Memory · Kuhl minimum</span><strong class="spec-value">8 GB RAM</strong><p>16 GB is a nice upgrade if you keep lots of apps and browser tabs open.</p></article>
         <article class="spec"><span class="spec-kicker">Free storage</span><strong class="spec-value">40 GB</strong><p>80 GB or more and an SSD are recommended for extra space and speed.</p></article>
         <article class="spec"><span class="spec-kicker">Processor</span><strong class="spec-value">64-bit PC</strong><p>Compatible Intel or AMD x86_64 hardware, suitable for Fedora Workstation.</p></article>
-        <article class="spec"><span class="spec-kicker">Graphics &amp; display</span><strong class="spec-value">Fedora-ready</strong><p>Graphics capable of running the Fedora GNOME desktop. Hardware support varies.</p></article>
+        <article class="spec"><span class="spec-kicker">Graphics &amp; display</span><strong class="spec-value">Fedora-ready</strong><p>Working GPU acceleration and Wayland support are needed for Niri. Check your hardware before switching sessions.</p></article>
       </div>
       <div class="spec-caption">
         <p>To install Fedora, also have an internet connection and a 4 GB or larger USB drive for the installer.</p>
-        <p>8 GB RAM is <strong>Kuhl’s chosen minimum</strong>, not Fedora’s absolute minimum. <a href="https://fedoraproject.org/workstation/download/" target="_blank" rel="noopener noreferrer">Check Fedora’s official requirements ↗</a></p>
+        <p>8 GB RAM is <strong>Kuhl’s design target</strong>, not Fedora’s technical minimum. <a href="https://fedoraproject.org/workstation/download/" target="_blank" rel="noopener noreferrer">Check Fedora’s official requirements ↗</a></p>
       </div>
     </section>
 
     <section class="shell install" id="install" aria-labelledby="install-title">
       <div class="install-grid">
-        <div><span class="eyebrow"><span class="dot"></span>03 / Get settled in</span><h2 id="install-title">Make yourself at home.</h2><p>Start from a fresh Fedora Workstation on a compatible PC with at least 8 GB of RAM. When the Kuhl setup script is released, follow its instructions to apply the theme, launcher and lean app defaults.</p><p class="small-note">Kuhl’s setup script and app-removal steps are still planned, not available yet. The command shown is only an example — do not run it.</p></div>
-        <div class="terminal" aria-label="Future installation terminal example">
-          <div class="terminal-bar"><div class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>kuhl ~ terminal</span><span>● preview</span></div>
-          <div class="terminal-body"><span class="comment"># The installation script is coming soon.</span>
-<span class="comment"># Example only — do not run this command:</span>
-<span class="prompt">$</span> curl -fsSL kuhl.example/install.sh | bash
+        <div><span class="eyebrow"><span class="dot"></span>03 / Get settled in</span><h2 id="install-title">Make yourself at home.</h2><p>Start with regular Fedora Workstation and keep GNOME as your backup. Download the Kuhl source, review its scripts and run the interactive installer as your normal user. Then log out and choose Niri from the login screen.</p><p class="small-note">Version 0.6 is an experimental project release. Publish these updated files to the Kuhl GitHub repository before using the command. The installer does not remove Fedora apps or make a custom ISO; Vicinae requires separate COPR consent.</p></div>
+        <div class="terminal" aria-label="Kuhl repository installation example">
+          <div class="terminal-bar"><div class="terminal-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>kuhl ~ terminal</span><span>v0.6 · source install</span></div>
+          <div class="terminal-body"><span class="comment"># After publishing the updated source to GitHub:</span>
+<span class="prompt">$</span> git clone https://github.com/TerabyteEXE/Kuhl-OS.git
+<span class="prompt">$</span> cd Kuhl-OS
+<span class="prompt">$</span> bash install.sh
 
-<span class="comment"># Check back for the official release. ✳</span></div>
-          <div class="terminal-bottom"><span>Not published yet · demo only</span><button type="button" id="copy-example">Copy example</button></div>
+<span class="comment"># Review choices → select Day/Dusk → install</span>
+<span class="comment"># Log out and choose Niri at login. ✳</span></div>
+          <div class="terminal-bottom"><span>Review scripts before you run them</span><button type="button" id="copy-example">Copy commands</button></div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer><div class="shell footer-inner"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kuhl OS</a><p>Kuhl OS is a Fedora Workstation customization. It isn’t affiliated with or endorsed by the Fedora Project or Red Hat. Fedora is a trademark of Red Hat, Inc.</p></div></footer>
+  <footer><div class="shell footer-inner"><a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Kuhl OS</a><p>Kuhl OS is an independent Fedora desktop configuration, not a separate Linux distribution. Not affiliated with Fedora, Red Hat, Niri or Vicinae. All upstream components retain their own licenses.</p></div></footer>
 
   <div id="overlay" role="dialog" aria-modal="true" aria-label="App launcher demo" aria-hidden="true">
     <div class="launcher-dialog">
       <div class="launcher-header"><span class="launcher-icon" aria-hidden="true">✳</span><input id="search" aria-label="Search the sample app launcher" aria-controls="results" aria-activedescendant="" role="combobox" aria-autocomplete="list" aria-expanded="true" placeholder="Search apps, files, settings..." autocomplete="off" spellcheck="false"><kbd>ESC</kbd></div>
       <ul id="results" role="listbox" aria-label="Launcher results"></ul>
-      <div class="launcher-footer"><span><strong>↑ ↓</strong> Move &nbsp; <strong>Enter</strong> Select &nbsp; <strong>Esc</strong> Close</span><span>Interactive preview</span></div>
+      <div class="launcher-footer"><span><strong>↑ ↓</strong> Move &nbsp; <strong>Enter</strong> Select &nbsp; <strong>Esc</strong> Close</span><span>Concept demo · no desktop actions</span></div>
     </div>
   </div>
   <div id="toast" role="status" aria-live="polite"></div>
@@ -429,9 +471,9 @@
     const dusk = document.getElementById('dusk');
     const items = [
       ['Files','Browse your folders'],['Terminal','Kitty'],['Firefox','Web browser'],
-      ['Lo-fi Radio','Play something calm'],['Notes','Quick notes'],['Settings','System'],
-      ['Theme: Dark','Appearance'],['Theme: Light','Appearance'],
-      ['Update Kuhl','Re-run the script'],['Lock screen','Take a break']
+      ['Niri overview','Scroll through open windows'],['Settings','System tools'],['Workspaces','Move between spaces'],
+      ['Theme: Dark','Run kuhl theme dusk'],['Theme: Light','Run kuhl theme day'],
+      ['Kuhl shortcuts','Run kuhl keys'],['Lock screen','Take a break']
     ];
     let filtered = items.slice();
     let selected = 0;
@@ -530,7 +572,7 @@
     document.querySelectorAll('[data-launcher-open]').forEach(btn => btn.addEventListener('click', openLauncher));
     search.addEventListener('input', () => { selected = 0; render(); });
     document.addEventListener('keydown', event => {
-      if (event.ctrlKey && !event.altKey && !event.metaKey && event.code === 'Space') {
+      if (event.metaKey && !event.ctrlKey && !event.altKey && event.code === 'Space') {
         event.preventDefault();
         overlay.classList.contains('on') ? closeLauncher() : openLauncher();
         return;
@@ -543,11 +585,11 @@
       else if (event.key === 'Tab') { event.preventDefault(); search.focus(); }
     });
     overlay.addEventListener('pointerdown', event => { if (event.target === overlay) closeLauncher(); });
-    const sample = '# Example only — not a published installer:\n# curl -fsSL kuhl.example/install.sh | bash';
+    const sample = 'git clone https://github.com/TerabyteEXE/Kuhl-OS.git\ncd Kuhl-OS\nbash install.sh';
     document.getElementById('copy-example').addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(sample);
-        announce('Example copied. This is not a working installer.');
+        announce('Commands copied. Review source before running.');
       } catch (_) {
         // File:// pages can deny clipboard access; the fallback supports local previews.
         const temp = document.createElement('textarea');
@@ -557,7 +599,7 @@
         temp.select();
         const copied = document.execCommand('copy');
         temp.remove();
-        announce(copied ? 'Example copied. This is not a working installer.' : 'Clipboard unavailable. Select the example in the terminal.');
+        announce(copied ? 'Commands copied. Review source before running.' : 'Clipboard unavailable. Select the commands in the terminal.');
       }
     });
   })();

@@ -1,5 +1,5 @@
-*.bak
-*.pre-kuhl.bak
 __pycache__/
-*.pyc
+*.py[cod]
 .DS_Store
+*.log
+.venv/

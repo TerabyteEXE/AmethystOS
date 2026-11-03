@@ -1,166 +1,125 @@
 #!/usr/bin/env bash
-# Kuhl OS CLI.  Installed to ~/.local/bin/kuhl; no resident background process.
+# KUHL-MANAGED - Kuhl OS 0.6 management command
 set -Eeuo pipefail
-KUHL_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/kuhl"
-if [[ ! -f "$KUHL_DATA/common.sh" ]]; then
-  printf 'Kuhl OS is not installed. Run bash install.sh first.\n' >&2
-  exit 1
-fi
-# shellcheck source=lib/common.sh
-source "$KUHL_DATA/common.sh"
-
-case "${1:-help}" in
+ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/kuhl"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/kuhl"
+THEME_FILE="$STATE/theme"
+command_name="${1:-help}"
+[[ $# -eq 0 ]] || shift
+case "$command_name" in
   theme)
-    [[ $# -eq 2 ]] || { kuhl_error "Usage: kuhl theme day|dusk"; exit 2; }
-    [[ -f "$KUHL_DATA/wallpapers/kuhl-day.png" && -f "$KUHL_DATA/wallpapers/kuhl-dusk.png" ]] || { kuhl_error "Wallpapers are missing; rerun install.sh."; exit 1; }
-    kuhl_theme "$2"
+    [[ $# -eq 1 && ( "$1" == day || "$1" == dusk ) ]] || { echo 'Usage: kuhl theme day|dusk' >&2; exit 2; }
+    [[ -f "$ROOT/render.py" ]] || { echo 'Kuhl desktop is not installed.' >&2; exit 1; }
+    python3 "$ROOT/render.py" theme --theme "$1"
+    if [[ "${XDG_CURRENT_DESKTOP:-}" == *niri* || -n "${NIRI_SOCKET:-}" ]]; then
+      pkill -USR2 -u "$(id -u)" -x waybar 2>/dev/null || true
+      if command -v makoctl >/dev/null 2>&1; then makoctl reload >/dev/null 2>&1 || true; fi
+      "$HOME/.local/bin/kuhl" wallpaper apply || true
+      if command -v vicinae >/dev/null 2>&1; then
+        vicinae "vicinae://theme/set/kuhl-${1}" >/dev/null 2>&1 || true
+      fi
+    fi
+    printf 'Kuhl %s applied (existing user-edited configs are left untouched).\n' "$1"
     ;;
-  capture)
-    shift
-    [[ -f "$KUHL_DATA/capture.py" ]] || { kuhl_error 'Capture tool missing. Rerun the new installer.'; exit 1; }
-    python3 "$KUHL_DATA/capture.py" "$@"
+  launcher)
+    if command -v vicinae >/dev/null 2>&1; then
+      vicinae toggle || fuzzel
+    else
+      exec fuzzel
+    fi
     ;;
   wallpaper)
-    [[ $# -eq 2 ]] || { kuhl_error 'Usage: kuhl wallpaper default|classic'; exit 2; }
-    case "$2" in
-      default)
-        kuhl_set org.gnome.desktop.background picture-uri "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-default.png")"
-        kuhl_set org.gnome.desktop.background picture-uri-dark "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-default.png")"
-        ;;
-      classic)
-        kuhl_set org.gnome.desktop.background picture-uri "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-day.png")"
-        kuhl_set org.gnome.desktop.background picture-uri-dark "$(kuhl_quote "file://$KUHL_DATA/wallpapers/kuhl-dusk.png")"
-        ;;
-      *) kuhl_error 'Usage: kuhl wallpaper default|classic'; exit 2;;
+    [[ $# -eq 1 ]] || { echo 'Usage: kuhl wallpaper apply|default|day|dusk' >&2; exit 2; }
+    case "$1" in
+      default|day|dusk) printf '%s\n' "$1" > "$STATE/wallpaper-choice"; set -- apply ;;
+      apply) ;;
+      *) echo 'Usage: kuhl wallpaper apply|default|day|dusk' >&2; exit 2;;
     esac
+    [[ "${XDG_CURRENT_DESKTOP:-}" == *niri* || -n "${NIRI_SOCKET:-}" ]] || { echo 'Wallpaper choice saved. Apply while logged into Niri.'; exit 0; }
+    choice="$(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
+    if [[ "$choice" == auto ]]; then choice="$(cat "$THEME_FILE" 2>/dev/null || echo dusk)"; fi
+    case "$choice" in
+      day) img="$ROOT/wallpapers/kuhl-day.png" ;;
+      dusk) img="$ROOT/wallpapers/kuhl-default.png" ;;
+      default) img="$ROOT/wallpapers/kuhl-default.png" ;;
+      *) echo 'Invalid wallpaper setting' >&2; exit 1;;
+    esac
+    [[ -r "$img" ]] || { echo "Missing wallpaper: $img" >&2; exit 1; }
+    if [[ -f "$STATE/swaybg.pid" ]]; then
+      pid="$(cat "$STATE/swaybg.pid")"
+      if [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] &&
+         tr '\0' ' ' < "/proc/$pid/cmdline" | grep -Fq "swaybg -i $ROOT/wallpapers/"; then
+        kill "$pid" 2>/dev/null || true
+      fi
+    fi
+    swaybg -i "$img" -m fill >/dev/null 2>&1 &
+    echo "$!" > "$STATE/swaybg.pid"
     ;;
-  extensions)
-    action="${2:-list}"
-    case "$action" in
-      list) python3 "$KUHL_DATA/extensions.py" list --profile "${3:-full}" --config "$KUHL_DATA/config" ;;
-      install) python3 "$KUHL_DATA/extensions.py" install --profile "${3:-full}" --config "$KUHL_DATA/config" ;;
-      uninstall) python3 "$KUHL_DATA/extensions.py" uninstall ;;
-      *) kuhl_error 'Usage: kuhl extensions list|install [full|balanced] OR kuhl extensions uninstall'; exit 2;;
-    esac
+  keys)
+    cat <<'TXT'
+KUHL OS · KEYBOARD
+  Super + Space     Search (Vicinae if installed, otherwise Fuzzel)
+  Super + Enter/T   Terminal       Super + E         Files
+  Super + H / L     Focus left/right column
+  Super + J / K     Focus down/up window
+  Super + Ctrl + H/J/K/L   Move columns or windows
+  Super + 1..5      Switch workspace
+  Super + Shift + 1..5   Move current column to workspace
+  Super + F         Maximize column
+  Super + Shift + F Fullscreen window
+  Super + R         Change column width
+  Super + V         Toggle floating
+  Super + Shift + Q Close window
+  Super + Shift + L Lock
+  Super + Shift + E Exit Niri (with confirmation)
+  Super + Shift + / Show Niri's shortcut overlay
+  Print             Screenshot
+TXT
     ;;
   status)
-    printf 'Kuhl OS\n'
-    if kuhl_key_exists org.gnome.desktop.interface color-scheme; then
-      printf '  Appearance: %s\n' "$(gsettings get org.gnome.desktop.interface color-scheme)"
-    fi
-    printf '  Wallpapers: %s\n' "$KUHL_DATA/wallpapers"
-    printf '  Backup:     %s\n' "$KUHL_SETTINGS"
-    printf '  Extensions: %s\n' "$KUHL_DATA/config/extensions.tsv"
+    echo 'Kuhl OS 0.6 — Fedora + Niri desktop edition'
+    echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
+    echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
+    echo "Launcher: $(command -v vicinae >/dev/null && echo Vicinae || echo 'Fuzzel fallback')"
+    echo "Configs: ${XDG_CONFIG_HOME:-$HOME/.config}/{niri,waybar,kitty,mako}"
+    [[ ! -f "$ROOT/render.py" ]] || python3 "$ROOT/render.py" status
     ;;
   doctor)
     problems=0
-    [[ -e /etc/fedora-release ]] && kuhl_info 'Fedora detected' || { kuhl_warn 'Not running on Fedora'; problems=$((problems+1)); }
-    [[ "${XDG_CURRENT_DESKTOP:-}" == *GNOME* ]] && kuhl_info 'GNOME session detected' || { kuhl_warn 'Not currently in GNOME'; problems=$((problems+1)); }
-    for pkg in gnome-menus papirus-icon-theme papirus-icon-theme-light papirus-icon-theme-dark adw-gtk3-theme google-noto-sans-fonts jetbrains-mono-fonts; do
-      if command -v rpm >/dev/null && rpm -q "$pkg" >/dev/null 2>&1; then
-        kuhl_info "Installed package: $pkg"
-      else
-        kuhl_warn "Missing package: $pkg"; problems=$((problems+1))
-      fi
+    [[ -r /etc/fedora-release ]] && echo '[ok] Fedora detected' || { echo '[warn] Not Fedora'; problems=$((problems+1)); }
+    for cmd in niri waybar fuzzel kitty mako swaybg swaylock swayidle python3; do
+      command -v "$cmd" >/dev/null 2>&1 && echo "[ok] $cmd" || { echo "[warn] Missing $cmd"; problems=$((problems+1)); }
     done
-    if command -v dconf >/dev/null 2>&1; then
-      shortcut="$(dconf read /org/gnome/shell/extensions/spotlight/toggle-shortcut)"
-      [[ "$shortcut" == *'<Super>space'* ]] && kuhl_info 'Spotlight Super+Space binding configured' || { kuhl_warn 'Spotlight Super+Space binding missing'; problems=$((problems+1)); }
+    if command -v niri >/dev/null 2>&1; then
+      niri validate && echo '[ok] Niri KDL validates' || { echo '[warn] Niri configuration failed validation'; problems=$((problems+1)); }
     fi
-    if command -v gnome-extensions >/dev/null 2>&1; then
-      kuhl_info "Enabled extensions: $(gnome-extensions list --enabled 2>/dev/null | wc -l)"
-      gnome-extensions list --enabled 2>/dev/null | grep -Fxq user-theme@gnome-shell-extensions.gcampax.github.com || \
-        kuhl_warn 'User Themes not enabled; Kuhl Shell style may need another login.'
-    fi
-    [[ -f "$KUHL_SETTINGS" ]] && kuhl_info 'Previous settings backed up' || { kuhl_warn 'No saved settings'; problems=$((problems+1)); }
-    if (( problems > 0 )); then
-      kuhl_warn "$problems checks require attention"
-      exit 1
-    fi
-    kuhl_info 'All basic checks passed'
+    [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]] || { echo '[warn] Niri user config not installed'; problems=$((problems+1)); }
+    if command -v vicinae >/dev/null; then echo '[ok] Optional Vicinae installed'; else echo '[info] Fuzzel is used for search'; fi
+    [[ -n "${NIRI_SOCKET:-}" ]] && echo '[ok] Running Niri session' || echo '[info] Log into Niri from your login screen to test the actual desktop'
+    printf '%s check(s) require attention.\n' "$problems"
+    (( problems == 0 ))
     ;;
   uninstall)
-    [[ $# -eq 1 ]] || { kuhl_error "Usage: kuhl uninstall"; exit 2; }
-    kuhl_info 'Restoring previous GNOME settings where Kuhl values are still unchanged...'
-    if [[ -f "$KUHL_SETTINGS" ]]; then
-      while IFS=$'\t' read -r schema key original applied || [[ -n "${schema:-}" ]]; do
-        [[ -z "$schema" ]] && continue
-        if kuhl_key_exists "$schema" "$key"; then
-          current="$(gsettings get "$schema" "$key")"
-          if [[ "$current" == "$applied" ]]; then
-            if ! gsettings set "$schema" "$key" "$original"; then
-              kuhl_warn "Couldn't restore $schema $key"
-              continue
-            fi
-          else
-            kuhl_warn "Keeping user-edited setting: $schema $key"
-          fi
-        fi
-      done < "$KUHL_SETTINGS"
-    fi
-    # Restore the Spotlight-specific dconf value if the user has not since changed it.
-    if [[ -f "$KUHL_STATE/spotlight-original" ]] && command -v dconf >/dev/null 2>&1; then
-      key='/org/gnome/shell/extensions/spotlight/toggle-shortcut'
-      if [[ "$(dconf read "$key")" == "['<Super>space']" ]]; then
-        original="$(cat "$KUHL_STATE/spotlight-original")"
-        if [[ -z "$original" ]]; then dconf reset "$key"; else dconf write "$key" "$original"; fi
-      else
-        kuhl_warn 'Keeping user-edited Spotlight shortcut.'
-      fi
-      rm -f "$KUHL_STATE/spotlight-original"
-    fi
-    # Remove only GDM branding created by Kuhl; other GDM changes are untouched.
-    if [[ -x "$KUHL_DATA/gdm-brand.sh" ]] && [[ -f /etc/dconf/db/gdm.d/95-kuhl-logo ]]; then
-      bash "$KUHL_DATA/gdm-brand.sh" uninstall || kuhl_warn 'GDM branding may need manual cleanup.'
-    fi
-    # Only uninstall Shell extensions that the Kuhl installer originally installed.
-    if [[ -f "$KUHL_DATA/extensions.py" ]]; then
-      python3 "$KUHL_DATA/extensions.py" uninstall || kuhl_warn 'Some installed extensions could not be removed.'
-    fi
-    if [[ -f "$KUHL_STATE/enabled-user-theme.txt" ]]; then
-      if command -v gnome-extensions >/dev/null 2>&1; then
-        gnome-extensions disable user-theme@gnome-shell-extensions.gcampax.github.com 2>/dev/null || \
-          kuhl_warn 'Could not disable Kuhl-enabled User Themes.'
-      fi
-      rm -f "$KUHL_STATE/enabled-user-theme.txt"
-    fi
-    for name in Day Dusk; do
-      target="$HOME/.themes/Kuhl-$name"
-      if [[ -f "$target/.kuhl-owned" ]]; then
-        rm -f "$target/gnome-shell/gnome-shell.css" "$target/.kuhl-owned"
-        rmdir "$target/gnome-shell" "$target" 2>/dev/null || true
-      fi
-    done
-    rm -f "$KUHL_APPS/kuhl-day.desktop" "$KUHL_APPS/kuhl-dusk.desktop"
-    # Keep installed Fedora packages: they might be used by other programs.
-    rm -f "$KUHL_BIN"
-    rm -rf -- "$KUHL_DATA/wallpapers" "$KUHL_DATA/branding"
-    rm -f -- "$KUHL_DATA/common.sh" "$KUHL_DATA/extensions.py" \
-      "$KUHL_DATA/config/extensions.tsv" "$KUHL_DATA/config/effects.tsv" \
-      "$KUHL_DATA/config/choices.json" "$KUHL_DATA/gdm-brand.sh" "$KUHL_DATA/capture.py"
-    rmdir "$KUHL_DATA/config" 2>/dev/null || true
-    rmdir -- "$KUHL_DATA" 2>/dev/null || true
-    # The backup is retained for inspection; do not destroy the user's history.
-    kuhl_info "Removed Kuhl files; previous settings restored where possible."
-    kuhl_info "Saved setting history remains at $KUHL_SETTINGS. Fedora packages were not removed."
+    [[ $# -eq 0 ]] || { echo 'Usage: kuhl uninstall' >&2; exit 2; }
+    echo 'Removing only Kuhl-tracked desktop configs (edited files are preserved)...'
+    [[ ! -r "$ROOT/render.py" ]] || python3 "$ROOT/render.py" uninstall || true
+    rm -f "$HOME/.local/bin/kuhl"
+    echo "Kuhl management command removed. Fedora packages, third-party repos, GNOME and previous GNOME Kuhl settings were NOT removed."
+    echo "Kuhl assets and backups remain in $ROOT and $STATE for safe inspection."
     ;;
   help|-h|--help)
-    cat <<'HELP'
-Kuhl OS — a cozy Fedora desktop
+    cat <<'TXT'
+KUHL OS 0.6 · Fedora + Niri
+  kuhl theme day|dusk        Apply matching Waybar, Niri, Kitty and Mako palette
+  kuhl wallpaper day|dusk|default|apply
+  kuhl launcher               Vicinae search, or Fuzzel fallback
+  kuhl keys                   Show keyboard cheat sheet
+  kuhl status                 Show managed config state
+  kuhl doctor                 Check installed desktop and configuration
+  kuhl uninstall              Remove/restore only unmodified Kuhl configs
 
-  kuhl theme day    Switch to the light look
-  kuhl theme dusk   Switch to the dark look
-  kuhl wallpaper default|classic
-  kuhl capture      Export your working GNOME setup to a reviewable JSON file
-  kuhl status       Show installed paths and current mode
-  kuhl extensions list [full|balanced]
-  kuhl extensions install [full|balanced]
-  kuhl extensions uninstall    Remove only Kuhl-installed extensions
-  kuhl doctor       Check GNOME launcher shortcut and installed components
-  kuhl uninstall    Restore saved preferences and remove Kuhl assets
-
-No AI services, telemetry, custom update services, or third-party RPM repos.
-HELP
+  Re-run the local install.sh to update. No background auto-update, AI or telemetry.
+TXT
     ;;
-  *) kuhl_error "Unknown command: $1"; exit 2;;
+  *) echo "Unknown command: $command_name (run: kuhl help)" >&2; exit 2 ;;
 esac

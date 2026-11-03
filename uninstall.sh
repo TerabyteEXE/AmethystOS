@@ -4,5 +4,5 @@ BIN="$HOME/.local/bin/kuhl"
 if [[ -x "$BIN" ]]; then
   exec "$BIN" uninstall
 fi
-printf 'Kuhl OS is not installed (no %s).\n' "$BIN" >&2
+echo 'Kuhl management command not installed; nothing was removed.' >&2
 exit 1

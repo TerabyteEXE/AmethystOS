@@ -1,0 +1,27 @@
+{
+  "// kuhl-managed": "Kuhl OS 0.6 Waybar layout",
+  "layer": "top",
+  "reload_style_on_change": true,
+  "position": "top",
+  "height": 36,
+  "spacing": 5,
+  "margin-top": 8,
+  "margin-left": 13,
+  "margin-right": 13,
+  "modules-left": ["custom/kuhl", "niri/workspaces", "niri/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["pulseaudio", "network", "battery", "tray", "custom/lock"],
+  "custom/kuhl": {
+    "format": "✳  kuhl",
+    "tooltip": "Super + Space · Search",
+    "on-click": "$HOME/.local/bin/kuhl launcher"
+  },
+  "niri/workspaces": { "format": "{index}", "on-click": "activate", "all-outputs": false },
+  "niri/window": { "format": "{title}", "max-length": 38, "separate-outputs": true },
+  "clock": { "format": "{:%a  %b %d  ·  %I:%M %p}", "tooltip-format": "{:%A, %B %d %Y}" },
+  "pulseaudio": { "format": "vol {volume}%", "format-muted": "muted", "on-click": "pavucontrol" },
+  "network": { "format-wifi": "wifi {signalStrength}%", "format-ethernet": "wired", "format-disconnected": "offline", "tooltip-format": "{ifname}: {ipaddr}" },
+  "battery": { "format": "bat {capacity}%", "format-charging": "bat +{capacity}%" },
+  "tray": { "spacing": 8 },
+  "custom/lock": { "format": "lock", "tooltip": "Lock · Super + Shift + L", "on-click": "swaylock -f -c 191f23" }
+}

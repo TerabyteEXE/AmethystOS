@@ -1,118 +1,125 @@
-# Kuhl OS v0.5 — Fedora Workstation, made cozy
+# Kuhl OS 0.6 — Fedora, made to flow
 
-Kuhl is a repeatable **Fedora GNOME configuration**, not yet an independent Linux distribution. This release includes a text installer, an original default wallpaper, a **Spotlight-style launcher on Super+Space**, a selected set of GNOME extensions, and a command to **capture the extra extensions/apps from your existing desktop**.
+A warm, keyboard-first **Fedora Workstation + Niri desktop experience**. Kuhl is **not** a separate distribution, ISO, modified kernel, or package manager. It adds a Niri scrolling-tiling session to Fedora while keeping GNOME as a fallback.
 
-Website: https://terabyteexe.github.io/Kuhl-OS/main.html  
-Video reference: https://www.youtube.com/watch?v=8QSJSZdUawk
+> **Status: experimental developer preview.** Configuration is based on documented Niri 26.04 and Fedora 43–45 packaging; static and simulated tests pass. No physical Fedora installation or full GUI login has been executed in the build environment. Test in a VM or spare machine before daily driving.
 
-> **Release status: experimental.** Automated script checks pass, but this specific release has not been tested on a physical Fedora 44 GNOME 50 machine. GNOME Shell extensions are third-party code; version support is checked at installation, but functionality still needs a real GNOME Wayland login test. The exact contents of the reference YouTube video have not been verified.
+Website: `main.html` (publish to your GitHub Pages repository). The website's desktop graphic is a concept illustration, **not a screenshot**.
 
-## Install with one command
+## What changed from 0.5
 
-Upload the **contents** of the `Kuhl-OS/` folder in the ZIP to the `main` branch of your existing GitHub repo, preserving any existing `main.html` and `LICENSE`. Then, on a fully booted and logged-in **Fedora Workstation GNOME** desktop, open Terminal:
+- Replaced the old GNOME extension-dependent desktop with **Niri**: scrollable tiling, rounded corners, live-reloading KDL, and comfortable workspace shortcuts.
+- Added **Waybar**, **Kitty**, **Mako**, **Swaybg**, **Swaylock**, **Swayidle**, **Fuzzel**, XWayland satellite and recommended XDG portals.
+- **Super + Space** opens **Fuzzel** out of the box. Both launchers can find Kuhl Day and Kuhl Dusk as application entries. Optional **Vicinae** offers a more macOS/Raycast-style search experience with file indexing, actions and clipboard features.
+- Kept the original Kuhl wallpapers and warm Day/Dusk aesthetic. `kuhl theme day|dusk` updates Niri's focus colors, bar, terminal, notifications, Fuzzel and the default wallpaper together. Theme entries also appear in application search.
+- Removed obsolete GNOME-extension manifests, installer logic and misleading website copy. Kuhl does **not** disable GNOME or remove existing apps.
+- Added non-destructive file ownership tracking, backups before explicitly requested replacement, and user-edit-aware uninstall.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
-```
+## Requirements
 
-Review remote installation scripts before running them. The bootstrap downloads the public GitHub `main` archive, then opens the installer menu. Don't run the installer with sudo; it asks for sudo only when needed. It does not support Silverblue, KDE or other ostree systems.
+Regular **Fedora Workstation 43 or newer**, x86_64; Fedora 44/45 are the primary targets, at least 8 GB RAM recommended, working Wayland-capable graphics and internet for package installation. Do not use on Silverblue/Kinoite or other rpm-ostree systems. Keep a functional GNOME session as a safety net.
 
-**Already installed Kuhl v0.3 or v0.4?** Upload the updated files, then rerun the command above. It reuses existing app installations and updates the new desktop settings. Save any work before choosing reboot.
+No AI services, telemetry, scheduled jobs, proprietary drivers, alternate update daemon, or ISO build system are included.
 
-## What the installer sets up
+## Install (review files first)
 
-- **Base, required:** GNOME Tweaks, Extension Manager, GNOME Extensions app, Kuhl theme assets, Papirus icons, Noto Sans and JetBrains Mono fonts, and Fedora's User Themes extension.
-- **Search, required:** [Spotlight](https://extensions.gnome.org/extension/10666/spotlight/), a floating search box for apps, files, system settings and calculations. Kuhl assigns **Super+Space** to Spotlight and moves GNOME's keyboard-layout switching to **Super+Alt+Space** (reverse: **Shift+Super+Alt+Space**).
-- **Reference setup, on by default:** ArcMenu, Dash to Dock, Blur my Shell (by aunetx), and Fedora Background Logo with a Kuhl logo overlay. User Themes is required. These are the extensions confirmed from the working Kuhl desktop. GNOME Extensions is a utility, not another extension.
-- **Other selectable extensions, off by default:** Just Perfection, AppIndicator, Tiling Assistant, Caffeine and Rounded Window Corners Reborn. Enable these only if you want them.
-- **GPU effects:** Blur my Shell is on by default because it is in the reference setup; it can be disabled in the text menu. Rounded Window Corners is optional.
-- **Optional apps:** Flatseal, Pika Backup, VLC, GIMP, Inkscape, and LibreOffice. Fedora's regular apps are kept intact.
-- **Optional login branding:** Add the Kuhl logo to GDM using supported GNOME system configuration. It does not replace the GDM login wallpaper or authentication greeter.
-- **Reboot:** The installer offers to reboot after a successful installation; new extensions may only be activated after a new GNOME session.
-
-There is no bundled AI, background daemon, custom package manager or disabled Fedora security service. Flathub is added to the current user to install Extension Manager and selected optional apps. Extensions are downloaded from `extensions.gnome.org` with compatibility metadata checked against the detected GNOME major version.
-
-## New default wallpaper
-
-`assets/wallpapers/kuhl-default.png` is the **new bundled default** for both light and dark GNOME backgrounds. The older Day and Dusk wallpapers remain bundled as an alternative.
-
-After installation:
+Use the downloaded ZIP or, **after publishing this updated code to your Kuhl-OS repo**:
 
 ```bash
-~/.local/bin/kuhl wallpaper default  # new landscape
-~/.local/bin/kuhl wallpaper classic  # previous Day/Dusk pair
-~/.local/bin/kuhl theme dusk         # dark app and shell appearance
-~/.local/bin/kuhl theme day          # light app and shell appearance
+git clone https://github.com/TerabyteEXE/Kuhl-OS.git
+cd Kuhl-OS
+bash tests/validate.sh
+bash install.sh --dry-run
+bash install.sh
 ```
 
-To customize the default for everyone, replace `assets/wallpapers/kuhl-default.png` with a PNG of your choice, commit it to GitHub and rerun Kuhl. 2560×1440 or higher is recommended. To apply an already-installed new wallpaper without reinstalling, run `kuhl wallpaper default` (full path above if `~/.local/bin` isn't in your `PATH`).
+Run `install.sh` as your **normal user**, not as root. A Python curses menu lets you choose Day/Dusk and optional apps. Fedora packages are installed via sudo as needed. The optional Vicinae COPR is **off by default** and, if chosen, requires typing `VICINAE` to authorize the extra repository.
 
-## Capturing your current working setup (important)
+When installation finishes, **log out**, choose **Niri** in GDM, and sign in. GNOME stays available on the same login screen. `kuhl doctor` checks required commands and validates your Niri config; `kuhl keys` prints the keybinding reference.
 
-You said you installed extra extensions and forgot which. The **capture tool** inventories them without reading your files, history, account tokens or extension-specific preferences:
+Already on old Kuhl GNOME v0.5? Install 0.6 as a separate Niri session. The GNOME theme, extension state, captured settings and old assets are **not automatically removed or reverted**. Back them up separately if you plan to retire the GNOME variant.
+
+### Config collision protection
+
+By default, Kuhl **never replaces existing** `~/.config/niri/config.kdl`, Waybar config, Kitty config, or Mako or Fuzzel config that it cannot identify as unchanged Kuhl-managed files. It prints a warning for preserved files. If you want Kuhl to own your existing Niri setup, review your dotfiles first and run:
 
 ```bash
-~/.local/bin/kuhl capture
+bash install.sh --replace-configs
 ```
 
-This creates **`~/kuhl-capture.json`** with:
+Type `REPLACE` at the confirmation prompt; originals are backed up under `~/.local/state/kuhl/backups`. **Edited Kuhl-managed configs are also preserved on future installs** unless you explicitly request replacement. To add personal Niri customizations, edit your config and know that Kuhl will preserve it rather than silently overwriting it.
 
-- Fedora/GNOME version
-- enabled/installed GNOME extension UUIDs
-- which enabled extensions are missing from Kuhl's current default list
-- installed Flatpak application IDs and (when available) user-installed Fedora RPM package names
-- a small whitelist of non-private GNOME appearance settings
+`--defaults` skips the menu and uses only Fedora-packaged components; it does not silently install Vicinae or Flathub apps. `--dry-run` shows all default selections without modifying your system and is runnable even on non-Fedora machines for review.
 
-The JSON does **not** change the installation. **Review it before sharing it**. Upload it in a chat or inspect it locally; then the remaining extensions can be evaluated and incorporated into `config/choices.json` and `config/extensions.tsv` so the next person gets your exact setup automatically. It does not auto-install all of your personal apps onto other people's machines.
+## Core keyboard shortcuts
 
-For deeper, optional replication of extension preferences (dock positioning, blur intensity, sizes, etc.), you may use:
+| Action | Shortcut |
+| --- | --- |
+| Spotlight-style search (Vicinae or Fuzzel) | **Super + Space** |
+| Terminal | Super + Enter / T |
+| Files | Super + E |
+| Focus left/right column | Super + H / L |
+| Focus up/down | Super + K / J |
+| Move column/window | Super + Ctrl + H/J/K/L |
+| Workspace | Super + 1–5 |
+| Move column to workspace | Super + Shift + 1–5 |
+| Resize column | Super + R |
+| Toggle floating | Super + V |
+| Lock screen | Super + Shift + L |
+| Quit window | Super + Shift + Q |
+| Log out of Niri (confirmation) | Super + Shift + E |
+| Screenshot | Print |
+
+See `docs/KEYBINDS.md` for the full list and practical tips.
+
+## Commands
 
 ```bash
-~/.local/bin/kuhl capture --with-extension-prefs --overwrite
+kuhl theme day          # light palette and wallpaper
+kuhl theme dusk         # warm dark palette and wallpaper
+kuhl wallpaper day      # pin the Day wallpaper even in Dusk mode
+kuhl wallpaper dusk     # pin Dusk wallpaper
+kuhl wallpaper default  # use original Kuhl default wallpaper
+kuhl status             # audit managed file state
+kuhl doctor             # check programs / validate Niri config
+kuhl keys               # printable hotkeys
+kuhl uninstall          # remove only unchanged Kuhl-owned config files
 ```
 
-This creates a separate `~/kuhl-capture.extensions.dconf` that **may include private URLs, usernames or other sensitive extension configuration**. Review and redact it before sending or putting it on a public repository. Do not copy it into GitHub unreviewed.
+To return to automatic theme-based wallpaper switching, remove `~/.local/state/kuhl/wallpaper-choice` or set its contents to `auto`, then run `kuhl wallpaper apply` in Niri.
 
-If you're still on Kuhl v0.3, you can run the new capture script **directly from the extracted v0.5 ZIP** using `python3 scripts/capture.py` before updating anything.
+## Safety and recovery
 
-## Testing and diagnostics
+If Niri fails to start, use GDM's gear/session menu to log into **GNOME** instead. Review `~/.local/state/kuhl/install.log`, run `niri validate` and `kuhl doctor` from GNOME. If your existing Niri dotfiles conflicted, the installer intentionally left them in place; review the warning and decide whether to use `--replace-configs`. An installer validation failure triggers removal/restoration of Kuhl-tracked config files.
 
-```bash
-bash tests/validate.sh                  # script and simulated GNOME tests
-bash install.sh --dry-run              # recommended selections; no changes
-bash install.sh --defaults --no-reboot # install without menu or reboot
-~/.local/bin/kuhl doctor               # check prerequisites and shortcut
-~/.local/bin/kuhl capture              # inventory this desktop
-~/.local/bin/kuhl uninstall            # restore tracked preferences
+`kuhl uninstall` removes or restores Kuhl-managed config files **only if they have not been modified since Kuhl generated them**. It retains RPMs, any enabled COPR, Flatpaks, the GNOME fallback, installed wallpapers, and backup/state logs to avoid deleting unrelated work. See `docs/RECOVERY.md` for manual cleanup.
+
+For changes to the repo, start with `bash tests/validate.sh`. CI executes these checks on every push/PR. A real Fedora guest is required to test login, workspace animations, portal screen sharing, input devices, notifications, suspend, X11 apps and battery behavior. See `docs/TESTING.md`.
+
+## Project structure
+
+```text
+Kuhl-OS/
+├── assets/                   # Original wallpapers and branding
+├── bin/kuhl                  # Theme, diagnostics, search and recovery command
+├── bootstrap.sh              # Optional GitHub source downloader
+├── config/
+│   ├── choices.json          # Terminal installer menu choices
+│   └── themes.json           # Day/Dusk color tokens
+├── configs/                  # Niri/Waybar/Kitty base configurations
+├── docs/                     # Design, testing, keybindings and recovery
+├── install.sh                # Fedora installer
+├── lib/common.sh             # Installer environment helpers
+├── main.html                 # Website, interactive launcher demo
+├── scripts/menu.py           # Curses TUI
+├── scripts/render.py         # Safe, manifest-backed config deployment
+└── tests/validate.sh         # Static + isolated functional tests
 ```
 
-The installer records its status in `~/.local/state/kuhl/install.log`. An extension may be installed but not appear active until you log out and back in on GNOME Wayland. Confirm Spotlight is enabled in **Extension Manager**, and that `dconf read /org/gnome/shell/extensions/spotlight/toggle-shortcut` prints `['<Super>space']`. If it doesn't open, check for another launcher bound to that shortcut.
+### Sources and licenses
 
-The uninstall restores Kuhl-tracked GNOME settings only when they haven't been edited since Kuhl set them. It restores the Spotlight key when appropriate, removes Kuhl assets and removes only extensions that its installer originally installed. Fedora packages and user-selected apps are retained so unrelated software isn't broken.
+Niri: https://github.com/niri-wm/niri · Fedora packages: https://packages.fedoraproject.org/pkgs/niri/niri/ · Vicinae Fedora packaging: https://docs.vicinae.com/install/linux · Niri + Vicinae: https://docs.vicinae.com/quickstart/niri · Waybar: https://github.com/Alexays/Waybar
 
-## Important limitations
+All these components are third-party software distributed under their respective licenses. Kuhl and its branding do not imply endorsement by Fedora, Red Hat, Niri, Vicinae or their maintainers. See `LICENSE` for the license of this repository's original code.
 
-1. **Installed extension names are now captured, but not their settings.** Use `kuhl capture --with-extension-prefs --overwrite` and review the separate settings file to replicate the dock/menu appearance on another machine.
-2. **GNOME extensions are not themes for GDM.** This installer supports a small optional GDM login logo only.
-3. Compatibility metadata doesn't guarantee zero GNOME Shell bugs; always validate a clean Fedora installation before calling it stable.
-4. The website currently describes a four-extension limit, Ctrl+Space and a coming-soon script. Update it to reflect the actual release before advertising Kuhl as ready.
-
-Copyright and licenses of upstream Fedora, GNOME, Flatpak and extensions remain with their authors. Kuhl's theme and wallpaper assets are independent project assets.
-
-## Confirmed installed extensions in the reference desktop (v0.5)
-
-| What you called it | Exact extension / tool | Default |
-| --- | --- | --- |
-| Background-logo | `background-logo@fedorahosted.org` (Fedora RPM) | On |
-| User theme | `user-theme@gnome-shell-extensions.gcampax.github.com` (Fedora RPM) | On |
-| Arc menu | `arcmenu@arcmenu.com` (requires `gnome-menus`) | On |
-| Blur my shell / aunetx | `blur-my-shell@aunetx` (`aunetx` is its author) | On |
-| Dash to dock | `dash-to-dock@micxgx.gmail.com` | On |
-| GNOME Shell Extensions | `gnome-extensions-app` (utility, not a shell effect) | Installed |
-| Spotlight | `spotlight@nin` (additional requested launcher) | On |
-
-The baseline matches **installed extensions by name**, not your personalized configuration for
-ArcMenu, dock position, blur intensity, etc. To reproduce those exact visual choices, run
-`kuhl capture --with-extension-prefs --overwrite`, inspect the resulting private dconf file,
-and redact secrets or file paths before sharing. This is an experimental build that still
-needs a clean Fedora GNOME 50 installation test.
+**Vicinae theming:** Kuhl installs a `kuhl-day.toml` or `kuhl-dusk.toml` theme file into your user Vicinae theme directory when you apply that palette. Use Vicinae’s **Set Theme** command if automatic selection does not take effect on your version.
