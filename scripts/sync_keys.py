@@ -1,47 +1,47 @@
 #!/usr/bin/env python3
-"""Build Kuhl's Niri bind list and documentation from one owned manifest."""
-import argparse, json, sys
+"""Verify Kuhl guide against the actual MIT-licensed KyleOS-derived bindings."""
+import argparse, json, re, sys
 from pathlib import Path
-ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / 'config/keys.json'
-NIRI = ROOT / 'configs/niri/config.kdl'
-DOC = ROOT / 'docs/KEYBINDS.md'
-START = '    // BEGIN KUHL GENERATED KEYBINDS'
-END = '    // END KUHL GENERATED KEYBINDS'
+ROOT=Path(__file__).resolve().parent.parent
+BIND_FILE=ROOT/'configs/niri/binds.kdl'
+MANIFEST=ROOT/'config/keys.json'
+DOC=ROOT/'docs/KEYBINDS.md'
 
-def generate():
-    data = json.loads(SOURCE.read_text())
-    lines = [START]
-    seen = set()
+def make_doc(data):
+    lines=['# Kuhl OS — complete keyboard reference', '',
+           'Based on the KyleOS Niri keybindings (MIT, Rosenkranz / Person-008).',
+           'Kuhl integration adds **Ctrl + Super + K** for the searchable guide.',
+           'The exact bindings are in `configs/niri/binds.kdl`; this guide is checked against that file.', '']
     for section in data['sections']:
-        lines.append(f'    // {section}')
-        for b in [x for x in data['bindings'] if x['section'] == section]:
-            if b['key'] in seen: raise ValueError(f'duplicate Niri binding: {b["key"]}')
-            seen.add(b['key'])
-            opts = (' repeat=false' if b.get('repeat') is False else '') + (' allow-when-locked=true' if b.get('locked') else '')
-            lines.append(f'    {b["key"]}{opts} {{ {b["action"]} }}')
+        lines.extend([f'## {section}', '', '| Shortcut | Action |', '| --- | --- |'])
+        for b in data['bindings']:
+            if b['section']==section:
+                lines.append(f'| {b["show"]} | {b["title"]} |')
         lines.append('')
-    lines.append(END)
-    doc = ['# Kuhl OS — keyboard reference', '', 'Press **Ctrl + Super + K** in Niri for a searchable on-screen guide. This table and the Niri bindings are both generated from `config/keys.json`.','','**Super** is the Windows key on most keyboards. **Niri uses scrolling columns**, so focus and move are different actions.','','**Migration note:** the old Super + Ctrl + K (move up) is now the requested help shortcut; use **Super + Shift + K** to move up. Screen lock is **Super + Alt + L** so Shift + L stays available for moving columns.','']
-    for sec in data['sections']:
-        doc += [f'## {sec}', '', '| Key | Action |', '| --- | --- |']
-        doc += [f'| {b["show"]} | {b["title"]} |' for b in data['bindings'] if b['section'] == sec]
-        doc.append('')
-    return '\n'.join(lines), '\n'.join(doc)+'\n'
+    return '\n'.join(lines)+'\n'
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--check',action='store_true');args=ap.parse_args()
-    bindings, doc = generate()
-    content=NIRI.read_text()
-    if START not in content or END not in content: raise ValueError('missing bind markers')
-    before,rest = content.split(START,1)
-    _,after=rest.split(END,1)
-    target=before+bindings+after
+    data=json.loads(MANIFEST.read_text());content=BIND_FILE.read_text();seen=set()
+    for b in data['bindings']:
+        key=b['key'];action=b['action']
+        if key in seen: raise ValueError(f'duplicate manifest shortcut: {key}')
+        seen.add(key)
+        matcher=r'^\s*'+re.escape(key)+r'(?:\s+[^{}]*)?\s*\{\s*'+re.escape(action)+r'\s*\}\s*$'
+        if not re.search(matcher,content,re.M):
+            print(f'Missing or altered Niri binding: {key} -> {action}',file=sys.stderr)
+            return 1
+    # Catch unlisted active binds, not only missing listed binds.
+    active=re.findall(r'^\s*([A-Za-z0-9_+]+)(?:\s+[^{}]*)?\s*\{\s*.*?\s*\}\s*$',content,re.M)
+    for k in active:
+        if k not in seen:
+            print(f'Unlisted Niri binding: {k}',file=sys.stderr);return 1
+    doc=make_doc(data)
     if args.check:
-        if target != content or DOC.read_text()!=doc:
-            print('Kuhl generated keybindings are not synchronized.',file=sys.stderr);return 1
-        print('[ok] Keybindings and keyboard guide are synchronized')
+        if DOC.read_text()!=doc:
+            print('Keyboard documentation is out of date.',file=sys.stderr);return 1
+        print(f'[ok] {len(seen)} KyleOS / Kuhl shortcuts and guide synchronized')
     else:
-        NIRI.write_text(target);DOC.write_text(doc)
+        DOC.write_text(doc)
     return 0
 if __name__=='__main__':sys.exit(main())

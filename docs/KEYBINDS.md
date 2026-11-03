@@ -1,74 +1,133 @@
-# Kuhl OS — keyboard reference
+# Kuhl OS — complete keyboard reference
 
-Press **Ctrl + Super + K** in Niri for a searchable on-screen guide. This table and the Niri bindings are both generated from `config/keys.json`.
-
-**Super** is the Windows key on most keyboards. **Niri uses scrolling columns**, so focus and move are different actions.
-
-**Migration note:** the old Super + Ctrl + K (move up) is now the requested help shortcut; use **Super + Shift + K** to move up. Screen lock is **Super + Alt + L** so Shift + L stays available for moving columns.
+Based on the KyleOS Niri keybindings (MIT, Rosenkranz / Person-008).
+Kuhl integration adds **Ctrl + Super + K** for the searchable guide.
+The exact bindings are in `configs/niri/binds.kdl`; this guide is checked against that file.
 
 ## Start here
 
-| Key | Action |
+| Shortcut | Action |
 | --- | --- |
-| Super + Space | Search apps and files |
+| Alt + K | Application launcher |
+| Super + T | Theme gallery |
+| Super + Enter | Alacritty terminal |
+| Super + D | Kuhl Control Center |
+| Super + B | Firefox |
+| Super + Space | Search apps |
 | Ctrl + Super + K | All keyboard shortcuts |
-| Super + D | Kuhl control center |
-| Super + Enter | Open terminal |
-| Super + T | Open terminal (alternative) |
-| Super + E | Open Files |
-| Super + Shift + T | Graphical theme gallery |
+| Super + E | Thunar file manager |
 
 ## Windows
 
-| Key | Action |
+| Shortcut | Action |
 | --- | --- |
-| Super + H | Focus column left |
-| Super + L | Focus column right |
-| Super + J | Focus window below |
-| Super + K | Focus window above |
-| Super + Shift + H | Move column left |
-| Super + Shift + L | Move column right |
-| Super + Shift + J | Move window down |
+| Super + Shift + E | Power menu |
+| Super + Alt + S | Spawn sh |
+| Super + Delete | Close window; |
+| Super + F12 | Close window; |
+| Super + ← | Focus column left; |
+| Super + ↓ | Focus window down; |
+| Super + ↑ | Focus window up; |
+| Super + → | Focus column right; |
+| Super + H | Focus column left; |
+| Super + J | Focus window down; |
+| Super + K | Focus window up; |
+| Super + L | Focus column right; |
+| Super + Ctrl + ← | Move column left; |
+| Super + Ctrl + ↓ | Move window down; |
+| Super + Ctrl + ↑ | Move window up; |
+| Super + Ctrl + → | Move column right; |
+| Super + Ctrl + H | Move column left; |
+| Super + Ctrl + J | Move window down; |
+| Super + Ctrl + L | Move column right; |
+| Super + Home | Focus column first; |
+| Super + End | Focus column last; |
+| Super + Ctrl + Home | Move column to first; |
+| Super + Ctrl + End | Move column to last; |
+| Super + Shift + WheelScrollDown | Focus column right; |
+| Super + Shift + WheelScrollUp | Focus column left; |
+| Super + Ctrl + Shift + WheelScrollDown | Move column right; |
+| Super + Ctrl + Shift + WheelScrollUp | Move column left; |
+| Super + Comma | Consume window into column; |
+| Super + Period | Expel window from column; |
+| Super + R | Switch preset column width; |
+| Super + Shift + R | Switch preset window height; |
+| Super + Ctrl + R | Reset window height; |
+| Super + F | Maximize column; |
+| Super + Shift + F | Fullscreen window; |
+| Super + Ctrl + F | Expand column to available width; |
+| Super + C | Center column; |
+| Super + Ctrl + C | Center visible columns; |
+| Super + Minus | Set column width |
+| Super + KP_Subtract | Set column width |
+| Super + Plus | Set column width |
+| Super + KP_Add | Set column width |
+| Super + Shift + Minus | Set window height |
+| Super + Shift + KP_Subtract | Set window height |
+| Super + Shift + Plus | Set window height |
+| Super + Shift + KP_Add | Set window height |
+| Super + V | Toggle window floating; |
+| Super + Shift + V | Switch focus between floating and tiling; |
+| Super + W | Toggle column tabbed display; |
+| Super + Escape | Toggle keyboard shortcuts inhibit; |
+| Super + Shift + T | Theme gallery |
 | Super + Shift + K | Move window up |
-| Super + Ctrl + H | Move column left (legacy) |
-| Super + Ctrl + L | Move column right (legacy) |
-| Super + Ctrl + J | Move window down (legacy) |
-| Super + R | Cycle column width |
-| Super + Shift + R | Cycle window height |
-| Super + F | Maximize column |
-| Super + Shift + F | Toggle fullscreen |
-| Super + V | Toggle floating |
-| Super + Shift + Q | Close focused window |
+| Super + Shift + P | Power menu |
 
 ## Workspaces
 
-| Key | Action |
+| Shortcut | Action |
 | --- | --- |
-| Super + 1 | Go to workspace 1 |
-| Super + 2 | Go to workspace 2 |
-| Super + 3 | Go to workspace 3 |
-| Super + 4 | Go to workspace 4 |
-| Super + 5 | Go to workspace 5 |
-| Super + Shift + 1 | Move column to workspace 1 |
-| Super + Shift + 2 | Move column to workspace 2 |
-| Super + Shift + 3 | Move column to workspace 3 |
-| Super + Shift + 4 | Move column to workspace 4 |
-| Super + Shift + 5 | Move column to workspace 5 |
+| Super + O | Toggle overview; |
+| Super + Shift + ← | Focus monitor left; |
+| Super + Shift + ↓ | Focus monitor down; |
+| Super + Shift + ↑ | Focus monitor up; |
+| Super + Shift + → | Focus monitor right; |
+| Super + Shift + H | Focus monitor left; |
+| Super + Shift + J | Focus monitor down; |
+| Super + Shift + L | Focus monitor right; |
+| Super + Shift + Ctrl + ← | Move column to monitor left; |
+| Super + Shift + Ctrl + ↓ | Move column to monitor down; |
+| Super + Shift + Ctrl + ↑ | Move column to monitor up; |
+| Super + Shift + Ctrl + → | Move column to monitor right; |
+| Super + Shift + Ctrl + H | Move column to monitor left; |
+| Super + Shift + Ctrl + J | Move column to monitor down; |
+| Super + Shift + Ctrl + K | Move column to monitor up; |
+| Super + Shift + Ctrl + L | Move column to monitor right; |
+| Super + Page_Down | Focus workspace down; |
+| Super + Page_Up | Focus workspace up; |
+| Super + U | Focus workspace down; |
+| Super + I | Focus workspace up; |
+| Super + Ctrl + Page_Down | Move column to workspace down; |
+| Super + Ctrl + Page_Up | Move column to workspace up; |
+| Super + Ctrl + U | Move column to workspace down; |
+| Super + Ctrl + I | Move column to workspace up; |
+| Super + Shift + Page_Down | Move workspace down; |
+| Super + Shift + Page_Up | Move workspace up; |
+| Super + Shift + U | Move workspace down; |
+| Super + Shift + I | Move workspace up; |
+| Super + WheelScrollDown | Focus workspace down; |
+| Super + WheelScrollUp | Focus workspace up; |
+| Super + Ctrl + WheelScrollDown | Move column to workspace down; |
+| Super + Ctrl + WheelScrollUp | Move column to workspace up; |
 
 ## System & media
 
-| Key | Action |
+| Shortcut | Action |
 | --- | --- |
-| Super + Shift + P | Power and session menu |
-| Super + Alt + L | Lock screen |
-| Super + Shift + E | Exit Niri (with confirmation) |
-| Super + Shift + / | Native Niri help |
-| Print Screen | Interactive screenshot |
-| Ctrl + Print | Screenshot whole monitor |
-| Volume + | Volume up |
-| Volume − | Volume down |
-| Mute | Toggle mute |
-| Brightness + | Screen brighter |
-| Brightness − | Screen dimmer |
-| Play / Pause | Media playback |
+| Scroll_Lock | Lock screen |
+| Super + Alt + L | Lock the screen |
+| Ctrl + Alt + Delete | Power menu |
+| XF86AudioMute | Spawn sh |
+| XF86AudioRaiseVolume | Spawn sh |
+| XF86AudioLowerVolume | Spawn sh |
+| XF86MonBrightnessUp | Spawn |
+| XF86MonBrightnessDown | Spawn |
+| XF86AudioPlay | Spawn sh |
+| XF86AudioStop | Spawn sh |
+| XF86AudioPrev | Spawn sh |
+| XF86AudioNext | Spawn sh |
+| Print Screen | Screenshot; |
+| Ctrl + Print Screen | Screenshot screen; |
+| Alt + Print Screen | Screenshot window; |
 

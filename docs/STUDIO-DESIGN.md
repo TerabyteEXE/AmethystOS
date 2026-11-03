@@ -11,3 +11,7 @@ This design is inspired by [KyleOS](https://github.com/Person-008/KyleOS) (MIT c
 - Fedora’s packaged apps and GNOME fallback are retained. No KyleOS system-level `/etc` files, fish auto-start behaviors, Arch-specific installer, shader animations, or per-monitor display IDs are imported.
 
 **AI-assisted source, unaudited.** See `docs/SECURITY.md` and independently review before deployment.
+
+
+## Release candidate direction
+The original pixel-like KyleOS UI is now used directly for v1 RC in Niri, Waybar, Rofi, Alacritty and Mako. The previous Studio centered-pill appearance is no longer the default; this document describes an older concept kept for historical reference.

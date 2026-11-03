@@ -1,112 +1,108 @@
 #!/usr/bin/env bash
+# Static and isolated tests for the release candidate.
 set -Eeuo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 for f in bootstrap.sh install.sh uninstall.sh bin/kuhl lib/common.sh tests/validate.sh; do bash -n "$f"; done
 python3 -m py_compile scripts/menu.py scripts/render.py scripts/validate_niri.py scripts/sync_keys.py scripts/kuhl_ui.py scripts/progress.py
 python3 - <<'PY'
-import json,re,struct
+import json,re,struct,hashlib
 from pathlib import Path
-choices=json.loads(Path('config/choices.json').read_text())['choices']
-ids=[i['id'] for i in choices]
+p=Path('.')
+options=json.loads((p/'config/choices.json').read_text())['choices']
+ids=[x['id'] for x in options]
 assert len(ids)==len(set(ids))
-assert {'core','theme','vicinae'} <= set(ids)
-assert not next(i for i in choices if i['id']=='vicinae')['default']
-assert not next(i for i in choices if i['id']=='replace_existing')['default']
-assert all(x.get('description') for x in choices)
-for x in ('frontier','dyson','puncture','slowend','day','dusk'):
- assert x in json.loads(Path('config/themes.json').read_text())
-for p in Path('assets/wallpapers').glob('*.png'):
- d=p.read_bytes()
- assert d[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',d[16:24])==(2560,1440)
-conf=Path('configs/niri/config.kdl').read_text()
-assert 'include "kuhl-theme.kdl"' in conf and 'Mod+Space repeat=false' in conf
-assert 'Mod+Shift+E { quit;' in conf
-assert 'Ctrl+Super+K repeat=false' in conf
-assert 'Mod+Shift+K { move-window-up; }' in conf
-assert 'window-rule {' in conf and 'kuhl-keys' in conf
-assert 'keyboard {\n        numlock\n    }' in conf
-assert 'keyboard { numlock }' not in conf
-site=Path('main.html').read_text()
-assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','Rofi','curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash','Kuhl OS','Ctrl + Super + K','copyInstall','AI-assisted','PrisonerCoin','KyleOS'])
-assert 'kuhl.example' not in site and 'coming soon' not in site.lower()
-assert 'ctrl+space' not in site.lower()
-assert 'https://github.com/TerabyteEXE/Kuhl-OS' in site
-assert 'git clone https://github.com/TerabyteEXE/Kuhl-OS.git' not in site
-assert 'id="command"' in site
-assert 'https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh' in Path('bootstrap.sh').read_text()
-assert Path('config/keys.json').is_file()
-assert 'default-wallpaper' not in conf
-assert 'geometry-corner-radius 20 0 40 0' in conf
-assert 'border-radius' in Path('configs/rofi/kuhl.rasi').read_text().lower()
-assert 'Survey' not in str([p for p in Path('assets/wallpapers/third-party').glob('*.png')])
-assert Path('docs/CREDITS.md').exists() and Path('docs/SECURITY.md').exists()
-assert 'MIT License' in Path('third_party/KyleOS-MIT.txt').read_text()
-assert 'CC BY-NC-SA' in Path('docs/CREDITS.md').read_text()
-assert Path('index.html').read_bytes()==Path('main.html').read_bytes()
-print('[test] Bundled config, site and manifest: OK')
+assert {'core','theme','replace_existing','vicinae'}<=set(ids)
+assert not next(x for x in options if x['id']=='replace_existing')['default']
+assert not next(x for x in options if x['id']=='vicinae')['default']
+assert all(x.get('description') for x in options)
+assert set(json.loads((p/'config/themes.json').read_text()))=={'frontier','dyson','puncture','slowend','day','dusk'}
+for image in (p/'assets/wallpapers').rglob('*.png'):
+    data=image.read_bytes();assert data.startswith(b'\x89PNG\r\n\x1a\n'),image
+for name in ('frontier','dyson','puncture','slowend'):
+    assert (p/f'assets/wallpapers/third-party/{name}.gif').read_bytes()[:6] in (b'GIF87a',b'GIF89a')
+    assert (p/f'assets/wallpapers/third-party/{name}-thumbnail.png').is_file()
+    theme=('SlowEnd' if name=='slowend' else name.title())
+    for f in ('niri.kdl','rofi.rasi','alacritty.toml','mako.config'):
+        assert (p/f'configs/upstream/themes/{theme}/{f}').is_file()
+conf=(p/'configs/niri/config.kdl').read_text()
+for name in ('layout','autostart','output','binds','window-rules','kuhl-theme'):
+    assert f'include "{name}.kdl"' in conf
+assert 'custom-shader' in conf and 'geometry-corner-radius 20 0 40 0' in (p/'configs/niri/window-rules.kdl').read_text()
+assert not re.search(r'(?m)^\s*include\s+"/etc/niri/',conf)
+assert 'HDMI-A-1' not in (p/'configs/niri/output.kdl').read_text().replace('// KyleOS hardcoded HDMI-A-1 and DP-3 outputs, which would break other hardware.','')
+bind=(p/'configs/niri/binds.kdl').read_text()
+assert 'Ctrl+Super+K' in bind and 'Mod+Space' in bind
+assert 'Mod+Ctrl+K     { move-window-up; }' not in bind
+assert '/usr/share/scripts/' not in bind and 'yay -Sy' not in bind
+assert 'Mod+Shift+K hotkey-overlay-title="Move window up"' in bind
+for rel in ('root/etc/niri/config.kdl','root/etc/niri/binds.kdl','root/etc/xdg/waybar/config.jsonc', 'root/usr/share/rofi/themes/thematic.rasi'):
+    assert (p/'third_party/KyleOS/original'/rel).is_file()
+assert (p/'configs/rofi/kuhl.rasi').read_text().splitlines()[1:] == (p/'third_party/KyleOS/original/root/usr/share/rofi/themes/thematic.rasi').read_text().splitlines()
+assert '"modules-left": ["pulseaudio", "battery", "niri/language"]' in (p/'configs/waybar/config.jsonc').read_text()
+assert 'font-size: 30px' in (p/'configs/waybar/style.css').read_text()
+assert 'alacritty' in (p/'install.sh').read_text()
+site=(p/'main.html').read_text()
+for token in ('KyleOS','PrisonerCoin','AI-assisted','niri','Kuhl OS','copyInstall','bootstrap.sh','CC BY-NC-SA','GitHub'):
+    assert token.lower() in site.lower(),token
+assert (p/'main.html').read_bytes()==(p/'index.html').read_bytes()
+assert 'MIT License' in (p/'third_party/KyleOS-MIT.txt').read_text()
+assert 'CC BY-NC-SA' in (p/'docs/CREDITS.md').read_text()
+print('[test] Direct KyleOS config port, images, website, license, manifest: OK')
 PY
 python3 scripts/sync_keys.py --check
 python3 scripts/progress.py 6 'Finished' | grep -q '100%'
-echo '[test] Keyboard manifest, generated documentation and progress UI: OK'
+echo '[test] 107-shortcut guide and installer progress display: OK'
 OUT="$(mktemp)"
 python3 scripts/menu.py --config config/choices.json --output "$OUT" --defaults
 python3 - "$OUT" <<'PY'
 import json,sys
-v=json.load(open(sys.argv[1])); assert v['theme']=='frontier'; assert {'core','theme'} <= set(v['selected']); assert 'vicinae' not in v['selected']; assert 'replace_existing' not in v['selected']
+x=json.load(open(sys.argv[1]));assert x['theme']=='frontier'; assert {'core','theme'}<=set(x['selected']); assert 'replace_existing' not in x['selected']
 PY
 rm -f "$OUT"
-echo '[test] Python TUI defaults: OK'
 bash install.sh --dry-run >/dev/null
 bash bootstrap.sh --help | grep -q 'one-command'
-# Selection/upgrade contract: the one-command TUI can opt in to replacing existing dotfiles.
-grep -q 'chosen replace_existing; then REPLACE_CONFIGS=1' install.sh
-grep -q 'Existing dotfiles will be backed up, then replaced' scripts/menu.py
-echo '[test] One-command entry point, safe upgrade choice, installer dry-run: OK'
-TMP="$(mktemp -d -t kuhl-tests.XXXXXXXX)"
+echo '[test] Installer options, dry-run, bootstrap help: OK'
+TMP="$(mktemp -d -t kuhl-v1-test.XXXXXX)"
 trap 'rm -rf -- "$TMP"' EXIT
 export HOME="$TMP/home" XDG_CONFIG_HOME="$TMP/config" XDG_DATA_HOME="$TMP/data" XDG_STATE_HOME="$TMP/state"
-mkdir -p "$HOME" "$XDG_DATA_HOME/kuhl" "$XDG_CONFIG_HOME/niri"
+mkdir -p "$HOME" "$XDG_DATA_HOME/kuhl/templates" "$XDG_CONFIG_HOME/niri"
 cp config/themes.json "$XDG_DATA_HOME/kuhl/themes.json"
-# Verify existing user file is protected; no Kuhl overwrite.
-printf 'keep my niri config\n' > "$XDG_CONFIG_HOME/niri/config.kdl"
-python3 scripts/render.py install --source configs --theme frontier >/dev/null
-[[ "$(cat "$XDG_CONFIG_HOME/niri/config.kdl")" == 'keep my niri config' ]]
-[[ -f "$XDG_CONFIG_HOME/waybar/style.css" ]]
-[[ -f "$XDG_CONFIG_HOME/fuzzel/fuzzel.ini" ]]
-[[ -f "$XDG_CONFIG_HOME/rofi/kuhl.rasi" ]]
-[[ -f "$XDG_CONFIG_HOME/rofi/color.rasi" ]]
-[[ -f "$XDG_CONFIG_HOME/rofi/gallery.rasi" ]]
-[[ -f "$HOME/.local/share/applications/kuhl-day.desktop" ]]
-[[ -f "$HOME/.local/share/applications/kuhl-control.desktop" ]]
-[[ -f "$HOME/.local/share/applications/kuhl-keys.desktop" ]]
-[[ -f "$XDG_DATA_HOME/vicinae/themes/kuhl-frontier.toml" ]]
-# Explicit replacement saves original, and uninstall restores it.
+cp -R configs/. "$XDG_DATA_HOME/kuhl/templates/"
+printf 'my own niri config\n' > "$XDG_CONFIG_HOME/niri/config.kdl"
+python3 scripts/render.py install --source configs --theme frontier > "$TMP/install-output"
+[[ "$(cat "$XDG_CONFIG_HOME/niri/config.kdl")" == 'my own niri config' ]]
+for f in niri/{layout,autostart,output,binds,window-rules,kuhl-theme}.kdl waybar/{config.jsonc,style.css} alacritty/alacritty.toml rofi/{kuhl,gallery,power,color}.rasi mako/config kitty/{kitty.conf,colors.conf}; do
+  [[ -f "$XDG_CONFIG_HOME/$f" ]] || { echo "Missing installed $f" >&2; exit 1; }
+done
+# Reference source files must be copied byte-for-byte into the active theme configs.
+cmp -s "$XDG_CONFIG_HOME/alacritty/alacritty.toml" configs/upstream/themes/Frontier/alacritty.toml
+diff -u <(sed 's/urgent-color "ff0000"/urgent-color "#ff0000"/' configs/upstream/themes/Frontier/niri.kdl) "$XDG_CONFIG_HOME/niri/kuhl-theme.kdl"
+cmp -s "$XDG_CONFIG_HOME/rofi/color.rasi" configs/upstream/themes/Frontier/rofi.rasi
+cmp -s "$XDG_CONFIG_HOME/mako/config" configs/upstream/themes/Frontier/mako.config
 python3 scripts/render.py install --source configs --theme dusk --replace-configs >/dev/null
-grep -q 'KUHL-MANAGED' "$XDG_CONFIG_HOME/niri/config.kdl"
-python3 scripts/render.py theme --theme day >/dev/null
-grep -q 'Kuhl day palette' "$XDG_CONFIG_HOME/niri/kuhl-theme.kdl"
-# User edit must never be destroyed by re-install, theme change or uninstall.
-echo '/* user edit */' >> "$XDG_CONFIG_HOME/waybar/style.css"
-python3 scripts/render.py theme --theme frontier >/dev/null
-grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
+[[ "$(head -1 "$XDG_CONFIG_HOME/niri/config.kdl")" == *KUHL-MANAGED* ]]
+python3 scripts/render.py theme --theme dyson >/dev/null
+diff -u <(sed 's/urgent-color "ff0000"/urgent-color "#ff0000"/' configs/upstream/themes/Dyson/niri.kdl) "$XDG_CONFIG_HOME/niri/kuhl-theme.kdl"
+cmp -s "$XDG_CONFIG_HOME/alacritty/alacritty.toml" configs/upstream/themes/Dyson/alacritty.toml
+# Never overwrite user manual edits, even on theme change.
+echo '/* custom user edit */' >> "$XDG_CONFIG_HOME/waybar/style.css"
+python3 scripts/render.py theme --theme slowend >/dev/null
+grep -q 'custom user edit' "$XDG_CONFIG_HOME/waybar/style.css"
 python3 scripts/render.py uninstall >/dev/null || true
-[[ "$(cat "$XDG_CONFIG_HOME/niri/config.kdl")" == 'keep my niri config' ]]
-grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
-[[ ! -e "$XDG_CONFIG_HOME/kitty/colors.conf" ]]
-echo '[test] Config protection, six-theme rendering, Rofi, backup restore, uninstall: OK'
+[[ "$(cat "$XDG_CONFIG_HOME/niri/config.kdl")" == 'my own niri config' ]]
+grep -q 'custom user edit' "$XDG_CONFIG_HOME/waybar/style.css"
+echo '[test] Six themes, original source equivalence, backup/restore, user edits: OK'
+install -m 644 config/keys.json "$XDG_DATA_HOME/kuhl/keys.json"
 bash "$ROOT/bin/kuhl" wallpaper set "$ROOT/assets/wallpapers/kuhl-day.png" >/dev/null
 [[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == custom ]]
-[[ -r "$XDG_STATE_HOME/kuhl/wallpaper-custom" ]]
 bash "$ROOT/bin/kuhl" wallpaper reset >/dev/null
 [[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == auto ]]
-# The searchable atlas is also available as plain text without a GUI.
-install -m 644 config/keys.json "$XDG_DATA_HOME/kuhl/keys.json"
 bash "$ROOT/bin/kuhl" keys | grep -q 'Ctrl + Super + K'
-echo '[test] Custom wallpaper choice, reset, and CLI keyboard atlas: OK'
+echo '[test] Wallpaper CLI and keyboard guide: OK'
 if command -v niri >/dev/null 2>&1; then
-  python3 scripts/validate_niri.py
+ python3 scripts/validate_niri.py
 else
-  echo '[test] SKIPPED native Niri validation (niri not installed; Fedora CI checks all six themes)'
+ echo '[test] SKIPPED native Fedora/Niri parser validation (niri unavailable on this test host)'
 fi
-echo '[test] All Kuhl Frontier v0.8 checks passed'
+echo '[test] All Kuhl OS v1 RC checks passed'

@@ -4,7 +4,7 @@
       "id": "core",
       "section": "The desktop",
       "title": "Kuhl core desktop",
-      "description": "Fedora-packaged Niri, full-width Waybar, graphical Rofi launcher, Fuzzel fallback, Kitty, Mako, wallpaper and Wayland essentials. GNOME stays as fallback.",
+      "description": "Fedora-packaged Niri, KyleOS status bar, graphical Rofi launcher, Fuzzel fallback, Alacritty and Kitty, Mako, wallpaper and Wayland essentials. GNOME stays as fallback.",
       "default": true,
       "required": true,
       "type": "core"
@@ -13,7 +13,7 @@
       "id": "theme",
       "section": "The desktop",
       "title": "Kuhl Frontier / six coordinated themes",
-      "description": "Art-led Frontier, Dyson, Puncture and Slow End palettes, plus original Kuhl Day/Dusk. Includes matched launcher, Niri, terminal, bar and notification colors; attribution and CC terms documented.",
+      "description": "Art-led Frontier, Dyson, Puncture and Slow End palettes, plus original Kuhl Day/Dusk. Includes exact source Niri, Rofi, Alacritty and Mako palettes, plus compatible Kuhl fallback colors; attribution and CC terms documented.",
       "default": true,
       "required": true,
       "type": "appearance"
@@ -30,7 +30,7 @@
       "id": "vicinae",
       "section": "The desktop",
       "title": "Vicinae Spotlight-style search (optional COPR)",
-      "description": "Optional macOS-style launcher/search, file index and clipboard tools. Explicit consent required for third-party COPR quadratech188/vicinae. Without it, Super+Space launches themed Fedora-packaged Rofi with Fuzzel fallback.",
+      "description": "Optional macOS-style launcher/search, file index and clipboard tools. Explicit consent required for third-party COPR quadratech188/vicinae. Without it, Super+Space launches the original KyleOS Rofi theme with Fuzzel fallback.",
       "default": false,
       "type": "copr",
       "value": "quadratech188/vicinae"

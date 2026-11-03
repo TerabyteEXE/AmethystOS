@@ -1,4 +1,4 @@
-# Kuhl Frontier 0.8 testing plan
+# Kuhl Frontier 1.0-rc1 testing plan
 
 1. `bash tests/validate.sh` — static/bash/python manifest checks, generated keys check, isolated deployment, modified-file preservation and uninstall.
 2. On **Fedora with Niri installed**: `python3 scripts/validate_niri.py` — *real* Niri parser validates all six themes in a temporary folder. It does not change personal configs.

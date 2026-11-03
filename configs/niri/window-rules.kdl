@@ -1,0 +1,42 @@
+// KUHL-MANAGED — KyleOS window geometry with hardware-specific rules removed
+// default window behaviour
+window-rule {
+    clip-to-geometry true
+    geometry-corner-radius 20 0 40 0
+    //baba-is-float true
+}
+
+// sharper corner for any apps that need the top left corner
+window-rule{
+	match app-id="Alacritty"
+	geometry-corner-radius 10 0 40 0
+}
+
+// sharper corner for any apps that neet that for some reason
+window-rule{
+	match app-id="Konsole"
+	geometry-corner-radius 10 0 10 0
+}
+
+window-rule{
+	match is-focused=false
+	focus-ring {
+		off
+	}
+}
+
+// Kuhl tools open in floating windows without changing KyleOS's regular tile layout.
+window-rule {
+  match app-id=r#"^kuhl-keys$"#
+  open-floating true
+}
+window-rule {
+  match app-id=r#"^kuhl-control$"#
+  open-floating true
+}
+
+// Keep the upstream floating-window treatment.
+window-rule {
+  match is-floating=true
+  geometry-corner-radius 4
+}

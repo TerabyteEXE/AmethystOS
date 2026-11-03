@@ -1,3 +1,5 @@
+> Historical note for Kuhl v0.6.1, not current v1.0 RC1.
+
 # Kuhl OS v0.6.1 — Niri parsing fix
 
 The v0.6 sample Niri config contained invalid KDL: `keyboard { numlock }`.

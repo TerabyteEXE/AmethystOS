@@ -51,6 +51,16 @@ PYCODE
       *) echo 'Unrecognized wallpaper setting; using solid background.' >&2; img='';;
     esac
   fi
+  # When a user installs awww separately, the original KyleOS animated wallpaper is
+  # available. Fedora's official swaybg remains the guaranteed static fallback.
+  if [[ "$choice" == auto && -n "$img" && "${KUHL_ANIMATED_WALLPAPER:-0}" == 1 ]] && command -v awww >/dev/null 2>&1; then
+    gif="${img%.png}.gif"
+    if [[ -r "$gif" ]]; then
+      awww-daemon >/dev/null 2>&1 &
+      awww img "$gif" --transition-type wipe --transition-duration 0.2 || true
+      return 0
+    fi
+  fi
   if [[ -n "$img" && ! -r "$img" ]]; then
     echo "Cannot read wallpaper: $img. Using solid background." >&2
     img=''
@@ -130,11 +140,11 @@ PYCODE
     [[ -n "$chosen" ]] && "$SELF" theme "$chosen"
     ;;
   launcher)
-    if command -v vicinae >/dev/null 2>&1; then
-      vicinae toggle && exit 0
+    if [[ "${1:-}" == vicinae ]] && command -v vicinae >/dev/null 2>&1; then
+      exec vicinae toggle
     fi
     if command -v rofi >/dev/null 2>&1; then
-      exec rofi -show drun -theme "$HOME/.config/rofi/kuhl.rasi"
+      exec rofi -show drun -config "$HOME/.config/rofi/kuhl.rasi"
     fi
     exec fuzzel
     ;;
@@ -178,17 +188,17 @@ PY
     show_ui control menu "$@"
     ;;
   status)
-    echo 'Kuhl OS 0.8 · Frontier Edition · Fedora + Niri'
+    echo 'Kuhl OS v1.0 RC1 · KyleOS config port · Fedora + Niri'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
-    echo "Launcher: $(command -v vicinae >/dev/null && echo Vicinae || echo 'Fuzzel fallback')"
+    echo "Launcher: $(command -v rofi >/dev/null && echo 'Rofi (KyleOS)' || echo 'Fuzzel fallback')"
     echo "Wallpaper: $(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
     [[ ! -f "$ROOT/render.py" ]] || python3 "$ROOT/render.py" status
     ;;
   doctor)
     problems=0
     [[ -r /etc/fedora-release ]] && echo '[ok] Fedora found' || { echo '[warn] Not running Fedora'; problems=$((problems+1)); }
-    for c in niri waybar rofi fuzzel kitty mako swaybg swaylock swayidle python3 thunar; do
+    for c in niri waybar rofi fuzzel kitty alacritty mako swaybg swaylock swayidle python3 thunar; do
       command -v "$c" >/dev/null 2>&1 && echo "[ok] $c" || { echo "[warn] Missing $c"; problems=$((problems+1)); }
     done
     if command -v niri >/dev/null 2>&1; then
@@ -209,12 +219,13 @@ PY
     ;;
   help|-h|--help)
     cat <<'HELP'
-KUHL OS · FRONTIER EDITION 0.8
+KUHL OS · 1.0 RELEASE CANDIDATE · KYLEOS RICE
   kuhl menu                         Keyboard-operated desktop control center
   kuhl themes --ui                  Graphical theme gallery (Super+Shift+T)
   kuhl keys --ui                    Searchable shortcut atlas · Ctrl+Super+K
   kuhl keys                         Print every shortcut
-  kuhl launcher                     Vicinae / Fuzzel search · Super+Space
+  kuhl launcher                     KyleOS Rofi / Fuzzel search · Super+Space
+  kuhl launcher vicinae             Optional Vicinae if installed
   kuhl theme list                   List available themes
   kuhl theme frontier|dyson|puncture|slowend|day|dusk  Apply a palette
   kuhl wallpaper set /path/image   Bring your own wallpaper

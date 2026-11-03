@@ -1,0 +1,15 @@
+/* KUHL-MANAGED — KyleOS original Waybar CSS (MIT, Rosenkranz) */
+* {
+	font-family: "proggyclean Nerd Font", "JetBrains Mono", monospace;
+	font-size: 30px;
+}
+
+#network{
+	margin-right: 20px
+}
+
+#pulseaudio,
+#battery,
+#language{
+	margin-left: 20px
+}

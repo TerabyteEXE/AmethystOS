@@ -90,29 +90,29 @@ def put(path: Path, content: bytes, m: dict, *, replace=False) -> bool:
 
 
 def template_files(source: Path):
-    """Original desktop templates plus launcher entries for discoverable Kuhl tools."""
+    """Deploy actual KyleOS config files (plus Kuhl integration) with rollback tracking."""
     binary = str(HOME / '.local/bin/kuhl').replace('\\', '\\\\').replace('"', '\\"')
     launchers = {}
     for name, title, comment, arguments, icon in (
-        ('day', 'Kuhl Day', 'Use the Kuhl Day palette', 'theme day', 'preferences-desktop-theme'),
-        ('dusk', 'Kuhl Dusk', 'Use the Kuhl Dusk palette', 'theme dusk', 'preferences-desktop-theme'),
-        ('frontier', 'Kuhl Frontier', 'Theme by Kuhl; art by PrisonerCoin CC BY-NC-SA', 'theme frontier', 'preferences-desktop-theme'),
+        ('day', 'Kuhl Day', 'Switch to Day theme', 'theme day', 'preferences-desktop-theme'),
+        ('dusk', 'Kuhl Dusk', 'Switch to Dusk theme', 'theme dusk', 'preferences-desktop-theme'),
+        ('frontier', 'Kuhl Frontier', 'KyleOS palette; art by PrisonerCoin CC BY-NC-SA', 'theme frontier', 'preferences-desktop-theme'),
         ('control', 'Kuhl Control Center', 'Themes, wallpaper, system and settings', 'menu --ui', 'preferences-system'),
-        ('keys', 'Kuhl Keyboard Guide', 'Search all Kuhl shortcuts', 'keys --ui', 'input-keyboard'),
+        ('keys', 'Kuhl Keyboard Guide', 'Search every Niri shortcut', 'keys --ui', 'input-keyboard'),
     ):
         content = (f'# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n'
                    f'Name={title}\nComment={comment}\n'
                    f'Exec="{binary}" {arguments}\n'
                    f'Icon={icon}\nTerminal=false\nCategories=Settings;\n')
         launchers[HOME / '.local/share/applications' / f'kuhl-{name}.desktop'] = content.encode()
-    return {
-        **launchers,
-        CONFIG / 'niri/config.kdl': (source / 'niri/config.kdl').read_bytes(),
-        CONFIG / 'waybar/config.jsonc': (source / 'waybar/config.jsonc').read_bytes(),
-        CONFIG / 'kitty/kitty.conf': (source / 'kitty/kitty.conf').read_bytes(),
-        CONFIG / 'rofi/kuhl.rasi': (source / 'rofi/kuhl.rasi').read_bytes(),
-        CONFIG / 'rofi/gallery.rasi': (source / 'rofi/gallery.rasi').read_bytes(),
-    }
+    for name in ('config', 'layout', 'autostart', 'output', 'binds', 'window-rules'):
+        launchers[CONFIG / f'niri/{name}.kdl'] = (source / f'niri/{name}.kdl').read_bytes()
+    for name in ('config.jsonc', 'style.css'):
+        launchers[CONFIG / f'waybar/{name}'] = (source / f'waybar/{name}').read_bytes()
+    launchers[CONFIG / 'kitty/kitty.conf'] = (source / 'kitty/kitty.conf').read_bytes()
+    for name in ('kuhl.rasi', 'gallery.rasi', 'power.rasi'):
+        launchers[CONFIG / f'rofi/{name}'] = (source / f'rofi/{name}').read_bytes()
+    return launchers
 
 
 def theme_files(theme: str):
@@ -222,9 +222,44 @@ icons=1
         f'secondary_background = "{p["bg"]}"',
         f'border = "{p["border"]}"', f'accent = "{p["accent"]}"', ''
     ])
+    upstream = DATA / 'templates/upstream/themes' / {'slowend':'SlowEnd'}.get(theme, theme.title())
+    if theme in {'frontier', 'dyson', 'puncture', 'slowend'}:
+        # These are the original, unmodified KyleOS theme files, kept under MIT.
+        # Don't reimplement their Niri focus ring, Rofi, Alacritty or Mako palettes.
+        niri = (upstream / 'niri.kdl').read_text(encoding='utf-8')
+        # The upstream tab-indicator has a malformed six-digit hex value without '#'.
+        niri = niri.replace('urgent-color "ff0000"', 'urgent-color "#ff0000"')
+        mako = (upstream / 'mako.config').read_text(encoding='utf-8')
+        rofi = (upstream / 'rofi.rasi').read_text(encoding='utf-8')
+        alacritty = (upstream / 'alacritty.toml').read_text(encoding='utf-8')
+    else:
+        # Kuhl's Day / Dusk use the complete upstream Rofi schema, so the unchanged
+        # KyleOS window/list/entry styles still have all their required color keys.
+        source_palette = (DATA / 'templates/upstream/themes/Frontier/rofi.rasi').read_text(encoding='utf-8')
+        import re
+        def rgba(key, fallback):
+            colors = {'red':'#c77e7e', 'blue':p['accent2'], 'lightfg':p['accent'],
+                      'lightbg':p['surface2'], 'foreground':p['fg'], 'background':p['bg']}
+            value = colors.get(key, fallback)
+            rgb = [int(value[i:i+2],16) for i in (1,3,5)]
+            return 'rgba ( '+', '.join(str(c) for c in rgb)+', 100 % )'
+        for key in ('red','blue','lightfg','lightbg','foreground','background'):
+            source_palette = re.sub(r'(?m)^(\s*'+key+r':\s*)rgba\s*\([^)]*\)',
+                                    lambda m: m.group(1)+rgba(key,''),source_palette,count=1)
+        rofi = source_palette
+        alacritty = f'''# KUHL-MANAGED — {theme} fallback Alacritty palette
+[colors.primary]
+background = "{p['terminal_bg']}"
+foreground = "{p['terminal_fg']}"
+[colors.cursor]
+text = "{p['terminal_bg']}"
+cursor = "{p['accent']}"
+[font]
+size = 12
+'''
     return {
         CONFIG / 'niri/kuhl-theme.kdl': niri.encode(),
-        CONFIG / 'waybar/style.css': css.encode(),
+        CONFIG / 'alacritty/alacritty.toml': alacritty.encode(),
         CONFIG / 'kitty/colors.conf': kitty.encode(),
         CONFIG / 'mako/config': mako.encode(),
         CONFIG / 'fuzzel/fuzzel.ini': fuzzel.encode(),

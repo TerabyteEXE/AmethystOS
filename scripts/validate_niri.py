@@ -26,13 +26,16 @@ def main():
         palettes = root / 'share/kuhl/themes.json'
         palettes.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / 'config/themes.json', palettes)
+        shutil.copytree(ROOT / 'configs/upstream', root / 'share/kuhl/templates/upstream')
         # Import only after changing XDG_*, as render.py defines its paths at import time.
         import render
         for theme in __import__('json').loads((ROOT / 'config/themes.json').read_text()):
             folder = root / theme
             folder.mkdir(parents=True)
             config = folder / 'config.kdl'
-            shutil.copy2(ROOT / 'configs/niri/config.kdl', config)
+            for part in ROOT.glob('configs/niri/*.kdl'):
+                if part.name != 'kuhl-theme.kdl':
+                    shutil.copy2(part, folder / part.name)
             generated = render.theme_files(theme)
             theme_path = next((p for p in generated if p.name == 'kuhl-theme.kdl'), None)
             if theme_path is None:

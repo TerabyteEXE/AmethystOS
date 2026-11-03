@@ -1,15 +1,36 @@
-/* KUHL-MANAGED — themed graphical chooser, adapted from KyleOS's MIT thematic menu.
-   Credit: Rosenkranz / Person-008, https://github.com/Person-008/KyleOS
-   Artwork icons are credited separately; see docs/CREDITS.md. */
-@import "color.rasi"
-* { font: "JetBrains Mono 12"; background-color: @background; text-color: @foreground; border-color: @outline; }
-window { width: 850px; location: center; anchor: center; padding: 23px; border: 2px; border-radius: 30px 0px 55px 0px; background-color: @background; }
-mainbox { children: [ inputbar, listview ]; spacing: 14px; }
-inputbar { children: [prompt,entry]; padding: 9px; spacing: 12px; }
-prompt { str: "THEMES /"; text-color: @accent; }
-entry { placeholder: "Select a Kuhl palette"; }
-listview { lines: 2; columns: 3; spacing: 10px; scrollbar: false; }
-element { children: [element-icon,element-text]; orientation: vertical; padding: 7px; spacing: 6px; border: 1px; border-radius: 15px 0px 25px 0px; }
-element selected { background-color: @selection; border-color: @accent; }
-element-icon { size: 180px; horizontal-align: 0.5; }
-element-text { horizontal-align: 0.5; text-color: @foreground; }
+/* KUHL-MANAGED — copied from KyleOS (MIT, Rosenkranz 2026) */
+@import "~/.config/rofi/color.rasi"
+
+window {
+padding: 20px;
+width: 760px;
+border-radius: 40px 0px 80px 0px;
+}
+
+mainbox {
+children: [listview];
+}
+
+
+listview, {
+border: 0px;
+margin: 10px;
+scrollbar: false;
+lines:   2;
+columns: 3;
+}
+
+element {
+children: [ element-icon ];
+orientation: vertical;
+border-radius: 20px 0px 40px 0px;
+border: 1px solid;
+}
+
+element selected {
+border: 5px solid;
+}
+
+element-icon {
+size: 112px;
+}

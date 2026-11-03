@@ -1,34 +1,48 @@
-# Third-party credits and license boundaries
+# Kuhl OS v1 RC — upstream code, adaptation and artwork notices
 
-**Kuhl OS v0.8 is AI-assisted. This file documents upstream code inspiration and individually licensed art.** Kuhl is not affiliated with any of the people or projects below.
+**Kuhl OS is an AI-assisted community Fedora + Niri setup.** This directory documents the origins of source code and assets. Kuhl OS is not an official product of Fedora, Niri, KyleOS, or the artists. The release candidate is not security audited.
 
-## KyleOS — design and permitted code adaptations
+## Original MIT-licensed source: KyleOS by Rosenkranz / Person-008
 
-- Original project: **KyleOS**, created by **Rosenkranz / Person-008** (2026), https://github.com/Person-008/KyleOS
-- Code and dotfiles are published under the **MIT License**, **except the images**.
-- The original MIT copyright and permission notice are reproduced in [`third_party/KyleOS-MIT.txt`](../third_party/KyleOS-MIT.txt). Kuhl credits KyleOS for the source's top status-line layout, asymmetric Niri window corner geometry, compact launcher appearance and theme-based palettes. The code is adapted for Fedora and Kuhl's existing management tools; KyleOS's Arch installation scripts, personal display rules, lock-screen helper, font files, generated GTK icon/theme directories and commands are **not** installed.
-- Kuhl's pre-existing independent scripts retain the original Kuhl license (`LICENSE`). The MIT notice is included as an acknowledgment and condition for source adaptations; it **does not** grant rights to the artwork.
+- Repository: https://github.com/Person-008/KyleOS
+- Author: Rosenkranz (also Person-008); copyright 2026.
+- Software license: MIT, **except the image assets**. The full notice is preserved in `third_party/KyleOS-MIT.txt`.
+- **Untouched, copied upstream files** are in `third_party/KyleOS/original/`.
+- **Actual Kuhl-deployed configuration files** are under `configs/`; Kuhl starts from the original files rather than just recreating the visual appearance.
 
-## PrisonerCoin — artwork (NOT MIT)
+| Source in KyleOS | Used in Kuhl | Adaptations |
+| --- | --- | --- |
+| `root/etc/niri/config.kdl` | `configs/niri/config.kdl` | Relative includes; default US keyboard; generic cursor; Kuhl theme include; original shader preserved |
+| `root/etc/niri/layout.kdl` | `configs/niri/layout.kdl` | Only a Kuhl attribution comment |
+| `root/etc/niri/binds.kdl` | `configs/niri/binds.kdl` | Arch-specific scripts replaced with Kuhl CLI; shortcut guide and search added; collisions resolved |
+| `root/etc/niri/window-rules.kdl` | `configs/niri/window-rules.kdl` | Kept asymmetric shapes; removed personal monitor/app restrictions and private screenshot rules |
+| `root/etc/niri/output.kdl` | `configs/niri/output.kdl` | Removed hardcoded HDMI/DP names and geometry |
+| `root/etc/niri/autostart.kdl` | `configs/niri/autostart.kdl` | Fedora compatible startup, Kuhl wallpaper manager, no lxsession or third-party awww requirement |
+| `root/etc/xdg/waybar/config.jsonc` | `configs/waybar/config.jsonc` | Fixed invalid layer alias `bot` to `bottom`; clock opens Kuhl controls |
+| `root/etc/xdg/waybar/style.css` | `configs/waybar/style.css` | CSS font-size unit fix; fallback font when original Nerd Font is absent |
+| `root/usr/share/rofi/themes/thematic*.rasi` | `configs/rofi/*.rasi` | Copied appearance files in user config directories; only the theme gallery icon dimensions and grid are scaled to fit small displays |
+| `root/etc/thematic/{Frontier,Dyson,Puncture,SlowEnd}/{niri.kdl,rofi.rasi,alacritty.toml,mako.config}` | `configs/upstream/themes/…` | **Original files preserved byte-for-byte; Niri runtime copy fixes one malformed `urgent-color` value (`ff0000` → `#ff0000`) before deployment |
 
-The following bundled PNG images in `assets/wallpapers/third-party/` are **static first frames converted from the GIF assets in the user-provided KyleOS archive**, which credits original art to **PrisonerCoin**. The conversion from GIF to static PNG is a modification; Kuhl does not claim authorship. Each image remains under **Creative Commons Attribution–NonCommercial–ShareAlike 3.0 (CC BY-NC-SA 3.0)**, not the MIT license. Redistribution or modification of these images must comply with **attribution, NonCommercial, and ShareAlike** terms; do not assume they can be reused for commercial products.
+The **original KyleOS theme switcher scripts and Arch installer are not run**. Kuhl's existing installer, user-config backup system, theme manager, searchable keyboard guide and GNOME fallback are retained. Exact source fonts, GNOME/GTK packages and icon sets are not bundled because the upstream source archive does not supply independently reviewed licenses for every third-party dependency.
 
-| Packaged static PNG | Original artwork | Original creator | Year |
-| --- | --- | --- | --- |
-| `frontier.png` | [Final Frontier](https://www.newgrounds.com/art/view/prisonercoin/final-frontier) | [PrisonerCoin](https://prisonercoin.newgrounds.com/) | 2022 |
-| `dyson.png` | [Dyson Analysis](https://www.newgrounds.com/art/view/prisonercoin/dyson-anaysis) | PrisonerCoin | 2023 |
-| `puncture.png` | [Puncture](https://www.newgrounds.com/art/view/prisonercoin/puncture) | PrisonerCoin | 2023 |
-| `slowend.png` | [Slow End](https://www.newgrounds.com/art/view/prisonercoin/slow-end) | PrisonerCoin | 2023 |
+## PrisonerCoin art — NOT MIT
 
-- Source collection/attribution: https://github.com/Person-008/KyleOS#license
-- Full CC license: https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode
-- **Excluded:** the KyleOS `Survey` wallpaper, screenshot/thumbnail, and icons based on `Survey Complete`, because the source README identifies the original artwork as having no confirmed reuse license. We also exclude the other KyleOS preview images, wallpapers thumbnails, fonts, precompiled GTK themes, and massive icon directories to avoid mistakenly relicensing third-party materials.
-- The website uses `frontier.png` in a labeled *concept* mockup and lists the required credits.
+Original images provided with KyleOS are attributed by its maintainer to PrisonerCoin and governed by **Creative Commons Attribution–NonCommercial–ShareAlike 3.0 (CC BY-NC-SA 3.0)**. This attribution applies to *both* the copied animated `.gif` files, converted static PNG first frames, and original `-thumbnail.png` previews in `assets/wallpapers/third-party/`. The original GIF files are unchanged; the static PNG frames are modifications. Do not sell, relicense as MIT, or use these assets in a commercial distribution without separate authorization.
 
-If you plan to distribute Kuhl OS commercially or without the NonCommercial/ShareAlike obligations, **remove the `assets/wallpapers/third-party/` files and replace their corresponding `wallpaper` values in `config/themes.json` with your own licensed images**. Merely removing credits is not sufficient. You can still use the MIT code.
+| Bundled assets | Source artwork | Author/year |
+| --- | --- | --- |
+| `frontier.gif`, `.png`, `-thumbnail.png` | [Final Frontier](https://www.newgrounds.com/art/view/prisonercoin/final-frontier) | [PrisonerCoin](https://prisonercoin.newgrounds.com/), 2022 |
+| `dyson.gif`, `.png`, `-thumbnail.png` | [Dyson Analysis](https://www.newgrounds.com/art/view/prisonercoin/dyson-anaysis) | PrisonerCoin, 2023 |
+| `puncture.gif`, `.png`, `-thumbnail.png` | [Puncture](https://www.newgrounds.com/art/view/prisonercoin/puncture) | PrisonerCoin, 2023 |
+| `slowend.gif`, `.png`, `-thumbnail.png` | [Slow End](https://www.newgrounds.com/art/view/prisonercoin/slow-end) | PrisonerCoin, 2023 |
 
-## External software (installed via Fedora; not bundled)
+- KyleOS license explanation: https://github.com/Person-008/KyleOS#license
+- CC BY-NC-SA 3.0 legalcode: https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode
+- **Excluded**: Survey (copyright/license permission unclear); upstream screenshots/other illustrative images, generated third-party icons, themes, font binaries and Arch-specific installation scripts.
+- For commercial distribution, remove the CC BY-NC-SA images from the archive and change each art theme's `wallpaper` key in `config/themes.json` to your own authorized art. Keep the original creator attribution in historical documentation.
 
-- [Fedora Workstation](https://fedoraproject.org/workstation/), [Niri](https://github.com/niri-wm/niri), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [Kitty](https://sw.kovidgoyal.net/kitty/), [Mako](https://github.com/emersion/mako), [Fuzzel](https://codeberg.org/dnkl/fuzzel), [Vicinae](https://github.com/vicinaehq/vicinae), [Thunar](https://docs.xfce.org/xfce/thunar/start), [swaybg](https://github.com/swaywm/swaybg), and [swaylock](https://github.com/swaywm/swaylock).
-- Each dependency retains its own upstream license. Vicinae is still optional and uses an independently operated third-party COPR if selected.
-- Kuhl's one-line installer retrieves live source from `TerabyteEXE/Kuhl-OS` and runs package management commands. Inspect the source and supply chain before running it.
+## Other packages (installed from independent repos)
+
+[Fedora Workstation](https://fedoraproject.org/workstation/), [Niri](https://github.com/niri-wm/niri), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [Alacritty](https://github.com/alacritty/alacritty), [Kitty](https://sw.kovidgoyal.net/kitty/), [Mako](https://github.com/emersion/mako), [Fuzzel](https://codeberg.org/dnkl/fuzzel), [Vicinae](https://github.com/vicinaehq/vicinae), [Thunar](https://docs.xfce.org/xfce/thunar/start), [swaybg](https://github.com/swaywm/swaybg), [swaylock](https://github.com/swaywm/swaylock). These tools are external dependencies, each under their own license. Vicinae's optional COPR is third-party and requires opt-in.
+
+`bootstrap.sh` fetches remote code from an editable GitHub branch. Users should read it and verify dependencies before executing it with Bash. These risks are further explained in [SECURITY.md](SECURITY.md).
