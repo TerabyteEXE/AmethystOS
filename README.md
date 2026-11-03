@@ -1,4 +1,4 @@
-# ✳ Kuhl OS v1.0 Release Candidate — KyleOS Rice
+# ✳ Kuhl OS v1.0 RC2 — Stabilization Build
 
 **Fedora Workstation + Niri**, with a keyboard-driven, artwork-led desktop. Kuhl is an installer and customizable desktop *layer*, **not** a new Linux distribution, ISO, custom kernel, or Fedora fork. GNOME is retained as an alternate login session.
 
@@ -6,7 +6,7 @@
 
 ## The look
 
-The desktop now directly incorporates MIT-licensed dotfiles from **[KyleOS](https://github.com/Person-008/KyleOS)** by Rosenkranz / Person-008, including its original Niri animation shader, layouts and window rules, Waybar layout/CSS, Rofi launchers, Alacritty palettes and Mako themes. Only Fedora compatibility and Kuhl integration changes are made. See `third_party/KyleOS/original/` for the untouched originals and `docs/CREDITS.md` for an adaptation map. Kuhl is adapted for **Fedora 43+** rather than KyleOS's Arch Linux package manager and global `/etc` configuration layout. The MIT copyright and permission notice for the source adaptations is included in [`third_party/KyleOS-MIT.txt`](third_party/KyleOS-MIT.txt).
+The desktop incorporates MIT-licensed dotfiles from **[KyleOS](https://github.com/Person-008/KyleOS)** by Rosenkranz / Person-008, including its original Niri animation shader, layouts and window rules, Waybar layout/CSS, Rofi launchers, Alacritty palettes and Mako themes. Only Fedora compatibility and Kuhl integration changes are made. See `third_party/KyleOS/original/` for the untouched originals and `docs/CREDITS.md` for an adaptation map. Kuhl is adapted for **Fedora 43+** rather than KyleOS's Arch Linux package manager and global `/etc` configuration layout. The MIT copyright and permission notice for the source adaptations is included in [`third_party/KyleOS-MIT.txt`](third_party/KyleOS-MIT.txt).
 
 **Artwork has a different license:** Kuhl includes *static PNG first-frame conversions AND the original GIF files* of four wallpapers from KyleOS, originally illustrated by **[PrisonerCoin](https://prisonercoin.newgrounds.com/)**. Those images are **CC BY-NC-SA 3.0, NOT MIT** and carry non-commercial and share-alike obligations. Their original artwork URLs and modification notes are in [`docs/CREDITS.md`](docs/CREDITS.md). The unlicensed `Survey` artwork and the massive third-party icon/GTK directories from KyleOS were **not** carried over. The original KyleOS font families are not bundled, so font metrics and some icons may differ until you install them yourself. The default `swaybg` wallpaper is static; exact KyleOS animated GIF playback needs optional `awww`, set via `KUHL_ANIMATED_WALLPAPER=1`, which Kuhl does not install automatically. The older Kuhl Day/Dusk palettes and wallpapers remain available. 
 
@@ -26,6 +26,22 @@ The branded terminal UI offers six theme choices; the default is **Frontier**. O
 
 To upgrade an old Kuhl installation, choose **Replace existing desktop settings (with backups)**, read the prompt, then type `REPLACE`. Kuhl backs up only replaced configs to `~/.local/state/kuhl/backups/`, tracks files it writes, and doesn't silently overwrite your edits.
 
+## Kuhl Settings and scaling
+
+The RC2 stabilization pass adds a working Niri-native settings experience, mouse-accessible window close control, adjustable full-width Waybar, per-output display scaling, and coordinated light/dark GTK appearance. Niri now permits native application titlebars rather than hiding all close buttons.
+
+```bash
+kuhl settings                     # Super+Shift+S, also clickable from Waybar
+kuhl display wizard               # safely select a monitor and output scale
+kuhl ui scale 125                 # larger application and terminal text
+kuhl bar scale 125                # larger clickable Waybar
+kuhl bar position bottom          # move the top bar to the bottom
+kuhl bar module close off         # hide the mouse close-window button
+kuhl bar reset                    # reset Kuhl bar layout
+```
+
+See [`docs/SETTINGS.md`](docs/SETTINGS.md) for the complete menu, independently configurable scale types, and GTK/Qt limitations.
+
 ## Desktop commands
 
 | Shortcut | Function |
@@ -33,6 +49,9 @@ To upgrade an old Kuhl installation, choose **Replace existing desktop settings 
 | Super + Space | Rofi application search, as in KyleOS (Vicinae still available optionally via `kuhl launcher vicinae`) |
 | Ctrl + Super + K | Searchable keyboard shortcuts guide |
 | Super + D | Kuhl terminal Control Center |
+| Super + Shift + S | Kuhl Settings |
+| Super + Q | Close focused application |
+| Super + M | Maximize to edges |
 | Super + Enter | Alacritty terminal |
 | Super + E | Thunar file manager |
 | Super + H/J/K/L | Focus columns/windows |
@@ -43,7 +62,7 @@ To upgrade an old Kuhl installation, choose **Replace existing desktop settings 
 | Super + V | Toggle floating window |
 | Super + Alt + L | Lock screen |
 
-The actual KyleOS-derived `configs/niri/binds.kdl` is authoritative. The 107-entry `config/keys.json` manifest and [`docs/KEYBINDS.md`](docs/KEYBINDS.md) are verified against it by `scripts/sync_keys.py`.
+The adapted `configs/niri/binds.kdl` is authoritative. The 110-entry `config/keys.json` manifest and [`docs/KEYBINDS.md`](docs/KEYBINDS.md) are verified against it by `scripts/sync_keys.py`.
 
 ```bash
 kuhl theme list                       # frontier, dyson, puncture, slowend, day, dusk
@@ -66,7 +85,7 @@ python3 scripts/validate_niri.py      # run on Fedora with niri installed
 bash install.sh --dry-run
 ```
 
-The test suite covers Bash/Python syntax, direct KyleOS source-file equivalence, wallpaper rights/metadata, 107 shortcut bindings, theme deployment, upgrade backups, restoration and installer dry-run. GitHub Actions also attempts native Niri validation inside Fedora. **These checks do not replace a live Niri login or security review.** Hardware-specific issues, graphics drivers, Wayland portals, and the session launcher may still need attention. For recovery, select GNOME from GDM and see [`docs/RECOVERY.md`](docs/RECOVERY.md).
+The test suite covers Bash/Python syntax, direct KyleOS source-file equivalence, wallpaper rights/metadata, 107 shortcut bindings, theme deployment, upgrade backups, restoration and installer dry-run. GitHub Actions also attempts native Niri validation inside Fedora. **These checks do not replace a live Niri login or security review. RC2 is NOT certified stable.** Hardware-specific issues, graphics drivers, Wayland portals, and the session launcher may still need attention. For recovery, select GNOME from GDM and see [`docs/RECOVERY.md`](docs/RECOVERY.md).
 
 ### External repositories and disclosures
 

@@ -33,3 +33,17 @@ In the Kuhl terminal menu, select **Replace existing desktop settings (with back
 ### Small VM storage
 
 If DNF says the root filesystem has insufficient space, do not remove arbitrary system files. Check `df -h /`, use `sudo dnf clean all` for cached RPMs, and consider enlarging the VM disk. Kuhl's installer now gives a low-space warning before DNF.
+
+## v1.0 RC2 scaling/settings recovery
+
+If scaling is wrong but you can open the terminal, run:
+
+```bash
+kuhl display reset
+kuhl ui reset
+kuhl bar reset
+```
+
+If the display is unusable, return to GNOME at the login screen, or press **Ctrl+Alt+F3** for a text console. As your **normal user**, edit `~/.config/niri/output.kdl` to remove only the output scale blocks. Check the configuration with `niri validate` before logging back into Niri. The managed-file protection may then require a reinstall with the explicit replacement-and-backups choice to restore Kuhl management.
+
+GTK color-scheme and icon-theme preferences may carry into GNOME because they are stored per user. `kuhl uninstall` attempts to restore the original values only if you have not changed them since Kuhl applied them. GTK / other app configurations edited manually are protected.

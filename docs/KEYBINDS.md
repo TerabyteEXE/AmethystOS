@@ -16,6 +16,7 @@ The exact bindings are in `configs/niri/binds.kdl`; this guide is checked agains
 | Super + Space | Search apps |
 | Ctrl + Super + K | All keyboard shortcuts |
 | Super + E | Thunar file manager |
+| Super + Shift + S | Kuhl Settings |
 
 ## Windows
 
@@ -73,6 +74,8 @@ The exact bindings are in `configs/niri/binds.kdl`; this guide is checked agains
 | Super + Shift + T | Theme gallery |
 | Super + Shift + K | Move window up |
 | Super + Shift + P | Power menu |
+| Super + Q | Close focused window |
+| Super + M | Maximize window to edges |
 
 ## Workspaces
 

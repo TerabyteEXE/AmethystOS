@@ -18,9 +18,9 @@
 | `root/etc/niri/window-rules.kdl` | `configs/niri/window-rules.kdl` | Kept asymmetric shapes; removed personal monitor/app restrictions and private screenshot rules |
 | `root/etc/niri/output.kdl` | `configs/niri/output.kdl` | Removed hardcoded HDMI/DP names and geometry |
 | `root/etc/niri/autostart.kdl` | `configs/niri/autostart.kdl` | Fedora compatible startup, Kuhl wallpaper manager, no lxsession or third-party awww requirement |
-| `root/etc/xdg/waybar/config.jsonc` | `configs/waybar/config.jsonc` | Fixed invalid layer alias `bot` to `bottom`; clock opens Kuhl controls |
-| `root/etc/xdg/waybar/style.css` | `configs/waybar/style.css` | CSS font-size unit fix; fallback font when original Nerd Font is absent |
-| `root/usr/share/rofi/themes/thematic*.rasi` | `configs/rofi/*.rasi` | Copied appearance files in user config directories; only the theme gallery icon dimensions and grid are scaled to fit small displays |
+| `root/etc/xdg/waybar/config.jsonc` | `configs/waybar/config.jsonc` | Retains source as a reference; runtime generator adds Kuhl Settings/close controls, scalable layout, and a readable font |
+| `root/etc/xdg/waybar/style.css` | `configs/waybar/style.css` | Retains source as a reference; runtime generator creates scale-aware and palette-aware CSS |
+| `root/usr/share/rofi/themes/thematic*.rasi` | `configs/rofi/*.rasi` | Preserves the original sources separately; runtime copies are corrected for valid Rasi syntax, available fonts, and lower resolutions |
 | `root/etc/thematic/{Frontier,Dyson,Puncture,SlowEnd}/{niri.kdl,rofi.rasi,alacritty.toml,mako.config}` | `configs/upstream/themes/…` | **Original files preserved byte-for-byte; Niri runtime copy fixes one malformed `urgent-color` value (`ff0000` → `#ff0000`) before deployment |
 
 The **original KyleOS theme switcher scripts and Arch installer are not run**. Kuhl's existing installer, user-config backup system, theme manager, searchable keyboard guide and GNOME fallback are retained. Exact source fonts, GNOME/GTK packages and icon sets are not bundled because the upstream source archive does not supply independently reviewed licenses for every third-party dependency.
@@ -46,3 +46,5 @@ Original images provided with KyleOS are attributed by its maintainer to Prisone
 [Fedora Workstation](https://fedoraproject.org/workstation/), [Niri](https://github.com/niri-wm/niri), [Waybar](https://github.com/Alexays/Waybar), [Rofi](https://github.com/davatorium/rofi), [Alacritty](https://github.com/alacritty/alacritty), [Kitty](https://sw.kovidgoyal.net/kitty/), [Mako](https://github.com/emersion/mako), [Fuzzel](https://codeberg.org/dnkl/fuzzel), [Vicinae](https://github.com/vicinaehq/vicinae), [Thunar](https://docs.xfce.org/xfce/thunar/start), [swaybg](https://github.com/swaywm/swaybg), [swaylock](https://github.com/swaywm/swaylock). These tools are external dependencies, each under their own license. Vicinae's optional COPR is third-party and requires opt-in.
 
 `bootstrap.sh` fetches remote code from an editable GitHub branch. Users should read it and verify dependencies before executing it with Bash. These risks are further explained in [SECURITY.md](SECURITY.md).
+
+**RC2 changes:** `scripts/desktop.py`, the generated Waybar layout and GTK/terminal appearance bridge are new Kuhl integration code. Modified styles and keybindings remain credited to the source design; the untouched originals remain in `third_party/KyleOS/original/`.

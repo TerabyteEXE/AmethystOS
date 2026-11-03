@@ -20,7 +20,8 @@ MENU = {
     'main': [
         ('Appearance', 'themes', 'Change palette or background'),
         ('Keyboard guide', 'keys', 'Search shortcuts by name or key'),
-        ('Settings and diagnostics', 'doctor', 'Check the Kuhl session'),
+        ('Settings', 'settings', 'Display, scaling, audio, bar and connections'),
+        ('Diagnostics', 'doctor', 'Check the Kuhl session'),
         ('File manager', 'files', 'Browse your files'),
         ('Network settings', 'network', 'Connections and Wi-Fi'),
         ('Volume settings', 'audio', 'Microphone and output levels'),
@@ -36,6 +37,35 @@ MENU = {
         ('Custom wallpaper path', 'wallpaper', 'Use your own JPG, PNG or WebP'),
         ('Solid background', 'solid', 'Use a clean color until you add artwork'),
         ('Existing Kuhl wallpapers', 'legacy', 'Select original bundled art'),
+    ],
+    'settings': [
+        ('Display scaling', 'display-wizard', 'Pick a monitor and resolution scale'),
+        ('Application UI scale', 'ui', 'Adjust terminal, launcher and GTK text'),
+        ('Top bar settings', 'bar', 'Resize, relocate and choose modules'),
+        ('Network', 'network', 'Configure Wi-Fi and wired connections'),
+        ('Sound', 'audio', 'Select output, microphone and volumes'),
+        ('Bluetooth', 'bluetooth', 'Pair and manage Bluetooth devices'),
+        ('Change theme', 'themes', 'Synchronized Day / Dusk / Frontier palettes'),
+        ('Run diagnostics', 'doctor', 'Inspect missing components and errors'),
+    ],
+    'bar': [
+        ('Bar 85%', 'bar-85', 'Compact strip for smaller displays'),
+        ('Bar 100%', 'bar-100', 'Comfortable default desktop height'),
+        ('Bar 125%', 'bar-125', 'Larger text and click targets'),
+        ('Bar 150%', 'bar-150', 'Large desktop / touch friendly'),
+        ('Move bar to top', 'bar-top', 'Place status strip along top edge'),
+        ('Move bar to bottom', 'bar-bottom', 'Place status strip along bottom edge'),
+        ('Toggle workspace indicators', 'bar-workspaces', 'Switch between open workspace labels'),
+        ('Toggle battery indicator', 'bar-battery', 'Hide on desktops without a battery'),
+        ('Toggle close button', 'bar-close', 'Show or hide focused-window close button'),
+        ('Reset bar layout', 'bar-reset', 'Restore Kuhl standard settings'),
+    ],
+    'ui': [
+        ('UI font 100%', 'ui-100', 'Default application and terminal text'),
+        ('UI font 110%', 'ui-110', 'Slightly larger application text'),
+        ('UI font 125%', 'ui-125', 'Larger text across supported apps'),
+        ('UI font 150%', 'ui-150', 'Very large text for high density displays'),
+        ('Reset UI text', 'ui-reset', 'Restore Kuhl text scaling'),
     ],
     'legacy': [
         ('Original Day image', 'legacy-day', 'Your previous image, kept optional'),
@@ -57,23 +87,48 @@ def action(item):
         'day': [KUHL_BIN,'theme','day'], 'dusk':[KUHL_BIN,'theme','dusk'],
         'frontier':[KUHL_BIN,'theme','frontier'], 'dyson':[KUHL_BIN,'theme','dyson'],
         'puncture':[KUHL_BIN,'theme','puncture'], 'slowend':[KUHL_BIN,'theme','slowend'],
-        'solid':[KUHL_BIN,'wallpaper','reset'],
+        'solid':[KUHL_BIN,'wallpaper','solid'],
         'legacy-day':[KUHL_BIN,'wallpaper','day'], 'legacy-dusk':[KUHL_BIN,'wallpaper','dusk'],
         'legacy-default':[KUHL_BIN,'wallpaper','default'], 'doctor':[KUHL_BIN,'doctor'],
-        'files':['thunar'], 'network':['nm-connection-editor'], 'audio':['pavucontrol'],
+        'files':['thunar'], 'network':[KUHL_BIN,'settings','network'],
+        'audio':[KUHL_BIN,'settings','audio'],
+        'bluetooth':[KUHL_BIN,'settings','bluetooth'],
+        'display-wizard':[KUHL_BIN,'display','wizard'],
         'lock':['swaylock','-f','-c','1c1b1a'], 'logout':['niri','msg','action','quit'],
         'suspend':['systemctl','suspend'], 'reboot':['systemctl','reboot'],
         'poweroff':['systemctl','poweroff'],
     }
+    if item.startswith('bar-'):
+        cmd=item[4:]
+        if cmd in ('85','100','125','150'):actions[item]=[KUHL_BIN,'bar','scale',cmd]
+        elif cmd in ('top','bottom'):actions[item]=[KUHL_BIN,'bar','position',cmd]
+        elif cmd=='reset':actions[item]=[KUHL_BIN,'bar','reset']
+        elif cmd in ('workspaces','battery','close'):
+            state=subprocess.run([KUHL_BIN,'bar','show'],capture_output=True,text=True)
+            try:
+                current=json.loads(state.stdout)['bar_modules'][cmd]
+                actions[item]=[KUHL_BIN,'bar','module',cmd,'off' if current else 'on']
+            except (ValueError,KeyError):
+                print('Could not read current Kuhl bar settings.');return
+    elif item.startswith('ui-'):
+        value=item[3:]
+        actions[item]=[KUHL_BIN,'ui','reset'] if value=='reset' else [KUHL_BIN,'ui','scale',value]
     if item not in actions: return
     if item in ('reboot','poweroff'):
         answer = input(f'\nConfirm {item.upper()}? Type YES to continue: ')
         if answer != 'YES': return
     try:
-        subprocess.run(actions[item], check=False)
+        # GUI tools start detached; otherwise the Kuhl terminal appears frozen
+        # until the user closes Network/Audio/Bluetooth settings.
+        if item in ('network','audio','bluetooth'):
+            subprocess.Popen(actions[item], start_new_session=True,
+                             stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL)
+        else:
+            subprocess.run(actions[item], check=False)
     except FileNotFoundError:
         print(f'Not installed: {actions[item][0]}')
-    if item in ('doctor','network','audio'):
+    if item in ('doctor','display-wizard'):
         input('\nPress Enter to close...')
 
 
@@ -100,6 +155,7 @@ def ui(screen, mode, firstpage):
     search=''
     search_mode=False
     chosen=None
+    page_history=[]
 
     def put(y,x,s,color=0):
         h,w=screen.getmaxyx()
@@ -136,7 +192,7 @@ def ui(screen, mode, firstpage):
             put(5,x, f'SECTION  {categories[cat]}    ·    TAB cycles sections',soft)
             put(6,x,('SEARCH  / '+search+('█' if search_mode else '')).ljust(min(width,75)),normal)
         else:
-            put(5,x,'One place for your entire desktop. No hidden settings.',soft)
+            put(5,x,'Your desktop settings, accessible by mouse or keyboard.',soft)
             put(6,x,'Super + Space: search    ·    Ctrl + Super + K: shortcuts',soft)
         line(7,x,width)
         opts=contents()
@@ -178,11 +234,11 @@ def ui(screen, mode, firstpage):
                 cat=(cat+1)%len(categories);cursor=offset=0
         else:
             if ch in (curses.KEY_BACKSPACE,127,8):
-                page='main';cursor=offset=0
+                page=(page_history.pop() if page_history else 'main');cursor=offset=0
             elif ch in (10,13,curses.KEY_ENTER) and opts:
                 target=opts[cursor][1]
                 if target in MENU:
-                    page=target;cursor=offset=0
+                    page_history.append(page);page=target;cursor=offset=0
                 else:
                     chosen=target;break
     return chosen

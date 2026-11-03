@@ -1,36 +1,12 @@
-/* KUHL-MANAGED — copied from KyleOS (MIT, Rosenkranz 2026) */
+/* KUHL-MANAGED — thematic gallery, adapted with correct Rasi syntax. */
 @import "~/.config/rofi/color.rasi"
-
-window {
-padding: 20px;
-width: 760px;
-border-radius: 40px 0px 80px 0px;
-}
-
-mainbox {
-children: [listview];
-}
-
-
-listview, {
-border: 0px;
-margin: 10px;
-scrollbar: false;
-lines:   2;
-columns: 3;
-}
-
-element {
-children: [ element-icon ];
-orientation: vertical;
-border-radius: 20px 0px 40px 0px;
-border: 1px solid;
-}
-
-element selected {
-border: 5px solid;
-}
-
-element-icon {
-size: 112px;
-}
+* { font: "JetBrains Mono 12"; }
+window { width: 55%; padding: 16px; border-radius: 30px 0px 55px 0px;
+         background-color: @background; }
+mainbox { children: [ listview ]; }
+listview { border: 0px; margin: 8px; scrollbar: false; lines: 2; columns: 3; spacing: 10px; }
+element { children: [ element-icon, element-text ]; orientation: vertical;
+          border-radius: 18px 0px 30px 0px; padding: 10px; }
+element selected { background-color: @selected-normal-background; }
+element-icon { size: 80px; horizontal-align: 0.5; }
+element-text { horizontal-align: 0.5; margin: 7px 0px 0px 0px; }

@@ -28,7 +28,7 @@ trap 'rm -rf -- "$tmp"' EXIT
 mkdir -p "$tmp/source"
 
 printf '\n\033[1;33m'
-printf '  ✳  K U H L   O S    /    S T U D I O\n'
+printf '  ✳  K U H L   O S    /    R E L E A S E   C A N D I D A T E\n'
 printf '\033[0m'
 printf '  Fedora + Niri · one-command desktop installer\n\n'
 printf '  [1/2] Downloading the current Kuhl OS release from GitHub...\n'

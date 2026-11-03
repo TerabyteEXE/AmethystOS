@@ -12,6 +12,7 @@ binds {
     
     Mod+Return hotkey-overlay-title="Alacritty terminal" { spawn "alacritty"; }
     Mod+D hotkey-overlay-title="Kuhl Control Center" repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl menu --ui"; }
+    Mod+Shift+S hotkey-overlay-title="Kuhl Settings" repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl settings"; }
     Mod+B hotkey-overlay-title="Firefox" { spawn "firefox"; }
     Super+Alt+L hotkey-overlay-title="Lock the screen" { spawn "swaylock" "-f" "-c" "0a0a10"; }
     
@@ -37,6 +38,8 @@ binds {
 
     Mod+Delete repeat=false { close-window; }
     Mod+F12 repeat=false { close-window; }
+    Mod+Q hotkey-overlay-title="Close focused window" { close-window; }
+    Mod+M hotkey-overlay-title="Maximize to edges" { maximize-window-to-edges; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-window-down; }

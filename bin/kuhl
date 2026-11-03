@@ -16,7 +16,7 @@ show_ui() {
   if command -v kitty >/dev/null 2>&1 && [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
     # Separate Kuhl panel window so it floats automatically under Niri.
     kitty --class "kuhl-${name}" --title "Kuhl OS / ${name}" \
-      -o font_size=11.5 -o initial_window_width=920 -o initial_window_height=650 \
+      -o font_size=11.5 -o initial_window_width=790 -o initial_window_height=580 \
       -e python3 "$ROOT/kuhl_ui.py" "$name" "$@"
   else
     python3 "$ROOT/kuhl_ui.py" "$name" "$@"
@@ -26,7 +26,7 @@ show_ui() {
 apply_wallpaper() {
   if ! in_niri; then echo 'Wallpaper choice saved. Apply when logged into Niri.'; return 0; fi
   command -v swaybg >/dev/null 2>&1 || { echo 'swaybg is not installed.' >&2; return 1; }
-  local choice img bg pid oldcmd
+  local choice img bg pid oldcmd theme_now gif
   choice="$(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
   if [[ "$choice" == custom ]]; then
     img="$(cat "$STATE/wallpaper-custom" 2>/dev/null || true)"
@@ -108,6 +108,7 @@ PYCODE
     python3 "$ROOT/render.py" theme --theme "$1"
     if in_niri; then
       pkill -USR2 -u "$(id -u)" -x waybar 2>/dev/null || true
+      if [[ -r "$ROOT/desktop.py" ]]; then python3 "$ROOT/desktop.py" appearance apply "$1" || true; fi
       if command -v makoctl >/dev/null 2>&1; then makoctl reload >/dev/null 2>&1 || true; fi
       "$SELF" wallpaper apply || true
       # Vicinae may need its built-in theme selector on some versions.
@@ -144,9 +145,42 @@ PYCODE
       exec vicinae toggle
     fi
     if command -v rofi >/dev/null 2>&1; then
-      exec rofi -show drun -config "$HOME/.config/rofi/kuhl.rasi"
+      exec rofi -show drun -theme "$HOME/.config/rofi/kuhl.rasi"
     fi
-    exec fuzzel
+    command -v fuzzel >/dev/null 2>&1 && exec fuzzel
+    echo 'No launcher installed. Run: sudo dnf install fuzzel' >&2; exit 1
+    ;;
+  bar|ui|display|appearance)
+    [[ -f "$ROOT/desktop.py" ]] || { echo 'Kuhl desktop settings component missing. Reinstall Kuhl.' >&2; exit 1; }
+    exec python3 "$ROOT/desktop.py" "$command_name" "$@"
+    ;;
+  window)
+    [[ "${1:-}" == close ]] || { echo 'Usage: kuhl window close' >&2; exit 2; }
+    exec niri msg action close-window
+    ;;
+  settings)
+    category="${1:-menu}"
+    [[ $# -eq 0 ]] || shift
+    case "$category" in
+      menu) show_ui control menu --page settings;;
+      bar) show_ui control menu --page bar;;
+      ui) show_ui control menu --page ui;;
+      network)
+        if command -v nm-connection-editor >/dev/null 2>&1; then exec nm-connection-editor; fi
+        if command -v nmtui >/dev/null 2>&1; then exec nmtui; fi
+        echo 'Network editor unavailable. Install: sudo dnf install nm-connection-editor' >&2; exit 1;;
+      audio)
+        command -v pavucontrol >/dev/null 2>&1 && exec pavucontrol
+        echo 'Audio settings unavailable. Install: sudo dnf install pavucontrol' >&2; exit 1;;
+      bluetooth)
+        command -v blueman-manager >/dev/null 2>&1 && exec blueman-manager
+        echo 'Bluetooth settings unavailable. Install: sudo dnf install blueman' >&2; exit 1;;
+      display)
+        exec python3 "$ROOT/desktop.py" display wizard;;
+      apps)
+        exec gnome-control-center applications;;
+      *) echo 'Usage: kuhl settings [network|audio|bluetooth|display|bar|ui|apps]' >&2; exit 2;;
+    esac
     ;;
   wallpaper)
     op="${1:-help}"; [[ $# -eq 0 ]] || shift
@@ -159,10 +193,11 @@ PYCODE
         printf 'custom\n' > "$STATE/wallpaper-choice"
         apply_wallpaper
         ;;
-      reset|auto|solid) printf 'auto\n' > "$STATE/wallpaper-choice"; apply_wallpaper;;
+      reset|auto) printf 'auto\n' > "$STATE/wallpaper-choice"; apply_wallpaper;;
+      solid) printf 'solid\n' > "$STATE/wallpaper-choice"; apply_wallpaper;;
       day|dusk|default) printf '%s\n' "$op" > "$STATE/wallpaper-choice"; apply_wallpaper;;
       apply) apply_wallpaper;;
-      *) echo 'Usage: kuhl wallpaper set PATH|reset|day|dusk|default|apply' >&2; exit 2;;
+      *) echo 'Usage: kuhl wallpaper set PATH|reset|solid|day|dusk|default|apply' >&2; exit 2;;
     esac
     ;;
   keys)
@@ -188,23 +223,25 @@ PY
     show_ui control menu "$@"
     ;;
   status)
-    echo 'Kuhl OS v1.0 RC1 · KyleOS config port · Fedora + Niri'
+    echo 'Kuhl OS v1.0 RC2 · stabilized KyleOS rice · Fedora + Niri'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
     echo "Launcher: $(command -v rofi >/dev/null && echo 'Rofi (KyleOS)' || echo 'Fuzzel fallback')"
     echo "Wallpaper: $(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
+    [[ ! -r "$ROOT/desktop.py" ]] || python3 "$ROOT/desktop.py" bar show
     [[ ! -f "$ROOT/render.py" ]] || python3 "$ROOT/render.py" status
     ;;
   doctor)
     problems=0
     [[ -r /etc/fedora-release ]] && echo '[ok] Fedora found' || { echo '[warn] Not running Fedora'; problems=$((problems+1)); }
-    for c in niri waybar rofi fuzzel kitty alacritty mako swaybg swaylock swayidle python3 thunar; do
+    for c in niri waybar rofi fuzzel kitty alacritty mako swaybg swaylock swayidle python3 thunar nm-connection-editor pavucontrol gsettings; do
       command -v "$c" >/dev/null 2>&1 && echo "[ok] $c" || { echo "[warn] Missing $c"; problems=$((problems+1)); }
     done
     if command -v niri >/dev/null 2>&1; then
       niri validate && echo '[ok] Niri configuration valid' || { echo '[warn] Niri validation failed'; problems=$((problems+1)); }
     fi
     [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]] || { echo '[warn] Niri config absent'; problems=$((problems+1)); }
+    [[ -r "$ROOT/desktop.py" ]] && echo '[ok] Kuhl settings component installed' || { echo '[warn] Kuhl settings component missing'; problems=$((problems+1)); }
     [[ -r "$ROOT/keys.json" ]] && echo '[ok] Searchable Kuhl keyboard reference present' || { echo '[warn] Kuhl keys missing'; problems=$((problems+1)); }
     [[ -n "${NIRI_SOCKET:-}" ]] && echo '[ok] Running Niri session' || echo '[info] Log into Niri to test the session'
     printf '%s concern(s) detected.\n' "$problems"
@@ -213,14 +250,27 @@ PY
   uninstall)
     [[ $# -eq 0 ]] || { echo 'Usage: kuhl uninstall' >&2; exit 2; }
     echo 'Restoring only unchanged Kuhl-managed configuration files...'
+    [[ ! -r "$ROOT/desktop.py" ]] || python3 "$ROOT/desktop.py" appearance restore || true
     [[ ! -r "$ROOT/render.py" ]] || python3 "$ROOT/render.py" uninstall || true
     rm -f -- "$SELF"
     echo 'Kuhl command removed. Fedora, GNOME, RPMs, wallpaper assets and backups remain.'
     ;;
   help|-h|--help)
     cat <<'HELP'
-KUHL OS · 1.0 RELEASE CANDIDATE · KYLEOS RICE
+KUHL OS · 1.0 STABILIZATION BUILD · KYLEOS RICE
   kuhl menu                         Keyboard-operated desktop control center
+  kuhl settings                     Settings menu (network, sound, Bluetooth, display, scale)
+  kuhl display outputs              List current Niri monitors
+  kuhl display wizard               Guided monitor scaling on connected displays
+  kuhl display scale eDP-1 1.25     Set monitor scaling; automatically validated
+  kuhl display reset                Reset monitor scaling to automatic
+  kuhl ui scale 125                 Application / terminal text scale (percentage)
+  kuhl bar scale 125                Resize top bar to 125%
+  kuhl bar position bottom          Move bar to bottom
+  kuhl bar module workspaces on     Show workspaces in bar
+  kuhl bar module close off         Hide click-to-close control
+  kuhl bar reset                    Restore default bar layout
+  kuhl window close                 Close focused Niri window
   kuhl themes --ui                  Graphical theme gallery (Super+Shift+T)
   kuhl keys --ui                    Searchable shortcut atlas · Ctrl+Super+K
   kuhl keys                         Print every shortcut

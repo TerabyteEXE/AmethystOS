@@ -163,28 +163,28 @@
     {
       "section": "Windows",
       "key": "Mod+Left",
-      "show": "Super + ←",
+      "show": "Super + \u2190",
       "title": "Focus column left;",
       "action": "focus-column-left;"
     },
     {
       "section": "Windows",
       "key": "Mod+Down",
-      "show": "Super + ↓",
+      "show": "Super + \u2193",
       "title": "Focus window down;",
       "action": "focus-window-down;"
     },
     {
       "section": "Windows",
       "key": "Mod+Up",
-      "show": "Super + ↑",
+      "show": "Super + \u2191",
       "title": "Focus window up;",
       "action": "focus-window-up;"
     },
     {
       "section": "Windows",
       "key": "Mod+Right",
-      "show": "Super + →",
+      "show": "Super + \u2192",
       "title": "Focus column right;",
       "action": "focus-column-right;"
     },
@@ -219,28 +219,28 @@
     {
       "section": "Windows",
       "key": "Mod+Ctrl+Left",
-      "show": "Super + Ctrl + ←",
+      "show": "Super + Ctrl + \u2190",
       "title": "Move column left;",
       "action": "move-column-left;"
     },
     {
       "section": "Windows",
       "key": "Mod+Ctrl+Down",
-      "show": "Super + Ctrl + ↓",
+      "show": "Super + Ctrl + \u2193",
       "title": "Move window down;",
       "action": "move-window-down;"
     },
     {
       "section": "Windows",
       "key": "Mod+Ctrl+Up",
-      "show": "Super + Ctrl + ↑",
+      "show": "Super + Ctrl + \u2191",
       "title": "Move window up;",
       "action": "move-window-up;"
     },
     {
       "section": "Windows",
       "key": "Mod+Ctrl+Right",
-      "show": "Super + Ctrl + →",
+      "show": "Super + Ctrl + \u2192",
       "title": "Move column right;",
       "action": "move-column-right;"
     },
@@ -296,28 +296,28 @@
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Left",
-      "show": "Super + Shift + ←",
+      "show": "Super + Shift + \u2190",
       "title": "Focus monitor left;",
       "action": "focus-monitor-left;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Down",
-      "show": "Super + Shift + ↓",
+      "show": "Super + Shift + \u2193",
       "title": "Focus monitor down;",
       "action": "focus-monitor-down;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Up",
-      "show": "Super + Shift + ↑",
+      "show": "Super + Shift + \u2191",
       "title": "Focus monitor up;",
       "action": "focus-monitor-up;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Right",
-      "show": "Super + Shift + →",
+      "show": "Super + Shift + \u2192",
       "title": "Focus monitor right;",
       "action": "focus-monitor-right;"
     },
@@ -345,28 +345,28 @@
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Ctrl+Left",
-      "show": "Super + Shift + Ctrl + ←",
+      "show": "Super + Shift + Ctrl + \u2190",
       "title": "Move column to monitor left;",
       "action": "move-column-to-monitor-left;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Ctrl+Down",
-      "show": "Super + Shift + Ctrl + ↓",
+      "show": "Super + Shift + Ctrl + \u2193",
       "title": "Move column to monitor down;",
       "action": "move-column-to-monitor-down;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Ctrl+Up",
-      "show": "Super + Shift + Ctrl + ↑",
+      "show": "Super + Shift + Ctrl + \u2191",
       "title": "Move column to monitor up;",
       "action": "move-column-to-monitor-up;"
     },
     {
       "section": "Workspaces",
       "key": "Mod+Shift+Ctrl+Right",
-      "show": "Super + Shift + Ctrl + →",
+      "show": "Super + Shift + Ctrl + \u2192",
       "title": "Move column to monitor right;",
       "action": "move-column-to-monitor-right;"
     },
@@ -754,6 +754,27 @@
       "show": "Super + Shift + P",
       "title": "Power menu",
       "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl menu --ui --page power\";"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Q",
+      "show": "Super + Q",
+      "title": "Close focused window",
+      "action": "close-window;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+M",
+      "show": "Super + M",
+      "title": "Maximize window to edges",
+      "action": "maximize-window-to-edges;"
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+Shift+S",
+      "show": "Super + Shift + S",
+      "title": "Kuhl Settings",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl settings\";"
     }
   ]
 }

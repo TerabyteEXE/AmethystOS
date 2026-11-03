@@ -1,3 +1,17 @@
+# Changelog
+
+## v1.0 RC2 — desktop stabilization (experimental)
+
+- Repaired the standalone Settings menu: real network, audio, Bluetooth and display actions; basic audio/network utilities installed as core components.
+- Added adjustable full-width Waybar (85–200%), top/bottom position, optional modules, clickable Settings and focused-window close controls.
+- Restored normal application titlebars and added Super+Q / Super+M shortcuts, plus Super+Shift+S for Settings.
+- Added safe Niri per-monitor fractional scale controls and a terminal wizard, with staged native validation and manual-edit protection.
+- Added independent UI text scaling in Kitty, Alacritty, Rofi and supported GTK applications. Launcher styles corrected for Rofi syntax.
+- Coordinated the theme files across Waybar, GTK 3/4, Fuzzel, Alacritty, Kitty, Rofi, and Mako; added best-effort GNOME portal light/dark preference and restoration.
+- Added a Niri session polkit authentication agent and explicit Fedora network/audio settings packages.
+- Added three standard-library unit tests for settings and protected display changes; expanded the installer simulation suite.
+- Kept KyleOS's original MIT-licensed sources, credited artwork and Kuhl's website design. Native Fedora/Niri login verification is still required before claiming a stable v1.0.
+
 # Kuhl OS changelog
 
 ## v1.0-rc1 — Direct KyleOS Rice Edition (2026-11-03)

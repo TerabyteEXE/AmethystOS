@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — Kuhl OS 1.0-rc1, Fedora + Niri edition (not a Linux distro/ISO).
+# KUHL-MANAGED — Kuhl OS 1.0 stabilization, Fedora + Niri edition (not a Linux distro/ISO).
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,7 +10,7 @@ REPLACE_CONFIGS=0
 NO_REBOOT=1
 usage() {
   cat <<'TXT'
-Kuhl OS 1.0-rc1 — Fedora Workstation + Niri
+Kuhl OS 1.0 stabilization — Fedora Workstation + Niri
 Recommended: curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 Internal/advanced: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
   --defaults         Use default choices without opening the text UI.
@@ -34,7 +34,7 @@ while (($#)); do
   esac
   shift
 done
-for f in config/choices.json config/themes.json scripts/menu.py scripts/render.py scripts/kuhl_ui.py scripts/progress.py config/keys.json configs/niri/config.kdl assets/wallpapers/kuhl-default.png; do
+for f in config/choices.json config/themes.json scripts/menu.py scripts/render.py scripts/kuhl_ui.py scripts/desktop.py scripts/progress.py config/keys.json configs/niri/config.kdl assets/wallpapers/kuhl-default.png; do
   [[ -f "$ROOT/$f" ]] || { echo "Missing repository file: $f" >&2; exit 1; }
 done
 command -v python3 >/dev/null || { echo 'Python 3 required.' >&2; exit 1; }
@@ -102,7 +102,7 @@ fi
 mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 1.0 RC1 — FEDORA + NIRI\n'
+printf '\n✳ KUHL OS 1.0 STABILIZATION — FEDORA + NIRI\n'
 printf 'Fedora %s / Kuhl %s\n' "${VERSION_ID:-unknown}" "$THEME"
 echo 'AI-assisted community scripts can contain security errors. Review bootstrap.sh, install.sh, and package sources before continuing.'
 [[ $(awk '/MemTotal:/ {print $2}' /proc/meminfo) -ge 7340032 ]] || kuhl_warn '8 GB RAM recommended, but not required.'
@@ -121,9 +121,10 @@ sudo -v
 sudo dnf install -y \
   niri xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
   waybar rofi fuzzel kitty alacritty mako swaybg swaylock swayidle thunar \
-  wl-clipboard papirus-icon-theme jetbrains-mono-fonts
+  wl-clipboard papirus-icon-theme jetbrains-mono-fonts \
+  polkit-kde gnome-keyring nm-connection-editor pavucontrol
 if chosen desktop_helpers; then
-  sudo dnf install -y network-manager-applet blueman pavucontrol brightnessctl playerctl
+  sudo dnf install -y network-manager-applet blueman brightnessctl playerctl
 fi
 ISSUES=0
 python3 "$ROOT/scripts/progress.py" 1 'Official Fedora components installed'
@@ -170,6 +171,7 @@ done
 install -m 644 "$ROOT/assets/branding/kuhl-logo.svg" "$KUHL_DATA/branding/kuhl-logo.svg"
 install -m 644 "$ROOT/config/themes.json" "$KUHL_DATA/themes.json"
 install -m 755 "$ROOT/scripts/render.py" "$KUHL_DATA/render.py"
+install -m 755 "$ROOT/scripts/desktop.py" "$KUHL_DATA/desktop.py"
 install -m 755 "$ROOT/scripts/kuhl_ui.py" "$KUHL_DATA/kuhl_ui.py"
 install -m 644 "$ROOT/config/keys.json" "$KUHL_DATA/keys.json"
 cp -R "$ROOT/configs/." "$KUHL_DATA/templates/"
@@ -204,7 +206,8 @@ fi
 python3 "$ROOT/scripts/progress.py" 6 'Kuhl 1.0 release candidate installed — ready for Niri'
 printf '\nInstalled. GNOME remains available.\n'
 printf 'Log out, choose Niri at the GDM login screen, then sign in.\n'
-printf 'Super+Space opens Rofi search; Ctrl+Super+K opens the keyboard guide. Super+D opens Kuhl Control Center.\n'
+printf 'Super+Space: search  |  Super+Shift+S: Settings  |  Ctrl+Super+K: key guide  |  Super+Q: close.\n'
+printf 'Settings: kuhl settings  |  Bar: kuhl bar show  |  Monitors: kuhl display wizard\n'
 printf 'See diagnostics: kuhl doctor  |  Install log: %s\n' "$LOG"
 if (( ISSUES )); then kuhl_warn "$ISSUES nonfatal issue(s) need attention; review the log."; fi
 printf 'No reboot performed; no GNOME settings or Fedora security controls were changed.\n'

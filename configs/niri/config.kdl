@@ -47,7 +47,8 @@ hotkey-overlay {
 	skip-at-startup
 }
 
-prefer-no-csd
+// Allow application titlebars (including mouse-accessible Close buttons).
+// The original KyleOS prefer-no-csd option hid some apps' native controls.
 
 screenshot-path "~/Pictures/Screenshots/Screenshot-%Y-%m-%d %H-%M-%S.png"
 

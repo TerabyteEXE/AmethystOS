@@ -99,6 +99,7 @@ def template_files(source: Path):
         ('frontier', 'Kuhl Frontier', 'KyleOS palette; art by PrisonerCoin CC BY-NC-SA', 'theme frontier', 'preferences-desktop-theme'),
         ('control', 'Kuhl Control Center', 'Themes, wallpaper, system and settings', 'menu --ui', 'preferences-system'),
         ('keys', 'Kuhl Keyboard Guide', 'Search every Niri shortcut', 'keys --ui', 'input-keyboard'),
+        ('settings', 'Kuhl Settings', 'Display, interface, bar, sound and connections', 'settings', 'preferences-system'),
     ):
         content = (f'# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n'
                    f'Name={title}\nComment={comment}\n'
@@ -120,6 +121,9 @@ def theme_files(theme: str):
     if theme not in palettes:
         raise SystemExit('Unknown theme; see kuhl theme list')
     p = palettes[theme]
+    import desktop
+    prefs = desktop.preferences()
+    ui_font_scale = prefs['ui_scale']
     niri = f'''// KUHL-MANAGED — automatically generated Kuhl {theme} palette
 layout {{
   focus-ring {{ active-color "{p['accent']}"; inactive-color "{p['border']}"; }}
@@ -174,7 +178,7 @@ color15 {p['fg']}
     rgba = lambda color: color.lstrip('#') + 'ff'
     fuzzel = f'''# KUHL-MANAGED — generated {theme} launcher palette
 [main]
-font=JetBrains Mono:size=12
+font=JetBrains Mono:size={max(10,round(12*ui_font_scale))}
 prompt=  Search  ›
 icon-theme=Papirus
 lines=8
@@ -197,7 +201,7 @@ radius=16
 selection-radius=8
 '''
     mako = f'''# KUHL-MANAGED — generated {theme} notification palette
-font=JetBrains Mono 10
+font=JetBrains Mono {max(9,round(11*ui_font_scale))}
 background-color={p['surface']}
 text-color={p['fg']}
 border-color={p['border']}
@@ -215,8 +219,8 @@ icons=1
     vicinae = '\n'.join([
         f'# KUHL-MANAGED — {theme} Vicinae theme', '[meta]', 'version = 1',
         f'name = "Kuhl {theme.title()}"', 'description = "Kuhl Frontier palette"',
-        f'variant = "{"dark" if theme == "dusk" else "light"}"',
-        f'inherits = "vicinae-{"dark" if theme == "dusk" else "light"}"',
+        f'variant = "{"light" if theme == "day" else "dark"}"',
+        f'inherits = "vicinae-{"light" if theme == "day" else "dark"}"',
         '[colors.core]',
         f'background = "{p["surface"]}"', f'foreground = "{p["fg"]}"',
         f'secondary_background = "{p["bg"]}"',
@@ -257,7 +261,29 @@ cursor = "{p['accent']}"
 [font]
 size = 12
 '''
+    # Preserve upstream palettes but use an installed, legible font at every UI scale.
+    import re
+    alacritty = re.sub(r'(?m)^(size\s*=\s*)[0-9.]+',
+                       lambda m: m.group(1)+str(round(12*ui_font_scale,1)), alacritty)
+    alacritty = re.sub(r'(?m)^(normal\s*=\s*\{\s*family\s*=\s*)"[^"]+"',
+                       lambda m:m.group(1)+'"JetBrains Mono"',alacritty)
+    kitty = kitty.replace('foreground ', f'font_size {round(12*ui_font_scale,1)}\nforeground ', 1)
+    bar_conf, bar_style = desktop.bar_files(theme, p)
+    # Keep KyleOS's asymmetrical launcher's proportions but make type responsive.
+    rasi = (DATA / 'templates/rofi/kuhl.rasi').read_text(encoding='utf-8')
+    rasi = rasi.replace('font: "JetBrains Mono 14";',
+                        f'font: "JetBrains Mono {max(11, round(14*ui_font_scale))}";')
+    gtk_dark = theme != 'day'
+    gtk_settings = (f'[Settings]\n'
+                    f'gtk-theme-name={"Adwaita-dark" if gtk_dark else "Adwaita"}\n'
+                    f'gtk-icon-theme-name={"Papirus-Dark" if gtk_dark else "Papirus"}\n'
+                    f'gtk-application-prefer-dark-theme={1 if gtk_dark else 0}\n')
     return {
+        CONFIG / 'gtk-3.0/settings.ini': gtk_settings.encode(),
+        CONFIG / 'gtk-4.0/settings.ini': gtk_settings.encode(),
+        CONFIG / 'waybar/config.jsonc': bar_conf,
+        CONFIG / 'waybar/style.css': bar_style,
+        CONFIG / 'rofi/kuhl.rasi': rasi.encode(),
         CONFIG / 'niri/kuhl-theme.kdl': niri.encode(),
         CONFIG / 'alacritty/alacritty.toml': alacritty.encode(),
         CONFIG / 'kitty/colors.conf': kitty.encode(),
