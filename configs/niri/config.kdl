@@ -1,4 +1,4 @@
-// KUHL-MANAGED — Kuhl OS Studio Edition / Fedora + Niri
+// KUHL-MANAGED — Kuhl OS Frontier Edition / Fedora + Niri
 // Designed independently for Kuhl, inspired visually by low-clutter centered-bar rices.
 // Changes live reload. Validate after manual edits: niri validate
 prefer-no-csd
@@ -14,19 +14,20 @@ input {
 }
 
 layout {
-    gaps 13
+    gaps 16
     default-column-width { proportion 0.5; }
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
         proportion 0.66667
     }
-    focus-ring { width 2; }
+    focus-ring { width 3; }
     border { off; }
+    struts { left 12; right 12; top 8; bottom 12; }
 }
 
 window-rule {
-    geometry-corner-radius 13
+    geometry-corner-radius 20 0 40 0
     clip-to-geometry true
 }
 
@@ -38,6 +39,12 @@ window-rule {
 window-rule {
     match app-id=r#"^kuhl-control$"#
     open-floating true
+}
+
+// Terminal windows get the sharper top-left corner of the reference desktop.
+window-rule {
+    match app-id=r#"^(kitty|Alacritty)$"#
+    geometry-corner-radius 10 0 40 0
 }
 
 // Only launched when starting the Niri session. GNOME stays untouched.
@@ -60,7 +67,7 @@ binds {
     Mod+Return { spawn "kitty"; }
     Mod+T { spawn "kitty"; }
     Mod+E { spawn "thunar"; }
-    Mod+Shift+T { spawn "sh" "-c" "$HOME/.local/bin/kuhl menu --ui --page themes"; }
+    Mod+Shift+T { spawn "sh" "-c" "$HOME/.local/bin/kuhl themes --ui"; }
 
     // Windows
     Mod+H { focus-column-left; }

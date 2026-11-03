@@ -16,7 +16,7 @@ Press **Ctrl + Super + K** in Niri for a searchable on-screen guide. This table 
 | Super + Enter | Open terminal |
 | Super + T | Open terminal (alternative) |
 | Super + E | Open Files |
-| Super + Shift + T | Choose Day / Dusk |
+| Super + Shift + T | Graphical theme gallery |
 
 ## Windows
 

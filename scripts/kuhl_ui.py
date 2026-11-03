@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kuhl's original lightweight terminal UI: searchable shortcuts & control center.
 
-Uses only Python's standard library. No third-party dotfile code is bundled.
+Uses only Python's standard library. Adaptations and artwork credited in docs/CREDITS.md.
 """
 import argparse
 import curses
@@ -27,7 +27,11 @@ MENU = {
         ('Power / session', 'power', 'Lock, log out or shut down'),
     ],
     'themes': [
-        ('Kuhl Dusk', 'dusk', 'Deep charcoal / muted gold'),
+        ('Frontier · default', 'frontier', 'Gold & olive · PrisonerCoin artwork'),
+        ('Dyson', 'dyson', 'Electric blue · PrisonerCoin artwork'),
+        ('Puncture', 'puncture', 'Neon green · PrisonerCoin artwork'),
+        ('Slow End', 'slowend', 'Rose & violet · PrisonerCoin artwork'),
+        ('Kuhl Dusk', 'dusk', 'Original charcoal / muted gold'),
         ('Kuhl Day', 'day', 'Warm cream / muted olive'),
         ('Custom wallpaper path', 'wallpaper', 'Use your own JPG, PNG or WebP'),
         ('Solid background', 'solid', 'Use a clean color until you add artwork'),
@@ -51,6 +55,8 @@ MENU = {
 def action(item):
     actions = {
         'day': [KUHL_BIN,'theme','day'], 'dusk':[KUHL_BIN,'theme','dusk'],
+        'frontier':[KUHL_BIN,'theme','frontier'], 'dyson':[KUHL_BIN,'theme','dyson'],
+        'puncture':[KUHL_BIN,'theme','puncture'], 'slowend':[KUHL_BIN,'theme','slowend'],
         'solid':[KUHL_BIN,'wallpaper','reset'],
         'legacy-day':[KUHL_BIN,'wallpaper','day'], 'legacy-dusk':[KUHL_BIN,'wallpaper','dusk'],
         'legacy-default':[KUHL_BIN,'wallpaper','default'], 'doctor':[KUHL_BIN,'doctor'],

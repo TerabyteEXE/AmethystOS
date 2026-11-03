@@ -4,7 +4,7 @@
       "id": "core",
       "section": "The desktop",
       "title": "Kuhl core desktop",
-      "description": "Fedora-packaged Niri, Waybar, Fuzzel, Kitty, Mako, wallpapers, screen lock and essential XWayland/portal integration. Leaves GNOME installed as fallback.",
+      "description": "Fedora-packaged Niri, full-width Waybar, graphical Rofi launcher, Fuzzel fallback, Kitty, Mako, wallpaper and Wayland essentials. GNOME stays as fallback.",
       "default": true,
       "required": true,
       "type": "core"
@@ -12,8 +12,8 @@
     {
       "id": "theme",
       "section": "The desktop",
-      "title": "Kuhl Day / Dusk appearance",
-      "description": "Install coordinated Kuhl colors, wallpapers, terminal, bar, notifications and Niri theme includes. Switch later with kuhl theme day or kuhl theme dusk.",
+      "title": "Kuhl Frontier / six coordinated themes",
+      "description": "Art-led Frontier, Dyson, Puncture and Slow End palettes, plus original Kuhl Day/Dusk. Includes matched launcher, Niri, terminal, bar and notification colors; attribution and CC terms documented.",
       "default": true,
       "required": true,
       "type": "appearance"
@@ -22,7 +22,7 @@
       "id": "replace_existing",
       "section": "Installation safety",
       "title": "Replace existing desktop settings (with backups)",
-      "description": "For upgrading an existing Niri/Kuhl setup. Back up then replace current Niri, Waybar, Kitty, Mako and launcher configurations. Off by default; requires typing REPLACE before changes.",
+      "description": "For upgrades: backs up and replaces existing Niri, Waybar, Kitty, Rofi, Mako and Fuzzel configurations. Off by default; requires typing REPLACE first.",
       "default": false,
       "type": "installation"
     },
@@ -30,7 +30,7 @@
       "id": "vicinae",
       "section": "The desktop",
       "title": "Vicinae Spotlight-style search (optional COPR)",
-      "description": "Advanced macOS/Raycast-style search, file index and clipboard tools. REQUIRES explicit consent to enable third-party COPR quadratech188/vicinae. Without this, Super+Space opens Fedora-packaged Fuzzel.",
+      "description": "Optional macOS-style launcher/search, file index and clipboard tools. Explicit consent required for third-party COPR quadratech188/vicinae. Without it, Super+Space launches themed Fedora-packaged Rofi with Fuzzel fallback.",
       "default": false,
       "type": "copr",
       "value": "quadratech188/vicinae"

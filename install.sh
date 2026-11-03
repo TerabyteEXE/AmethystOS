@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — Kuhl OS 0.7.2, Fedora + Niri edition (not a Linux distro/ISO).
+# KUHL-MANAGED — Kuhl OS 0.8, Fedora + Niri edition (not a Linux distro/ISO).
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,7 +10,7 @@ REPLACE_CONFIGS=0
 NO_REBOOT=1
 usage() {
   cat <<'TXT'
-Kuhl OS 0.7.2 — Fedora Workstation + Niri
+Kuhl OS 0.8 — Fedora Workstation + Niri
 Recommended: curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 Internal/advanced: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
   --defaults         Use default choices without opening the text UI.
@@ -56,10 +56,10 @@ if not {p['id'] for p in options if p.get('required')} <= selected: raise System
 for item in sorted(selected): print(item)
 PY
 )
-THEME="$(python3 - "$TMP/choices.json" <<'PY'
+THEME="$(python3 - "$TMP/choices.json" "$ROOT/config/themes.json" <<'PY'
 import json,sys
 v=json.load(open(sys.argv[1]))['theme']
-assert v in ('day','dusk')
+assert v in json.load(open(sys.argv[2]))
 print(v)
 PY
 )"
@@ -71,7 +71,7 @@ if (( DRY_RUN )); then
   echo "  Theme: $THEME"
   printf '  Option: %s\n' "${SELECTED[@]}"
   (( REPLACE_CONFIGS == 0 )) || echo '  Replace existing configs: yes, after backups'
-  echo '  Fedora Niri + Fuzzel/Waybar/Kitty/Mako: required'
+  echo '  Fedora Niri + Rofi/Fuzzel/Waybar/Kitty/Mako: required'
   chosen vicinae && echo '  Third-party COPR: selected (requires explicit review)' || echo '  Third-party COPR: disabled'
   exit 0
 fi
@@ -85,7 +85,7 @@ source /etc/os-release
 (( ${VERSION_ID%%.*} >= 43 )) || { echo 'Requires Fedora 43 or newer (Niri include support).' >&2; exit 1; }
 command -v dnf >/dev/null || { echo 'DNF is missing' >&2; exit 1; }
 if (( REPLACE_CONFIGS )); then
-  echo 'CAUTION: --replace-configs will back up then replace Niri/Waybar/Kitty/Mako/Fuzzel dotfiles.'
+  echo 'CAUTION: --replace-configs will back up then replace Niri/Waybar/Kitty/Rofi/Mako/Fuzzel dotfiles.'
   [[ -r /dev/tty ]] || { echo 'Interactive confirmation needed to replace dotfiles.' >&2; exit 1; }
   read -r -p 'Type REPLACE to continue: ' reply </dev/tty
   [[ "$reply" == REPLACE ]] || { echo 'Cancelled.'; exit 2; }
@@ -102,8 +102,9 @@ fi
 mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 0.7.2 — FEDORA + NIRI\n'
+printf '\n✳ KUHL OS 0.8 — FEDORA + NIRI\n'
 printf 'Fedora %s / Kuhl %s\n' "${VERSION_ID:-unknown}" "$THEME"
+echo 'AI-assisted community scripts can contain security errors. Review bootstrap.sh, install.sh, and package sources before continuing.'
 [[ $(awk '/MemTotal:/ {print $2}' /proc/meminfo) -ge 7340032 ]] || kuhl_warn '8 GB RAM recommended, but not required.'
 # Avoid letting DNF fail at transaction commit on a small VM root partition.
 AVAILABLE_KB="$(df -Pk / | awk 'NR==2 {print $4}')"
@@ -119,22 +120,22 @@ printf '\n[1/6] Official Fedora desktop components\n'
 sudo -v
 sudo dnf install -y \
   niri xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
-  waybar fuzzel kitty mako swaybg swaylock swayidle thunar \
+  waybar rofi fuzzel kitty mako swaybg swaylock swayidle thunar \
   wl-clipboard papirus-icon-theme jetbrains-mono-fonts
 if chosen desktop_helpers; then
   sudo dnf install -y network-manager-applet blueman pavucontrol brightnessctl playerctl
 fi
 ISSUES=0
 python3 "$ROOT/scripts/progress.py" 1 'Official Fedora components installed'
-printf '\n[2/6] Preflight: validate both Kuhl Niri themes before any user config changes\n'
+printf '\n[2/6] Preflight: validate every Kuhl Niri theme before any user config changes\n'
 python3 "$ROOT/scripts/validate_niri.py" || { kuhl_warn 'Bundled Niri config failed validation. Nothing in your personal config was changed.'; exit 1; }
-python3 "$ROOT/scripts/progress.py" 2 'Both Kuhl palettes passed Niri validation'
+python3 "$ROOT/scripts/progress.py" 2 'All Kuhl themes passed Niri validation'
 printf '\n[3/6] Optional software and launcher\n'
 if chosen vicinae; then
   if sudo dnf copr enable -y quadratech188/vicinae && sudo dnf install -y vicinae; then
     kuhl_info 'Vicinae installed (Super+Space will prefer it)'
   else
-    kuhl_warn 'Could not install Vicinae: Fuzzel remains the safe default.'
+    kuhl_warn 'Could not install Vicinae: themed Rofi remains the default; Fuzzel is fallback.'
     ISSUES=$((ISSUES+1))
   fi
 fi
@@ -155,10 +156,14 @@ if (( ${#FLATPAKS[@]} )); then
   done
 fi
 python3 "$ROOT/scripts/progress.py" 3 'Optional desktop features prepared'
-printf '\n[4/6] Kuhl Studio assets, keyboard guide and management tools\n'
+printf '\n[4/6] Kuhl Frontier assets, keyboard guide and management tools\n'
 mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_DATA/templates" "$KUHL_DATA/branding"
 for image in kuhl-day.png kuhl-dusk.png kuhl-default.png; do
   install -m 644 "$ROOT/assets/wallpapers/$image" "$KUHL_DATA/wallpapers/$image"
+done
+mkdir -p "$KUHL_DATA/wallpapers/third-party"
+for image in frontier dyson puncture slowend; do
+  install -m 644 "$ROOT/assets/wallpapers/third-party/$image.png" "$KUHL_DATA/wallpapers/third-party/$image.png"
 done
 install -m 644 "$ROOT/assets/branding/kuhl-logo.svg" "$KUHL_DATA/branding/kuhl-logo.svg"
 install -m 644 "$ROOT/config/themes.json" "$KUHL_DATA/themes.json"
@@ -174,7 +179,7 @@ if [[ -f "$KUHL_BIN" ]] && ! grep -q -E 'KUHL-MANAGED|Kuhl OS' "$KUHL_BIN"; then
 fi
 install -m 755 "$ROOT/bin/kuhl" "$KUHL_BIN"
 python3 "$ROOT/scripts/progress.py" 4 'Kuhl assets and applications registered'
-printf '\n[5/6] Applying Kuhl Niri / Waybar / Kitty / Mako / Fuzzel rice\n'
+printf '\n[5/6] Applying Kuhl Niri / Waybar / Kitty / Rofi / Mako / Fuzzel rice\n'
 OPTIONS=(install --source "$KUHL_DATA/templates" --theme "$THEME")
 (( ! REPLACE_CONFIGS )) || OPTIONS+=(--replace-configs)
 python3 "$KUHL_DATA/render.py" "${OPTIONS[@]}"
@@ -185,7 +190,7 @@ python3 "$ROOT/scripts/progress.py" 5 'Backed-up, tracked configuration deployme
 printf '\n[6/6] Validating your active Niri session configuration\n'
 if ! niri validate; then
   kuhl_warn 'The active Niri config is invalid (possibly an existing user config).'
-  kuhl_warn 'Both bundled Kuhl themes passed isolated native validation before deployment.'
+  kuhl_warn 'All bundled Kuhl themes passed isolated native validation before deployment.'
   kuhl_warn 'Existing files and Kuhl-managed configs are preserved for manual diagnosis.'
   kuhl_warn 'Run niri validate to inspect the active file; use kuhl uninstall if you want to undo Kuhl-managed configs.'
   exit 1
@@ -194,7 +199,7 @@ if ! grep -q 'KUHL-MANAGED' "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl";
   kuhl_warn 'Existing Niri config was preserved; add Kuhl integration manually or use --replace-configs.'
   ISSUES=$((ISSUES+1))
 fi
-python3 "$ROOT/scripts/progress.py" 6 'Kuhl Studio installed successfully — ready for Niri'
+python3 "$ROOT/scripts/progress.py" 6 'Kuhl Frontier installed successfully — ready for Niri'
 printf '\nInstalled. GNOME remains available.\n'
 printf 'Log out, choose Niri at the GDM login screen, then sign in.\n'
 printf 'Super+Space opens search; Ctrl+Super+K opens the keyboard guide. Super+D opens Kuhl Control Center.\n'

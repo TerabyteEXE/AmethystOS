@@ -1,7 +1,7 @@
-# Wallpapers
+# Kuhl wallpapers
 
-The three PNG images in this folder are original Kuhl assets retained from previous editions. Studio 0.7 deliberately **does not activate them automatically**, because the project is awaiting new user-created artwork. Its default background is a solid color.
+- `kuhl-default.png`, `kuhl-day.png`, `kuhl-dusk.png`: pre-existing Kuhl assets retained for compatibility.
+- `third-party/frontier.png`, `dyson.png`, `puncture.png`, `slowend.png`: modified frames from KyleOS's PrisonerCoin-based artwork, **CC BY-NC-SA 3.0, not MIT**; see `docs/CREDITS.md`.
+- If replacing wallpapers for a publicly distributed version, check artwork provenance and rights, not only filenames.
 
-After installing, run `kuhl wallpaper set /path/to/your/wallpaper.png` to use a new image, or `kuhl wallpaper reset` to return to a solid background. Original images remain selectable through `kuhl wallpaper day|dusk|default`.
-
-No wallpaper from the visual reference project is distributed.
+`kuhl wallpaper set ~/Pictures/your-image.png` chooses your own image. `kuhl wallpaper reset` returns to automatic theme artwork, while Day/Dusk revert to solid colors.

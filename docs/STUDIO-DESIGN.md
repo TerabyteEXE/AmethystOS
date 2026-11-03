@@ -1,35 +1,13 @@
-# Kuhl OS Studio — visual and interaction specification
+# Kuhl OS 0.8 — Frontier rice specification
 
-## Direction
-A single rounded floating capsule centered along the top of the screen, low-contrast charcoal surfaces, gentle gold indicators, monospaced utility text, terminal windows with modest radii and 13px gaps. Inspired visually by supplied screenshots of a minimal Niri rice; all source code and CSS are independently authored. No unlicensed reference wallpaper or code is distributed.
+This design is inspired by [KyleOS](https://github.com/Person-008/KyleOS) (MIT code by Rosenkranz/Person-008) and includes CC BY-NC-SA artwork by PrisonerCoin. **See `docs/CREDITS.md` for licenses and modifications.**
 
-| Token | Dusk | Day |
-|---|---|---|
-| Background | `#2c2c2c` | `#eae4d8` |
-| Capsule | `#302e2c` | `#f3eee4` |
-| Surface elevation | `#423d35` | `#e2d8c8` |
-| Text | `#e9e2d5` | `#353631` |
-| Accent | `#e4c977` | `#8b7950` |
+- Full-width, 29px, top-anchored Waybar with minimal status text, workspaces at left, date/time centered, tools at right.
+- Niri scrolling tiling with 16px gaps, focused ring, and asymmetric corner geometry `20 0 40 0`; terminals get `10 0 40 0`.
+- Rofi desktop launcher with clipped-corner theme and a 3x2 artwork gallery for `Super+Shift+T`. Optional Vicinae is retained, Fuzzel remains installed as fallback.
+- Six color sets: `frontier` (default), `dyson`, `puncture`, `slowend`, plus legacy `day` and `dusk`.
+- Theme-linked wallpaper is a **static modified frame** from the source GIF and licensed **CC BY-NC-SA 3.0**. Custom wallpapers override; old Kuhl wallpapers are optional.
+- Every shortcut is mapped in `config/keys.json` and its Niri manifest. `Ctrl+Super+K` still opens the searchable guide; `Super+D` opens Kuhl Control Center.
+- Fedora’s packaged apps and GNOME fallback are retained. No KyleOS system-level `/etc` files, fish auto-start behaviors, Arch-specific installer, shader animations, or per-monitor display IDs are imported.
 
-There is deliberately no default generated wallpaper. In a polished release, an artist-made original Kuhl wallpaper can replace the solid background; until then the OS is fully usable.
-
-## Main flows
-
-- `Super + Space`: launcher (Vicinae if installed, Fuzzel otherwise)
-- `Ctrl + Super + K`: searchable keyboard atlas (standalone floating Kitty window)
-- `Super + D`: Kuhl control center (themes, wallpaper, diagnostics, apps, power)
-- `Super + Shift + T`: theme selection
-- `Super + Shift + P`: power/sleep/logout with explicit confirmation for reboot/poweroff
-- `Super + H/J/K/L`: navigate, `Super + Shift + H/J/K/L`: move
-
-## Performance rules
-No wallpaper animation, compositing blur, giant icon packs beyond the selected theme, constant background scripts, live polling for updates or new WebKit/Electron UI. Rendering is performed by Niri, Waybar, Kitty, Mako, and Fuzzel. Python only runs when using the control center/guide or during setup.
-
-## Adding wallpapers later
-
-```bash
-kuhl wallpaper set ~/Pictures/kuhl-dusk-original.png
-kuhl wallpaper reset
-```
-
-The original Kuhl images remain optional for compatibility and are **not** part of the new design reference.
+**AI-assisted source, unaudited.** See `docs/SECURITY.md` and independently review before deployment.

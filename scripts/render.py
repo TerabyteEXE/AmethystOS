@@ -96,6 +96,7 @@ def template_files(source: Path):
     for name, title, comment, arguments, icon in (
         ('day', 'Kuhl Day', 'Use the Kuhl Day palette', 'theme day', 'preferences-desktop-theme'),
         ('dusk', 'Kuhl Dusk', 'Use the Kuhl Dusk palette', 'theme dusk', 'preferences-desktop-theme'),
+        ('frontier', 'Kuhl Frontier', 'Theme by Kuhl; art by PrisonerCoin CC BY-NC-SA', 'theme frontier', 'preferences-desktop-theme'),
         ('control', 'Kuhl Control Center', 'Themes, wallpaper, system and settings', 'menu --ui', 'preferences-system'),
         ('keys', 'Kuhl Keyboard Guide', 'Search all Kuhl shortcuts', 'keys --ui', 'input-keyboard'),
     ):
@@ -109,13 +110,15 @@ def template_files(source: Path):
         CONFIG / 'niri/config.kdl': (source / 'niri/config.kdl').read_bytes(),
         CONFIG / 'waybar/config.jsonc': (source / 'waybar/config.jsonc').read_bytes(),
         CONFIG / 'kitty/kitty.conf': (source / 'kitty/kitty.conf').read_bytes(),
+        CONFIG / 'rofi/kuhl.rasi': (source / 'rofi/kuhl.rasi').read_bytes(),
+        CONFIG / 'rofi/gallery.rasi': (source / 'rofi/gallery.rasi').read_bytes(),
     }
 
 
 def theme_files(theme: str):
     palettes = json.loads((DATA / 'themes.json').read_text(encoding='utf-8'))
     if theme not in palettes:
-        raise SystemExit('Theme must be day or dusk')
+        raise SystemExit('Unknown theme; see kuhl theme list')
     p = palettes[theme]
     niri = f'''// KUHL-MANAGED — automatically generated Kuhl {theme} palette
 layout {{
@@ -124,30 +127,25 @@ layout {{
 }}
 overview {{ backdrop-color "{p['bg']}"; }}
 '''
-    css = f'''/* KUHL-MANAGED — original Kuhl Studio {theme} palette */
-* {{ border: 0; border-radius: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; min-height: 0; }}
-window#waybar {{
-  background: {p['surface']}; color: {p['fg']};
-  border: 1px solid {p['border']}; border-radius: 22px;
-}}
-.modules-center {{ margin: 0 7px; }}
-#custom-kuhl, #workspaces, #clock, #custom-theme, #pulseaudio,
-#network, #battery, #tray, #custom-keys, #custom-power {{
-  color: {p['muted']}; padding: 0 6px; margin: 0 1px;
-}}
-#custom-kuhl {{ font-size: 18px; font-weight: 900; padding: 0 8px; color: {p['accent']}; }}
-#clock {{ color: {p['fg']}; font-weight: 700; padding: 0 8px; }}
-#workspaces {{ padding: 0 0 0 3px; }}
-#workspaces button {{ padding: 0 5px; margin: 4px 1px; color: {p['muted']}; border-radius: 8px; }}
-#workspaces button.active {{ background: {p['surface2']}; color: {p['accent']}; font-weight: 800; }}
-#workspaces button:hover {{ background: {p['surface2']}; color: {p['fg']}; box-shadow: none; }}
-#custom-theme {{ color: {p['accent']}; font-size: 17px; }}
-#tray {{ padding: 0 5px; }}
-#custom-keys {{ color: {p['accent']}; font-weight: 700; }}
-#custom-power {{ color: #e5a69e; padding-right: 12px; font-size: 15px; }}
+    # Full-width edge-to-edge Waybar, retaining KyleOS's quiet status-line rhythm.
+    css = f'''/* KUHL-MANAGED — palette {theme}; KyleOS design reference (MIT, Rosenkranz). */
+* {{ border: none; border-radius: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; min-height: 0; }}
+window#waybar {{ background: {p['bg']}; color: {p['fg']}; border-bottom: 1px solid {p['border']}; }}
+#custom-kuhl, #workspaces, #clock, #pulseaudio, #network, #battery,
+#tray, #custom-keys, #custom-theme, #custom-power {{ color: {p['muted']}; padding: 0 11px; }}
+#custom-kuhl {{ color: {p['accent']}; font-weight: 800; padding-left: 18px; letter-spacing: 1px; }}
+#clock {{ color: {p['accent']}; font-weight: 600; letter-spacing: 1px; }}
+#workspaces {{ padding: 0 5px; }}
+#workspaces button {{ padding: 0 7px; color: {p['muted']}; }}
+#workspaces button.active {{ color: {p['accent']}; background: {p['surface2']}; box-shadow: inset 0 -2px {p['accent']}; }}
+#workspaces button:hover {{ color: {p['fg']}; background: {p['surface2']}; box-shadow: none; }}
+#custom-theme, #custom-keys {{ color: {p['accent']}; }}
+#custom-power {{ color: {p['accent']}; padding-right: 18px; }}
+#network {{ color: {p['muted']}; }}
+#pulseaudio {{ color: {p['accent2']}; }}
 #battery.warning {{ color: {p['accent']}; }}
-#battery.critical {{ color: #e5a69e; }}
-tooltip {{ background-color: {p['surface']}; color: {p['fg']}; border: 1px solid {p['border']}; border-radius: 10px; }}
+#battery.critical {{ color: #dc817d; }}
+tooltip {{ background: {p['surface']}; color: {p['fg']}; border: 1px solid {p['border']}; border-radius: 9px; }}
 '''
     kitty = f'''# KUHL-MANAGED — generated {theme} terminal palette
 foreground {p['terminal_fg']}
@@ -210,10 +208,13 @@ margin=12
 default-timeout=5000
 icons=1
 '''
+    rofi = f'''/* KUHL-MANAGED — generated {theme} Rofi color variables */
+* {{ background: {p['surface']}; foreground: {p['fg']}; outline: {p['border']}; selection: {p['surface2']}; accent: {p['accent']}; }}
+'''
     # Optional Vicinae stays opt-in. Kuhl does not configure its telemetry policy.
     vicinae = '\n'.join([
         f'# KUHL-MANAGED — {theme} Vicinae theme', '[meta]', 'version = 1',
-        f'name = "Kuhl {theme.title()}"', 'description = "Kuhl Studio palette"',
+        f'name = "Kuhl {theme.title()}"', 'description = "Kuhl Frontier palette"',
         f'variant = "{"dark" if theme == "dusk" else "light"}"',
         f'inherits = "vicinae-{"dark" if theme == "dusk" else "light"}"',
         '[colors.core]',
@@ -227,6 +228,7 @@ icons=1
         CONFIG / 'kitty/colors.conf': kitty.encode(),
         CONFIG / 'mako/config': mako.encode(),
         CONFIG / 'fuzzel/fuzzel.ini': fuzzel.encode(),
+        CONFIG / 'rofi/color.rasi': rofi.encode(),
         DATA.parent / 'vicinae/themes' / f'kuhl-{theme}.toml': vicinae.encode(),
     }
 
@@ -270,7 +272,7 @@ def uninstall():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['install', 'theme', 'uninstall', 'status'])
-    parser.add_argument('--theme', choices=['day', 'dusk'], default='dusk')
+    parser.add_argument('--theme', choices=['frontier', 'dyson', 'puncture', 'slowend', 'day', 'dusk'], default='frontier')
     parser.add_argument('--source', type=Path, default=DATA / 'templates')
     parser.add_argument('--replace-configs', action='store_true', help='backup and replace existing/edited files')
     args = parser.parse_args()

@@ -35,7 +35,19 @@ apply_wallpaper() {
       day) img="$ROOT/wallpapers/kuhl-day.png";;
       dusk) img="$ROOT/wallpapers/kuhl-dusk.png";;
       default) img="$ROOT/wallpapers/kuhl-default.png";;
-      auto|solid) img='';;
+      auto) 
+        theme_now="$(cat "$THEME_FILE" 2>/dev/null || echo frontier)"
+        img="$(python3 - "$ROOT/themes.json" "$theme_now" <<'PYCODE'
+import json,sys
+from pathlib import Path
+try:
+    data=json.loads(Path(sys.argv[1]).read_text()); print(data.get(sys.argv[2],{}).get('wallpaper',''))
+except (OSError,ValueError): print('')
+PYCODE
+)"
+        [[ -z "$img" ]] || img="$ROOT/wallpapers/$img"
+        ;;
+      solid) img='';;
       *) echo 'Unrecognized wallpaper setting; using solid background.' >&2; img='';;
     esac
   fi
@@ -57,8 +69,12 @@ apply_wallpaper() {
     swaybg -i "$img" -m fill >/dev/null 2>&1 &
   else
     local color
-    color='#2c2c2c'
-    [[ "$(cat "$THEME_FILE" 2>/dev/null || echo dusk)" != day ]] || color='#eae4d8'
+    color="$(python3 - "$ROOT/themes.json" "$(cat "$THEME_FILE" 2>/dev/null || echo frontier)" <<'PYCODE'
+import json,sys
+try: print(json.load(open(sys.argv[1])).get(sys.argv[2],{}).get('bg','#0b0d15'))
+except (OSError,ValueError):print('#0b0d15')
+PYCODE
+)"
     swaybg -c "$color" >/dev/null 2>&1 &
   fi
   printf '%s\n' "$!" > "$STATE/swaybg.pid"
@@ -66,7 +82,18 @@ apply_wallpaper() {
 
 case "$command_name" in
   theme)
-    [[ $# -eq 1 && ( "$1" == day || "$1" == dusk ) ]] || { echo 'Usage: kuhl theme day|dusk' >&2; exit 2; }
+    if [[ "${1:-}" == list ]]; then
+      python3 - "$ROOT/themes.json" <<'PYCODE'
+import json,sys
+for key,info in json.load(open(sys.argv[1])).items():print(f"{key:12} {info['name']}")
+PYCODE
+      exit 0
+    fi
+    [[ $# -eq 1 ]] || { echo 'Usage: kuhl theme list|THEME' >&2; exit 2; }
+    python3 - "$ROOT/themes.json" "$1" <<'PYCODE'
+import json,sys
+if sys.argv[2] not in json.load(open(sys.argv[1])): raise SystemExit('Unknown Kuhl theme. Run: kuhl theme list')
+PYCODE
     [[ -r "$ROOT/render.py" ]] || { echo 'Kuhl desktop is not installed.' >&2; exit 1; }
     python3 "$ROOT/render.py" theme --theme "$1"
     if in_niri; then
@@ -77,12 +104,39 @@ case "$command_name" in
     fi
     printf 'Kuhl %s palette activated (edited personal configs are preserved).\n' "$1"
     ;;
+  themes)
+    [[ "${1:-}" == --ui ]] || { echo 'Usage: kuhl themes --ui' >&2; exit 2; }
+    if ! command -v rofi >/dev/null 2>&1; then
+      "$SELF" menu --ui --page themes
+      exit 0
+    fi
+    # This only consumes known IDs from the installed Kuhl theme manifest.
+    chosen="$(python3 - "$ROOT/themes.json" "$ROOT/wallpapers" "$HOME/.config/rofi/gallery.rasi" <<'PYCODE'
+import json,subprocess,sys
+from pathlib import Path
+palettes=json.load(open(sys.argv[1])); wallpapers=Path(sys.argv[2])
+items=[];names={}
+for key,p in palettes.items():
+    name=p['name']; names[name]=key
+    art=p.get('wallpaper') or ('kuhl-day.png' if key=='day' else 'kuhl-dusk.png')
+    path=wallpapers/art
+    items.append(f"{name}\0icon\x1f{path}" if path.is_file() else name)
+try:
+    proc=subprocess.run(['rofi','-dmenu','-i','-no-custom','-show-icons','-p','Kuhl themes','-theme',sys.argv[3]],input='\n'.join(items)+'\n',text=True,capture_output=True,check=False)
+    if proc.returncode==0:print(names.get(proc.stdout.strip(),''))
+except OSError: pass
+PYCODE
+)"
+    [[ -n "$chosen" ]] && "$SELF" theme "$chosen"
+    ;;
   launcher)
     if command -v vicinae >/dev/null 2>&1; then
-      vicinae toggle || exec fuzzel
-    else
-      exec fuzzel
+      vicinae toggle && exit 0
     fi
+    if command -v rofi >/dev/null 2>&1; then
+      exec rofi -show drun -theme "$HOME/.config/rofi/kuhl.rasi"
+    fi
+    exec fuzzel
     ;;
   wallpaper)
     op="${1:-help}"; [[ $# -eq 0 ]] || shift
@@ -124,7 +178,7 @@ PY
     show_ui control menu "$@"
     ;;
   status)
-    echo 'Kuhl OS 0.7 · Studio Edition · Fedora + Niri'
+    echo 'Kuhl OS 0.8 · Frontier Edition · Fedora + Niri'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
     echo "Launcher: $(command -v vicinae >/dev/null && echo Vicinae || echo 'Fuzzel fallback')"
@@ -134,7 +188,7 @@ PY
   doctor)
     problems=0
     [[ -r /etc/fedora-release ]] && echo '[ok] Fedora found' || { echo '[warn] Not running Fedora'; problems=$((problems+1)); }
-    for c in niri waybar fuzzel kitty mako swaybg swaylock swayidle python3 thunar; do
+    for c in niri waybar rofi fuzzel kitty mako swaybg swaylock swayidle python3 thunar; do
       command -v "$c" >/dev/null 2>&1 && echo "[ok] $c" || { echo "[warn] Missing $c"; problems=$((problems+1)); }
     done
     if command -v niri >/dev/null 2>&1; then
@@ -155,20 +209,22 @@ PY
     ;;
   help|-h|--help)
     cat <<'HELP'
-KUHL OS · STUDIO EDITION 0.7
+KUHL OS · FRONTIER EDITION 0.8
   kuhl menu                         Keyboard-operated desktop control center
+  kuhl themes --ui                  Graphical theme gallery (Super+Shift+T)
   kuhl keys --ui                    Searchable shortcut atlas · Ctrl+Super+K
   kuhl keys                         Print every shortcut
   kuhl launcher                     Vicinae / Fuzzel search · Super+Space
-  kuhl theme day|dusk               Apply the palette across components
+  kuhl theme list                   List available themes
+  kuhl theme frontier|dyson|puncture|slowend|day|dusk  Apply a palette
   kuhl wallpaper set /path/image   Bring your own wallpaper
-  kuhl wallpaper reset             Return to a solid palette background
+  kuhl wallpaper reset             Restore theme artwork (or solid Day/Dusk)
   kuhl wallpaper day|dusk|default  Use previous Kuhl images (optional)
   kuhl doctor                       Diagnose installed desktop
   kuhl status                       Managed-file status
   kuhl uninstall                    Restore unchanged managed dotfiles
 
-No background updater or bundled AI. GNOME is kept for recovery.
+No background updater or bundled AI runtime. Some project code was AI-assisted. Review scripts before use. GNOME is kept for recovery.
 HELP
     ;;
   *) echo "Unknown command: $command_name (run: kuhl help)" >&2; exit 2;;

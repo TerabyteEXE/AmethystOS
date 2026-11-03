@@ -41,7 +41,8 @@ def menu(screen, items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
     cursor = 0
     offset = 0
-    theme = 'dusk'
+    theme = 'frontier'
+    themes = ['frontier','dyson','puncture','slowend','day','dusk']
 
     def paint(row, col, content, style=0):
         height, width = screen.getmaxyx()
@@ -85,9 +86,9 @@ def menu(screen, items):
             continue
         screen.border()
         paint(1, 3, '✳  K U H L    /    O S', accent | curses.A_BOLD)
-        paint(2, 3, 'S T U D I O    E D I T I O N   /   F E D O R A   +   N I R I', muted)
+        paint(2, 3, 'F R O N T I E R    E D I T I O N   /   F E D O R A   +   N I R I', muted)
         paint(4, 3, '✳  Build your Kuhl desktop. Your existing files stay safe.', curses.A_BOLD)
-        paint(5, 3, 'UP/DOWN  navigate    SPACE  select    T  Day/Dusk    ENTER  review', muted)
+        paint(5, 3, 'UP/DOWN  navigate    SPACE  select    T  cycle 6 themes    ENTER  review', muted)
         paint(6, 3, 'INSTALLATION   [━━━━━━━━━━··········]  01/02 CHOICES', accent)
         paint(7, 3, f'PALETTE {theme.upper():<6}     COMPONENTS {len(selected):02}/{len(items):02}   /   USER-CONTROLLED', good)
         screen.hline(8, 3, curses.ACS_HLINE, width-6)
@@ -108,7 +109,7 @@ def menu(screen, items):
         paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
         for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
             paint(row, 3, part)
-        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL STUDIO 0.7.2   ·   Q / ESC to cancel', muted)
+        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL FRONTIER 0.8   ·   Q / ESC to cancel', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
@@ -123,7 +124,7 @@ def menu(screen, items):
                 else:
                     selected.add(item['id'])
         elif key in (ord('t'), ord('T')):
-            theme = 'day' if theme == 'dusk' else 'dusk'
+            theme = themes[(themes.index(theme)+1)%len(themes)]
         elif key in (ord('q'), ord('Q'), 27):
             return None
         elif key in (10, 13, curses.KEY_ENTER):
@@ -134,7 +135,7 @@ def menu(screen, items):
 
 def plain(items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
-    print('\n✳ KUHL OS 0.7.2  /  FEDORA + NIRI  /  TEXT MODE')
+    print('\n✳ KUHL OS 0.8  /  FEDORA + NIRI  /  TEXT MODE')
     for index, item in enumerate(items, 1):
         marker = 'x' if item['id'] in selected else ' '
         lock = ' [required]' if item.get('required') else ''
@@ -153,8 +154,8 @@ def plain(items):
                 selected.remove(item['id'])
             else:
                 selected.add(item['id'])
-    theme = input('Palette: [dusk]/day: ').strip().lower() or 'dusk'
-    if theme not in ('day', 'dusk'):
+    theme = input('Palette: [frontier]/dyson/puncture/slowend/day/dusk: ').strip().lower() or 'frontier'
+    if theme not in ('frontier','dyson','puncture','slowend','day','dusk'):
         raise ValueError('Unknown palette')
     print('GNOME is retained. ' + ('Existing configs will be backed up and replaced with REPLACE confirmation.' if 'replace_existing' in selected else 'Existing personal configurations are preserved.'))
     if 'vicinae' in selected:
@@ -171,7 +172,7 @@ def main():
     args = parser.parse_args()
     items = rows(args.config)
     if args.defaults:
-        result = {'theme': 'dusk', 'selected': sorted(r['id'] for r in items if r.get('default') or r.get('required'))}
+        result = {'theme': 'frontier', 'selected': sorted(r['id'] for r in items if r.get('default') or r.get('required'))}
     else:
         if not sys.stdin.isatty() or not sys.stdout.isatty():
             raise RuntimeError('Interactive installation requires a terminal. Use --defaults for automation.')

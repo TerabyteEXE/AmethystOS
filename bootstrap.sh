@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — the one-command entry point for Kuhl OS Studio.
+# KUHL-MANAGED — the one-command entry point for Kuhl OS Frontier.
 # Public install command:
 #   curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 # Runs with the current user; only DNF operations inside install.sh use sudo.
@@ -8,7 +8,7 @@ set -Eeuo pipefail
 SOURCE_URL='https://github.com/TerabyteEXE/Kuhl-OS/archive/refs/heads/main.tar.gz'
 
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
-  printf '%s\n' 'Kuhl OS Studio — one-command installer' \
+  printf '%s\n' 'Kuhl OS Frontier — one-command installer' \
     'Install from Fedora Workstation as your regular user:' \
     '  curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash' \
     'The installer opens a terminal menu to configure your desktop and backups.'

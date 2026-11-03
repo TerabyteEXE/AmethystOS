@@ -1,0 +1,30 @@
+/* KUHL-MANAGED — style adapted from KyleOS layout direction (MIT, Rosenkranz 2026).
+   All colors generated separately to color.rasi by Kuhl render.py. */
+@import "color.rasi"
+configuration { modi: "drun,run,window"; show-icons: true; drun-display-format: "{name}"; }
+* {
+  font: "JetBrains Mono 12";
+  background-color: @background;
+  text-color: @foreground;
+  border-color: @outline;
+  selected-normal-background: @selection;
+  selected-normal-foreground: @accent;
+}
+window {
+  width: 620px;
+  location: center;
+  anchor: center;
+  border: 2px;
+  padding: 18px;
+  border-radius: 24px 0px 42px 0px;
+  background-color: @background;
+}
+mainbox { children: [inputbar,listview]; spacing: 16px; }
+inputbar { padding: 11px 15px; border: 1px; border-radius: 9px 0px 16px 0px; children: [prompt,entry]; spacing: 12px; }
+prompt { text-color: @accent; str: "⌕"; }
+entry { placeholder: "Search applications…"; }
+listview { lines: 7; columns: 1; spacing: 4px; scrollbar: false; }
+element { padding: 10px 12px; spacing: 12px; border-radius: 10px 0px 16px 0px; }
+element selected { background-color: @selection; text-color: @accent; }
+element-icon { size: 24px; }
+element-text { vertical-align: 0.5; }

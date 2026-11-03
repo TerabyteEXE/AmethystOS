@@ -56,8 +56,8 @@
       "section": "Start here",
       "key": "Mod+Shift+T",
       "show": "Super + Shift + T",
-      "title": "Choose Day / Dusk",
-      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl menu --ui --page themes\";"
+      "title": "Graphical theme gallery",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl themes --ui\";"
     },
     {
       "section": "Windows",

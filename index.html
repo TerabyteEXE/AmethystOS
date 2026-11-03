@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0e17">
+  <meta name="description" content="Kuhl OS is a community Fedora + Niri desktop setup inspired by KyleOS, with a one-command installer, polished shortcuts and safety-focused configuration management.">
+  <title>Kuhl OS — Fedora, made personal</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b0e17; --surface:#121620; --line:#303744; --text:#e3e5d8; --muted:#a2a89b; --gold:#ddd089; --green:#85a897; }
+    * {box-sizing:border-box}
+    html {scroll-behavior:smooth}
+    body {margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a {color:var(--gold);text-underline-offset:3px} a:hover{text-decoration:none}
+    .container {width:min(1060px,calc(100% - 44px));margin-inline:auto}
+    header {border-bottom:1px solid var(--line);position:relative;z-index:1}
+    header .container {min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .brand {text-decoration:none;color:var(--text);font-weight:750;font-size:18px;letter-spacing:.005em}
+    .brand-mark {display:inline-block;color:var(--gold);margin-right:7px}
+    nav {display:flex;gap:26px;align-items:center}
+    nav a {color:var(--muted);font-size:13px;text-decoration:none}
+    nav a:hover {color:var(--text)}
+    .tag {display:inline-block;text-transform:uppercase;font-size:11px;font-weight:750;letter-spacing:.16em;color:var(--gold)}
+    .hero {padding:92px 0 64px}
+    .hero h1 {font-size:clamp(42px,6.6vw,80px);max-width:900px;line-height:1.04;letter-spacing:-.055em;font-weight:700;margin:15px 0 24px}
+    .lead {color:var(--muted);font-size:clamp(17px,2vw,20px);max-width:675px;margin:0 0 26px}
+    .meta {color:#93998e;font-size:13px;margin:0}
+    .preview {margin:16px 0 75px;border:1px solid var(--line);background:#14161e;overflow:hidden}
+    .screen {aspect-ratio:16/8.7;min-height:300px;background:linear-gradient(#0002,#0003),url("assets/wallpapers/third-party/frontier.png") center / cover;position:relative}
+    .desktop-bar {min-height:31px;background:#0b0d15f5;border-bottom:1px solid #485041;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 18px;gap:14px;color:#a3ab8f;font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+    .desktop-bar strong {color:var(--gold);font-weight:600}
+    .desktop-bar .end {justify-self:end}
+    .fake-term {position:absolute;top:18%;left:10%;width:40%;min-height:55%;background:#090d17ed;border:1px solid #555e48;border-radius:17px 0 37px 0;box-shadow:0 17px 55px #000a;overflow:hidden}
+    .term-top {border-bottom:1px solid #29323d;font:11px/1.5 ui-monospace,monospace;padding:9px 15px;color:#9ca797}
+    .term-body {padding:19px 23px;font:clamp(10px,1.18vw,14px)/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;color:#b6c4a8}
+    .term-body .cmd {color:var(--gold)} .term-body .dim {color:#6d8278}
+    figcaption {font-size:12px;color:var(--muted);padding:11px 16px;background:#10141b;border-top:1px solid var(--line)}
+    section {padding:0 0 75px}
+    h2 {font-size:clamp(28px,3.4vw,40px);font-weight:650;letter-spacing:-.035em;line-height:1.17;margin:10px 0 16px}
+    .section-desc {max-width:700px;color:var(--muted);margin:0 0 27px}
+    .cols {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;border-top:1px solid var(--line);padding-top:24px}
+    h3 {font-size:16px;font-weight:650;margin:0 0 8px}
+    .cols p {font-size:14px;color:var(--muted);margin:0}
+    .code {background:#151923;border:1px solid #384236;display:flex;align-items:center;gap:14px;padding:15px 16px;margin:22px 0 14px}
+    .code code {font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all;flex:1;color:#dae4bf}
+    button {font:inherit;background:#d9cb86;color:#1a1d1b;font-size:13px;font-weight:700;padding:8px 14px;border:0;cursor:pointer;min-width:80px}
+    button:hover {background:#f0dfa1}
+    .hint {color:var(--muted);font-size:13px;margin:0}
+    .note {border-left:2px solid #b1a66a;padding:0 0 0 18px;margin:22px 0 0;color:var(--muted);max-width:790px}
+    .themes {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .themes figure {margin:0;border:1px solid var(--line);background:var(--surface)}
+    .themes img {width:100%;display:block;aspect-ratio:16/10;object-fit:cover;image-rendering:auto}
+    .themes figcaption {border:0;padding:10px 12px;color:var(--text);font-size:13px}
+    .links {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;padding-left:0;list-style:none}
+    .links li {color:var(--muted);font-size:14px}
+    .links a {color:var(--text)}
+    footer {border-top:1px solid var(--line);padding:28px 0 42px;color:var(--muted);font-size:13px}
+    footer .container {display:flex;gap:20px;justify-content:space-between}
+    @media(max-width:740px) { nav {gap:13px}nav a{font-size:12px}.hero{padding:65px 0 37px}.preview{margin-bottom:55px}.cols{grid-template-columns:1fr;gap:20px}.themes{grid-template-columns:repeat(2,minmax(0,1fr))}.desktop-bar .end {display:none}.desktop-bar{grid-template-columns:1fr auto}.fake-term{width:77%;left:7%;min-height:45%}.links{grid-template-columns:1fr}footer .container{display:block} .code{align-items:stretch;flex-direction:column}.code button{align-self:flex-start} }
+    @media(max-width:440px){.container{width:calc(100% - 30px)}nav a:nth-child(2){display:none}.desktop-bar{font-size:10px}.screen{min-height:210px}.term-body{padding:12px}.fake-term{top:21%;width:86%;left:5%}}
+  </style>
+</head>
+<body>
+  <header><div class="container"><a class="brand" href="#top"><span class="brand-mark">✳</span>Kuhl OS</a><nav aria-label="Main navigation"><a href="#desktop">Desktop</a><a href="#install">Install</a><a href="#credits">Credits &amp; safety</a><a href="https://github.com/TerabyteEXE/Kuhl-OS">GitHub</a></nav></div></header>
+  <main id="top">
+    <div class="container hero"><span class="tag">Fedora Workstation + Niri</span><h1>A quieter way to use your computer.</h1><p class="lead">A carefully styled, keyboard-first Linux desktop. Scrolling tiles, fast search, useful shortcuts, and a setup that stays out of your way.</p><p class="meta">Community project · Experimental v0.8 · x86_64 · Not a standalone distribution</p></div>
+    <div class="container" id="desktop"><figure class="preview"><div class="screen" role="img" aria-label="Illustrative desktop concept, showing Kuhl's compact status bar and terminal against the Frontier wallpaper"><div class="desktop-bar"><span><strong>✳ kuhl</strong> &nbsp; 01 &nbsp; 02 &nbsp; 03 &nbsp; ♪ 50%</span><span>2026.11.03 — 10:24</span><span class="end">wired &nbsp; ◈ &nbsp; ? &nbsp; ⏻</span></div><div class="fake-term"><div class="term-top">● &nbsp; kuhl / terminal</div><div class="term-body"><div class="cmd">~ ❯ kuhl status</div><div>Kuhl OS <span class="dim">/ Frontier</span></div><div>Niri + Fedora</div><div>Ready.</div><div class="cmd">~ ❯ <span class="dim">▍</span></div></div></div></div><figcaption>Illustrative composition, not an actual screenshot. Wallpaper: <a href="https://www.newgrounds.com/art/view/prisonercoin/final-frontier">Final Frontier — PrisonerCoin</a> (CC BY-NC-SA 3.0); static frame prepared from the KyleOS asset.</figcaption></figure></div>
+    <section><div class="container"><span class="tag">The desktop</span><h2>Everything you need, nothing to fight.</h2><p class="section-desc">Built on Fedora with Niri's scrollable tiling. A familiar launcher, transparent controls, and shortcuts you can actually discover.</p><div class="cols"><div><h3>One place to search</h3><p>Super + Space opens the styled Rofi launcher. Optional Vicinae remains available; Fuzzel is included as a fallback.</p></div><div><h3>Keyboard help on demand</h3><p>Ctrl + Super + K opens the searchable Kuhl shortcut guide. Super + D opens the control center.</p></div><div><h3>A setup you can undo</h3><p>Existing dotfiles are preserved by default. Explicit replacements are backed up, with a GNOME session retained as fallback.</p></div></div></div></section>
+    <section id="themes"><div class="container"><span class="tag">Appearance</span><h2>Four artwork-led palettes.</h2><p class="section-desc">Inspired by <a href="https://github.com/Person-008/KyleOS">KyleOS</a> and the original works of <a href="https://prisonercoin.newgrounds.com/">PrisonerCoin</a>. Kuhl Day and Dusk are still included. Artwork is licensed separately from code; see the credits.</p><div class="themes"><figure><img alt="Final Frontier pixel-art space scene" src="assets/wallpapers/third-party/frontier.png"><figcaption>Frontier</figcaption></figure><figure><img alt="Dyson sci-fi pixel-art scene" src="assets/wallpapers/third-party/dyson.png"><figcaption>Dyson</figcaption></figure><figure><img alt="Puncture green sci-fi pixel-art scene" src="assets/wallpapers/third-party/puncture.png"><figcaption>Puncture</figcaption></figure><figure><img alt="Slow End purple sci-fi pixel-art scene" src="assets/wallpapers/third-party/slowend.png"><figcaption>Slow End</figcaption></figure></div></div></section>
+    <section id="install"><div class="container"><span class="tag">Getting started</span><h2>One command. Your choices.</h2><p class="section-desc">Run on a regular Fedora Workstation installation. The terminal setup handles package selection, checks, configuration and the optional replacement of existing settings.</p><div class="code"><code id="command">curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash</code><button id="copyInstall" type="button">Copy</button></div><p class="hint">The command uses code from the GitHub main branch. Publish the revised project first. Do not run it as root.</p><p class="note"><strong>Before installing:</strong> This is an AI-assisted, experimental community project. Generated code can contain bugs, unsafe commands, insecure dependencies, or security weaknesses. Inspect <a href="https://github.com/TerabyteEXE/Kuhl-OS/blob/main/bootstrap.sh">bootstrap.sh</a>, <a href="https://github.com/TerabyteEXE/Kuhl-OS/blob/main/install.sh">install.sh</a>, and third-party repositories yourself. Research packages and licensing, verify changes, and keep tested backups. No security audit is claimed.</p></div></section>
+    <section id="credits"><div class="container"><span class="tag">Open source and attribution</span><h2>Built on other people's work.</h2><p class="section-desc">Kuhl OS includes Kuhl's own code and compatible MIT-licensed layout adaptations inspired by KyleOS by Rosenkranz (Person-008). KyleOS's original wallpapers are not MIT; four licensed artwork-based static frames are included under CC BY-NC-SA 3.0, credited to PrisonerCoin. Unlicensed Survey artwork is excluded.</p><ul class="links"><li><a href="https://github.com/Person-008/KyleOS">KyleOS — Rosenkranz</a> · MIT source reference</li><li><a href="https://prisonercoin.newgrounds.com/">PrisonerCoin</a> · original artwork</li><li><a href="https://www.newgrounds.com/art/view/prisonercoin/final-frontier">Final Frontier</a> · 2022</li><li><a href="https://www.newgrounds.com/art/view/prisonercoin/dyson-anaysis">Dyson Analysis</a> · 2023</li><li><a href="https://www.newgrounds.com/art/view/prisonercoin/puncture">Puncture</a> · 2023</li><li><a href="https://www.newgrounds.com/art/view/prisonercoin/slow-end">Slow End</a> · 2023</li><li><a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a> · artwork license</li><li><a href="https://github.com/niri-wm/niri">Niri</a> · Wayland compositor</li><li><a href="https://fedoraproject.org/workstation/">Fedora</a> · Linux base</li><li><a href="https://github.com/Alexays/Waybar">Waybar</a> · desktop bar</li><li><a href="https://github.com/davatorium/rofi">Rofi</a> · launcher</li><li><a href="https://github.com/emersion/mako">Mako</a> · notifications</li></ul><p class="hint">Full notices, modifications, excluded artwork, other dependencies, and licensing notes are in <a href="https://github.com/TerabyteEXE/Kuhl-OS/blob/main/docs/CREDITS.md">docs/CREDITS.md</a> and <a href="https://github.com/TerabyteEXE/Kuhl-OS/blob/main/docs/SECURITY.md">docs/SECURITY.md</a>.</p></div></section>
+  </main>
+  <footer><div class="container"><span>© 2026 Kuhl OS · AI-assisted experimental desktop</span><span>Not affiliated with Fedora, Niri, KyleOS, or the artists credited above.</span></div></footer>
+  <script>
+    document.querySelector('#copyInstall').addEventListener('click', async () => {
+      const button = document.querySelector('#copyInstall');
+      try { await navigator.clipboard.writeText(document.querySelector('#command').textContent);button.textContent = 'Copied'; }
+      catch { button.textContent = 'Select text to copy'; }
+    });
+  </script>
+</body></html>

@@ -1,31 +1,33 @@
 {
-  "// kuhl-managed": "Kuhl OS Studio / original centered capsule design",
+  "// kuhl-managed": "Kuhl OS Frontier / MIT-inspired KyleOS reference: full-width, simple status line",
   "layer": "top",
   "position": "top",
-  "height": 34,
-  "width": 646,
+  "height": 29,
   "exclusive": true,
-  "fixed-center": true,
   "reload_style_on_change": true,
-  "margin-top": 5,
-  "margin-bottom": 1,
-  "modules-left": [],
-  "modules-center": [
+  "margin-top": 0,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "modules-left": [
     "custom/kuhl",
     "niri/workspaces",
-    "clock",
-    "custom/theme",
     "pulseaudio",
+    "battery"
+  ],
+  "modules-center": [
+    "clock"
+  ],
+  "modules-right": [
     "network",
-    "battery",
     "tray",
+    "custom/theme",
     "custom/keys",
     "custom/power"
   ],
-  "modules-right": [],
   "custom/kuhl": {
-    "format": "✳",
-    "tooltip": "Kuhl control center · Super+D",
+    "format": "✳ KUHL",
+    "tooltip": "Control center · Super+D",
     "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui'"
   },
   "niri/workspaces": {
@@ -34,47 +36,48 @@
     "on-click": "activate"
   },
   "clock": {
-    "format": "{:%d %b · %H:%M}",
-    "tooltip-format": "{:%A, %B %d %Y}"
-  },
-  "custom/theme": {
-    "format": "●",
-    "tooltip": "Choose Kuhl theme · Super+Shift+T",
-    "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui --page themes'"
+    "format": "{:%Y.%m.%d  —  %H:%M}",
+    "tooltip-format": "{:%A, %d %B %Y}"
   },
   "pulseaudio": {
     "format": "♪ {volume}%",
-    "format-muted": "♪ off",
+    "format-muted": "♪ mute",
+    "tooltip": false,
     "on-click": "pavucontrol",
     "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
     "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
   },
   "network": {
-    "format-wifi": "◈",
-    "format-ethernet": "◇",
-    "format-disconnected": "×",
-    "tooltip-format": "{ifname} · {ipaddr}",
+    "format-wifi": "wifi {essid}",
+    "format-ethernet": "wired",
+    "format-disconnected": "offline",
+    "tooltip": true,
     "on-click": "nm-connection-editor"
   },
   "battery": {
     "format": "▰ {capacity}%",
-    "format-charging": "⚡{capacity}%",
+    "format-charging": "⚡ {capacity}%",
     "states": {
       "warning": 25,
       "critical": 12
     }
   },
+  "tray": {
+    "spacing": 5
+  },
+  "custom/theme": {
+    "format": "◈",
+    "tooltip": "Themes · Super+Shift+T",
+    "on-click": "sh -c '$HOME/.local/bin/kuhl themes --ui'"
+  },
   "custom/keys": {
     "format": "?",
-    "tooltip": "All shortcuts · Ctrl+Super+K",
+    "tooltip": "Shortcuts · Ctrl+Super+K",
     "on-click": "sh -c '$HOME/.local/bin/kuhl keys --ui'"
   },
   "custom/power": {
     "format": "⏻",
-    "tooltip": "Power and session options",
+    "tooltip": "Power & session",
     "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui --page power'"
-  },
-  "tray": {
-    "spacing": 4
   }
 }

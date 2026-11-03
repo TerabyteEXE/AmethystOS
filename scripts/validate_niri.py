@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate Kuhl's Day and Dusk Niri configs with the installed Niri binary.
+"""Validate Kuhl's six Niri configs with the installed Niri binary.
 
 This check only writes to a temporary folder; it NEVER modifies ~/.config/niri.
 """
@@ -28,7 +28,7 @@ def main():
         shutil.copy2(ROOT / 'config/themes.json', palettes)
         # Import only after changing XDG_*, as render.py defines its paths at import time.
         import render
-        for theme in ('day', 'dusk'):
+        for theme in __import__('json').loads((ROOT / 'config/themes.json').read_text()):
             folder = root / theme
             folder.mkdir(parents=True)
             config = folder / 'config.kdl'

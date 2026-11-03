@@ -3,7 +3,7 @@
 The v0.6 sample Niri config contained invalid KDL: `keyboard { numlock }`.
 The corrected configuration puts bare flags on individual lines (and expands
 other compact sections for readability). Fedora/CI now uses **Niri's own parser**
-for both Day and Dusk in an isolated temporary directory before installation.
+for the two original Day and Dusk themes in an isolated temporary directory before installation.
 
 If your previous installation printed a successful rollback with `[removed]`
 messages, you can extract this updated ZIP and run `bash install.sh` again on
