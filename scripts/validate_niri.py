@@ -27,6 +27,10 @@ def main():
         palettes.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / 'config/themes.json', palettes)
         shutil.copytree(ROOT / 'configs/upstream', root / 'share/kuhl/templates/upstream')
+        # render.theme_files() reads this launcher template from the staged XDG data dir.
+        rofi_template = root / 'share/kuhl/templates/rofi/kuhl.rasi'
+        rofi_template.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / 'configs/rofi/kuhl.rasi', rofi_template)
         # Import only after changing XDG_*, as render.py defines its paths at import time.
         import render
         for theme in __import__('json').loads((ROOT / 'config/themes.json').read_text()):
