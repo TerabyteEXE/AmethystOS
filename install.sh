@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — Kuhl OS 1.0 stabilization, Fedora + Niri edition (not a Linux distro/ISO).
+# KUHL-MANAGED — Kuhl OS Niri Rebase, Fedora Workstation edition (not a Linux distro/ISO).
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,7 +10,7 @@ REPLACE_CONFIGS=0
 NO_REBOOT=1
 usage() {
   cat <<'TXT'
-Kuhl OS 1.0 stabilization — Fedora Workstation + Niri
+Kuhl OS / Niri Rebase — Fedora Workstation + Niri
 Recommended: curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 Internal/advanced: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
   --defaults         Use default choices without opening the text UI.
@@ -34,7 +34,7 @@ while (($#)); do
   esac
   shift
 done
-for f in config/choices.json config/themes.json scripts/menu.py scripts/render.py scripts/kuhl_ui.py scripts/desktop.py scripts/progress.py config/keys.json configs/niri/config.kdl assets/wallpapers/kuhl-default.png; do
+for f in config/choices.json config/themes.json scripts/menu.py scripts/render.py scripts/kuhl_ui.py scripts/desktop.py scripts/progress.py config/keys.json configs/niri/config.kdl configs/waybar/config.jsonc third_party/niri-dotfiles/LICENSE; do
   [[ -f "$ROOT/$f" ]] || { echo "Missing repository file: $f" >&2; exit 1; }
 done
 command -v python3 >/dev/null || { echo 'Python 3 required.' >&2; exit 1; }
@@ -102,7 +102,7 @@ fi
 mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 1.0 STABILIZATION — FEDORA + NIRI\n'
+printf '\n✳ KUHL OS / NIRI REBASE — FEDORA + NIRI\n'
 printf 'Fedora %s / Kuhl %s\n' "${VERSION_ID:-unknown}" "$THEME"
 echo 'AI-assisted community scripts can contain security errors. Review bootstrap.sh, install.sh, and package sources before continuing.'
 [[ $(awk '/MemTotal:/ {print $2}' /proc/meminfo) -ge 7340032 ]] || kuhl_warn '8 GB RAM recommended, but not required.'
@@ -116,19 +116,19 @@ elif [[ "$AVAILABLE_KB" =~ ^[0-9]+$ ]] && (( AVAILABLE_KB < 3145728 )); then
   kuhl_warn 'Below 3 GiB free on /; consider resizing your VM disk for future Fedora updates.'
 fi
 python3 "$ROOT/scripts/progress.py" 0 'Verifying Fedora and preparing installation' 
-printf '\n[1/6] Official Fedora desktop components\n'
+printf '\n[1/6] Fedora desktop components (no Arch/AUR scripts)\n'
 sudo -v
 sudo dnf install -y \
   niri xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk \
   waybar rofi fuzzel kitty alacritty mako swaybg swaylock swayidle thunar \
   wl-clipboard papirus-icon-theme jetbrains-mono-fonts \
-  polkit-kde gnome-keyring nm-connection-editor pavucontrol
+  polkit-kde gnome-keyring nm-connection-editor pavucontrol firefox playerctl brightnessctl
 if chosen desktop_helpers; then
-  sudo dnf install -y network-manager-applet blueman brightnessctl playerctl
+  sudo dnf install -y network-manager-applet blueman
 fi
 ISSUES=0
 python3 "$ROOT/scripts/progress.py" 1 'Official Fedora components installed'
-printf '\n[2/6] Preflight: validate every Kuhl Niri theme before any user config changes\n'
+printf '\n[2/6] Preflight: validate every Kuhl Niri palette before any user config changes\n'
 python3 "$ROOT/scripts/validate_niri.py" || { kuhl_warn 'Bundled Niri config failed validation. Nothing in your personal config was changed.'; exit 1; }
 python3 "$ROOT/scripts/progress.py" 2 'All Kuhl themes passed Niri validation'
 printf '\n[3/6] Optional software and launcher\n'
@@ -157,17 +157,13 @@ if (( ${#FLATPAKS[@]} )); then
   done
 fi
 python3 "$ROOT/scripts/progress.py" 3 'Optional desktop features prepared'
-printf '\n[4/6] KyleOS-licensed wallpaper assets, keyboard guide and Kuhl tools\n'
+printf '\n[4/6] Installing MIT-licensed Niri dotfiles and Kuhl tools\n'
 mkdir -p "$KUHL_DATA/wallpapers" "$KUHL_DATA/templates" "$KUHL_DATA/branding"
 for image in kuhl-day.png kuhl-dusk.png kuhl-default.png; do
   install -m 644 "$ROOT/assets/wallpapers/$image" "$KUHL_DATA/wallpapers/$image"
 done
-mkdir -p "$KUHL_DATA/wallpapers/third-party"
-for image in frontier dyson puncture slowend; do
-  install -m 644 "$ROOT/assets/wallpapers/third-party/$image.png" "$KUHL_DATA/wallpapers/third-party/$image.png"
-  install -m 644 "$ROOT/assets/wallpapers/third-party/$image.gif" "$KUHL_DATA/wallpapers/third-party/$image.gif"
-  install -m 644 "$ROOT/assets/wallpapers/third-party/$image-thumbnail.png" "$KUHL_DATA/wallpapers/third-party/$image-thumbnail.png"
-done
+# The source's wallpapers are a separate Git submodule, not MIT-licensed with the dotfiles.
+# Never install them or download unknown artwork implicitly.
 install -m 644 "$ROOT/assets/branding/kuhl-logo.svg" "$KUHL_DATA/branding/kuhl-logo.svg"
 install -m 644 "$ROOT/config/themes.json" "$KUHL_DATA/themes.json"
 install -m 755 "$ROOT/scripts/render.py" "$KUHL_DATA/render.py"
@@ -183,7 +179,7 @@ if [[ -f "$KUHL_BIN" ]] && ! grep -q -E 'KUHL-MANAGED|Kuhl OS' "$KUHL_BIN"; then
 fi
 install -m 755 "$ROOT/bin/kuhl" "$KUHL_BIN"
 python3 "$ROOT/scripts/progress.py" 4 'Kuhl assets and applications registered'
-printf '\n[5/6] Applying original KyleOS Niri / Waybar / Rofi / Alacritty configs plus Kuhl additions\n'
+printf '\n[5/6] Applying the MIT-licensed Niri dotfiles + Fedora/Kuhl integration\n'
 OPTIONS=(install --source "$KUHL_DATA/templates" --theme "$THEME")
 (( ! REPLACE_CONFIGS )) || OPTIONS+=(--replace-configs)
 python3 "$KUHL_DATA/render.py" "${OPTIONS[@]}"
@@ -203,7 +199,7 @@ if ! grep -q 'KUHL-MANAGED' "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl";
   kuhl_warn 'Existing Niri config was preserved; add Kuhl integration manually or use --replace-configs.'
   ISSUES=$((ISSUES+1))
 fi
-python3 "$ROOT/scripts/progress.py" 6 'Kuhl 1.0 release candidate installed — ready for Niri'
+python3 "$ROOT/scripts/progress.py" 6 'Kuhl Niri rebase installed — ready for Niri'
 printf '\nInstalled. GNOME remains available.\n'
 printf 'Log out, choose Niri at the GDM login screen, then sign in.\n'
 printf 'Super+Space: search  |  Super+Shift+S: Settings  |  Ctrl+Super+K: key guide  |  Super+Q: close.\n'

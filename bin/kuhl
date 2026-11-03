@@ -36,7 +36,7 @@ apply_wallpaper() {
       dusk) img="$ROOT/wallpapers/kuhl-dusk.png";;
       default) img="$ROOT/wallpapers/kuhl-default.png";;
       auto) 
-        theme_now="$(cat "$THEME_FILE" 2>/dev/null || echo frontier)"
+        theme_now="$(cat "$THEME_FILE" 2>/dev/null || echo sevens)"
         img="$(python3 - "$ROOT/themes.json" "$theme_now" <<'PYCODE'
 import json,sys
 from pathlib import Path
@@ -51,8 +51,7 @@ PYCODE
       *) echo 'Unrecognized wallpaper setting; using solid background.' >&2; img='';;
     esac
   fi
-  # When a user installs awww separately, the original KyleOS animated wallpaper is
-  # available. Fedora's official swaybg remains the guaranteed static fallback.
+  # Fedora swaybg is default. Optional animation daemons are never installed by Kuhl.
   if [[ "$choice" == auto && -n "$img" && "${KUHL_ANIMATED_WALLPAPER:-0}" == 1 ]] && command -v awww >/dev/null 2>&1; then
     gif="${img%.png}.gif"
     if [[ -r "$gif" ]]; then
@@ -79,7 +78,7 @@ PYCODE
     swaybg -i "$img" -m fill >/dev/null 2>&1 &
   else
     local color
-    color="$(python3 - "$ROOT/themes.json" "$(cat "$THEME_FILE" 2>/dev/null || echo frontier)" <<'PYCODE'
+    color="$(python3 - "$ROOT/themes.json" "$(cat "$THEME_FILE" 2>/dev/null || echo sevens)" <<'PYCODE'
 import json,sys
 try: print(json.load(open(sys.argv[1])).get(sys.argv[2],{}).get('bg','#0b0d15'))
 except (OSError,ValueError):print('#0b0d15')
@@ -223,10 +222,10 @@ PY
     show_ui control menu "$@"
     ;;
   status)
-    echo 'Kuhl OS v1.0 RC2 · stabilized KyleOS rice · Fedora + Niri'
+    echo 'Kuhl OS / Niri Rebase · Fedora + Niri'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
-    echo "Launcher: $(command -v rofi >/dev/null && echo 'Rofi (KyleOS)' || echo 'Fuzzel fallback')"
+    echo "Launcher: $(command -v rofi >/dev/null && echo 'Rofi (MIT upstream)' || echo 'Fuzzel fallback')"
     echo "Wallpaper: $(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
     [[ ! -r "$ROOT/desktop.py" ]] || python3 "$ROOT/desktop.py" bar show
     [[ ! -f "$ROOT/render.py" ]] || python3 "$ROOT/render.py" status
@@ -257,7 +256,7 @@ PY
     ;;
   help|-h|--help)
     cat <<'HELP'
-KUHL OS · 1.0 STABILIZATION BUILD · KYLEOS RICE
+KUHL OS · NIRI REBASE BETA · FEDORA
   kuhl menu                         Keyboard-operated desktop control center
   kuhl settings                     Settings menu (network, sound, Bluetooth, display, scale)
   kuhl display outputs              List current Niri monitors
@@ -265,8 +264,8 @@ KUHL OS · 1.0 STABILIZATION BUILD · KYLEOS RICE
   kuhl display scale eDP-1 1.25     Set monitor scaling; automatically validated
   kuhl display reset                Reset monitor scaling to automatic
   kuhl ui scale 125                 Application / terminal text scale (percentage)
-  kuhl bar scale 125                Resize top bar to 125%
-  kuhl bar position bottom          Move bar to bottom
+  kuhl bar scale 125                Resize status bar to 125%
+  kuhl bar position bottom          Move status bar to bottom
   kuhl bar module workspaces on     Show workspaces in bar
   kuhl bar module close off         Hide click-to-close control
   kuhl bar reset                    Restore default bar layout
@@ -274,10 +273,10 @@ KUHL OS · 1.0 STABILIZATION BUILD · KYLEOS RICE
   kuhl themes --ui                  Graphical theme gallery (Super+Shift+T)
   kuhl keys --ui                    Searchable shortcut atlas · Ctrl+Super+K
   kuhl keys                         Print every shortcut
-  kuhl launcher                     KyleOS Rofi / Fuzzel search · Super+Space
+  kuhl launcher                     Upstream-based Rofi / Fuzzel search · Super+Space
   kuhl launcher vicinae             Optional Vicinae if installed
   kuhl theme list                   List available themes
-  kuhl theme frontier|dyson|puncture|slowend|day|dusk  Apply a palette
+  kuhl theme sevens|dusk|day  Apply a palette
   kuhl wallpaper set /path/image   Bring your own wallpaper
   kuhl wallpaper reset             Restore theme artwork (or solid Day/Dusk)
   kuhl wallpaper day|dusk|default  Use previous Kuhl images (optional)

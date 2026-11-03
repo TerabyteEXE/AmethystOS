@@ -28,15 +28,12 @@ MENU = {
         ('Power / session', 'power', 'Lock, log out or shut down'),
     ],
     'themes': [
-        ('Frontier · default', 'frontier', 'Gold & olive · PrisonerCoin artwork'),
-        ('Dyson', 'dyson', 'Electric blue · PrisonerCoin artwork'),
-        ('Puncture', 'puncture', 'Neon green · PrisonerCoin artwork'),
-        ('Slow End', 'slowend', 'Rose & violet · PrisonerCoin artwork'),
-        ('Kuhl Dusk', 'dusk', 'Original charcoal / muted gold'),
-        ('Kuhl Day', 'day', 'Warm cream / muted olive'),
-        ('Custom wallpaper path', 'wallpaper', 'Use your own JPG, PNG or WebP'),
-        ('Solid background', 'solid', 'Use a clean color until you add artwork'),
-        ('Existing Kuhl wallpapers', 'legacy', 'Select original bundled art'),
+        ('Kuhl Sevens · default','sevens','The original slate and blue source palette'),
+        ('Kuhl Dusk','dusk','Warm charcoal / muted gold'),
+        ('Kuhl Day','day','Soft cream / light desktop'),
+        ('Choose wallpaper','wallpaper','Select your own wallpaper image'),
+        ('Solid background','solid','Use a clean color background'),
+        ('Legacy wallpapers','legacy','Optional original Kuhl artwork'),
     ],
     'settings': [
         ('Display scaling', 'display-wizard', 'Pick a monitor and resolution scale'),
@@ -45,7 +42,7 @@ MENU = {
         ('Network', 'network', 'Configure Wi-Fi and wired connections'),
         ('Sound', 'audio', 'Select output, microphone and volumes'),
         ('Bluetooth', 'bluetooth', 'Pair and manage Bluetooth devices'),
-        ('Change theme', 'themes', 'Synchronized Day / Dusk / Frontier palettes'),
+        ('Change theme', 'themes', 'Change your active theme'),
         ('Run diagnostics', 'doctor', 'Inspect missing components and errors'),
     ],
     'bar': [
@@ -53,8 +50,10 @@ MENU = {
         ('Bar 100%', 'bar-100', 'Comfortable default desktop height'),
         ('Bar 125%', 'bar-125', 'Larger text and click targets'),
         ('Bar 150%', 'bar-150', 'Large desktop / touch friendly'),
-        ('Move bar to top', 'bar-top', 'Place status strip along top edge'),
-        ('Move bar to bottom', 'bar-bottom', 'Place status strip along bottom edge'),
+        ('Move bar to left', 'bar-left', 'Original vertical sidebar'),
+        ('Move bar to right', 'bar-right', 'Right-side sidebar'),
+        ('Move bar to top', 'bar-top', 'Horizontal strip at top'),
+        ('Move bar to bottom', 'bar-bottom', 'Horizontal strip at bottom'),
         ('Toggle workspace indicators', 'bar-workspaces', 'Switch between open workspace labels'),
         ('Toggle battery indicator', 'bar-battery', 'Hide on desktops without a battery'),
         ('Toggle close button', 'bar-close', 'Show or hide focused-window close button'),
@@ -85,8 +84,7 @@ MENU = {
 def action(item):
     actions = {
         'day': [KUHL_BIN,'theme','day'], 'dusk':[KUHL_BIN,'theme','dusk'],
-        'frontier':[KUHL_BIN,'theme','frontier'], 'dyson':[KUHL_BIN,'theme','dyson'],
-        'puncture':[KUHL_BIN,'theme','puncture'], 'slowend':[KUHL_BIN,'theme','slowend'],
+        'sevens':[KUHL_BIN,'theme','sevens'],
         'solid':[KUHL_BIN,'wallpaper','solid'],
         'legacy-day':[KUHL_BIN,'wallpaper','day'], 'legacy-dusk':[KUHL_BIN,'wallpaper','dusk'],
         'legacy-default':[KUHL_BIN,'wallpaper','default'], 'doctor':[KUHL_BIN,'doctor'],
@@ -101,7 +99,7 @@ def action(item):
     if item.startswith('bar-'):
         cmd=item[4:]
         if cmd in ('85','100','125','150'):actions[item]=[KUHL_BIN,'bar','scale',cmd]
-        elif cmd in ('top','bottom'):actions[item]=[KUHL_BIN,'bar','position',cmd]
+        elif cmd in ('left','right','top','bottom'):actions[item]=[KUHL_BIN,'bar','position',cmd]
         elif cmd=='reset':actions[item]=[KUHL_BIN,'bar','reset']
         elif cmd in ('workspaces','battery','close'):
             state=subprocess.run([KUHL_BIN,'bar','show'],capture_output=True,text=True)

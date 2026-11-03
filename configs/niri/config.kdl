@@ -1,135 +1,216 @@
-// KUHL-MANAGED — KyleOS Niri core port, MIT (Rosenkranz 2026), see docs/CREDITS.md
-// This config is in the KDL format: https://kdl.dev
-// "/-" comments out the following node.
-// Check the wiki for a full description of the configuration:
-// https://yalter.github.io/niri/Configuration:-Introduction
+// KUHL-MANAGED — Fedora adaptation of saatvik333/niri-dotfiles (MIT, Saatvik Sharma).
+// Original reference is preserved in third_party/niri-dotfiles/niri/config.kdl.
+// There is deliberately no hard-coded eDP-1/Intel GPU, Arch paths, or shell defaults.
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-sh-at-startup "if command -v vicinae >/dev/null 2>&1; then vicinae server; fi"
+spawn-sh-at-startup "$HOME/.local/bin/kuhl wallpaper apply"
+spawn-sh-at-startup "if command -v /usr/libexec/polkit-kde-authentication-agent-1 >/dev/null 2>&1; then /usr/libexec/polkit-kde-authentication-agent-1; fi"
 
-// Input device configuration.
-// Find the full list of options on the wiki:
-// https://yalter.github.io/niri/Configuration:-Input
+screenshot-path "~/Pictures/Screenshots/%Y-%m-%d %H-%M-%S.png"
 input {
     keyboard {
-	    xkb {
-	      layout "us"
-	      // options "grp:win_space_toggle" // enable if you need a second layout
-
-	    }
-	    numlock
+        xkb {
+            layout "us"
+        }
     }
-
-    mouse {
-        // off
-        // natural-scroll
-        // accel-speed 0.2
-        // accel-profile "flat"
-        // scroll-method "no-scroll"
+    touchpad {
+        tap
+        natural-scroll
     }
-    //warp-mouse-to-focus
-
-    // Setting max-scroll-amount="0%" makes it work only on windows already fully on screen.
-    focus-follows-mouse max-scroll-amount="20%"
+    focus-follows-mouse
+    workspace-auto-back-and-forth
 }
-
-gestures {
-	hot-corners {
-		off
-	}
+hotkey-overlay {
+    skip-at-startup
 }
-
-include "layout.kdl"
-include "autostart.kdl"
+cursor {
+    hide-when-typing
+    hide-after-inactive-ms 5000
+}
+overview {
+    backdrop-color "#1e1e2e"
+    workspace-shadow {
+        off
+    }
+}
+// Kuhl files are isolated and safely regenerated from the source manifest.
 include "output.kdl"
 include "binds.kdl"
-include "window-rules.kdl"
 include "kuhl-theme.kdl"
 
-hotkey-overlay {
-	skip-at-startup
+// Source compositor layout / animations (MIT)
+
+layout {
+    gaps 0
+    center-focused-column "on-overflow"
+    background-color "transparent"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    focus-ring {
+        width 0
+        active-color "#1E1E2E"
+    }
+
+    insert-hint {
+        off
+        color "#1E1E2E"
+    }
+
+    struts {}
+
 }
 
-// Allow application titlebars (including mouse-accessible Close buttons).
-// The original KyleOS prefer-no-csd option hid some apps' native controls.
-
-screenshot-path "~/Pictures/Screenshots/Screenshot-%Y-%m-%d %H-%M-%S.png"
-
-cursor{
-	hide-after-inactive-ms 1000
-	xcursor-theme "Adwaita"
-	xcursor-size 32
-}
+// Animation Settings
 animations {
-    // Uncomment to turn off all animations.
-    // off
-
-    // Slow down all animations by this factor. Values below 1 speed them up instead.
-    // slowdown 3.0
+    workspace-switch {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
     window-open {
         duration-ms 200
-
-        curve "linear"
-
-        custom-shader r"
-            vec4 open_color(vec3 coords_geo, vec3 size_geo) {
-                float within_bounds = step(0.0, coords_geo.x) * step(coords_geo.x, 1.0) *
-                                     step(0.0, coords_geo.y) * step(coords_geo.y, 1.0);
-                float progress = niri_clamped_progress;
-                // Vertical beam sweep (moves from top to bottom)
-                float beam_pos = progress * 1.2 - 0.1;
-                float beam = smoothstep(beam_pos - 0.05, beam_pos, coords_geo.y) *
-                             smoothstep(beam_pos + 0.05, beam_pos, coords_geo.y);
-                // Transporter glittering noise
-                float noise = fract(sin(dot(coords_geo.xy, vec2(12.9898, 78.233))) * 43758.5453);
-                float sparkle = step(0.95, fract(noise + progress * 5.0));
-                // Materialization logic: as progress increases, alpha increases
-                // Window content is hidden where noise > progress
-                float alpha = smoothstep(1.0 - progress - 0.1, 1.0 - progress, 1.0 - noise);
-                // Sample the window texture
-                vec4 color = texture2D(niri_tex, coords_geo.xy);
-                // Transporter energy color (blue-white)
-                vec3 beam_color = vec3(0.6, 0.8, 1.0) * (beam * 2.0 + sparkle);
-                // Add the beam/sparkle glow on top of the appearing window
-                // The beam and sparkles are most visible where the window is still transparent
-                color.rgb = mix(color.rgb, beam_color, (1.0 - alpha) + beam);
-                // Final composite: window color + transporter energy, clipped to window bounds
-                return (color * alpha + (vec4(beam_color, 1.0) * beam * 0.5)) * within_bounds;
-            }
-        "
+        curve "ease-out-quad"
     }
-    
     window-close {
         duration-ms 200
-
-        curve "linear"
-
-        custom-shader r"
-            vec4 close_color(vec3 coords_geo, vec3 size_geo) {
-                // Confine to window boundaries
-                float within_bounds = step(0.0, coords_geo.x) * step(coords_geo.x, 1.0) *
-                                     step(0.0, coords_geo.y) * step(coords_geo.y, 1.0);
-                float progress = niri_clamped_progress;
-                // Invert progress for the closing sequence (1.0 is start, 0.0 is end)
-                float inverse_progress = 1.0 - progress;
-                // Vertical beam sweep (moves top to bottom as progress increases)
-                float beam_pos = progress * 1.2 - 0.1;
-                float beam = smoothstep(beam_pos - 0.05, beam_pos, coords_geo.y) *
-                             smoothstep(beam_pos + 0.05, beam_pos, coords_geo.y);
-                // Glittering noise effect
-                float noise = fract(sin(dot(coords_geo.xy, vec2(12.9898, 78.233))) * 43758.5453);
-                float sparkle = step(0.95, fract(noise + progress * 5.0));
-                // Visibility: starts at 1.0 and shrinks toward 0.0 based on noise
-                // This ensures the window remains until the transporter beam eats it
-                float alpha = smoothstep(progress - 0.1, progress, 1.0 - noise);
-                // Sample texture
-                vec4 color = texture2D(niri_tex, coords_geo.xy);
-                // Transporter blue-white glow
-                vec3 beam_color = vec3(0.6, 0.8, 1.0) * (beam * 2.0 + sparkle);
-                // Mix window color with beam glow
-                // As alpha drops, the beam/sparkle becomes the dominant visual
-                color.rgb = mix(color.rgb, beam_color, (1.0 - alpha) + beam);
-                // Combine and clip
-                // Adding the beam/sparkle to the return ensures they are visible even when alpha is 0
-                return (color * alpha + vec4(beam_color * beam, 0.0)) * within_bounds;
-            }
-        "
+        curve "ease-out-cubic"
     }
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=900 epsilon=0.0001
     }
+    window-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    window-resize {
+        spring damping-ratio=1.0 stiffness=1000 epsilon=0.0001
+    }
+    config-notification-open-close {
+        spring damping-ratio=0.6 stiffness=1200 epsilon=0.001
+    }
+    screenshot-ui-open {
+        duration-ms 300
+        curve "ease-out-quad"
+    }
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=900 epsilon=0.0001
+    }
+}
+
+
+// Source window rules (MIT)
+
+// Application-specific rules
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"firefox"#
+    match app-id=r#"google-chrome"#
+    match app-id=r#"code"#
+    match app-id=r#"obsidian$"#
+    open-maximized true
+}
+
+// File dialogs - Open/Save/Select
+window-rule {
+    match title=r#".*(Open|Save|Select).*"#
+    open-floating true
+    default-column-width { proportion 0.0; }
+    max-width 800
+    max-height 1000
+}
+
+window-rule {
+    match title=r#".*File.*"#
+    open-floating true
+    default-column-width { proportion 0.0; }
+    max-width 800
+    max-height 1000
+}
+
+window-rule {
+    match app-id=r#"org\.gtk\.FileChooserDialog"#
+    open-floating true
+    default-column-width { proportion 0.0; }
+    max-width 800
+    max-height 1000
+}
+
+window-rule {
+    match title=r#".*Sign in - Google Accounts — Mozilla Firefox"#
+    open-floating true
+}
+
+// System dialogs
+window-rule {
+    match title=r#".*(Dialog|Properties|Preferences|Settings|Rename).*"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"zenity"#
+    open-floating true
+}
+
+// Authentication dialogs
+window-rule {
+    match app-id=r#"org\.kde\.polkit-kde-authentication-agent-1"#
+    open-floating true
+}
+
+window-rule {
+    match title=r#".*Authentication.*"#
+    open-floating true
+}
+
+// Password managers
+window-rule {
+    match app-id=r#"org\.keepassxc\.KeePassXC"# title=r#".*Auto-Type.*"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"Bitwarden"# title=r#".*unlock.*"#
+    open-floating true
+}
+
+// Notification and system utilities
+window-rule {
+    match app-id=r#"nm-connection-editor"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"blueman-manager"#
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"pavucontrol"#
+    open-floating true
+}
+
+// Steam dialogs
+window-rule {
+    match app-id=r#"steam"# title=r#".*(Friends|Settings|Properties).*"#
+    open-floating true
+}
+
+// Global window appearance
+window-rule {
+    geometry-corner-radius 0
+    clip-to-geometry true
+}
+
+// Inactive window transparency
+window-rule {
+    match is-active=false
+    opacity 0.9
+}
+

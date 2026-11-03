@@ -1,11 +1,2 @@
-/* KUHL-MANAGED — compact power dialog. */
-@import "~/.config/rofi/color.rasi"
-* { font: "JetBrains Mono 13"; }
-window { width: 45%; padding: 18px; border-radius: 25px 0px 45px 0px;
-         background-color: @background; }
-mainbox { children: [ listview ]; }
-listview { border: 0px; margin: 5px; scrollbar: false; lines: 1; columns: 4; }
-element { children: [ element-text ]; orientation: horizontal;
-          padding: 12px; border-radius: 12px 0px 24px 0px; }
-element selected { background-color: @selected-normal-background; }
-element-text { text-color: inherit; horizontal-align: 0.5; }
+@import "kuhl.rasi"
+entry { placeholder: "Power and session"; }

@@ -1,15 +1,12 @@
-/* KUHL-MANAGED — KyleOS angular launcher, responsive Kuhl adaptation. */
-@import "~/.config/rofi/color.rasi"
-* { font: "JetBrains Mono 14"; }
-window { width: 42%; padding: 22px; border: 1px solid @border-color;
-         border-radius: 22px 0px 42px 0px; background-color: @background; }
-mainbox { children: [ inputbar, listview ]; spacing: 10px; }
-inputbar { children: [ entry ]; padding: 12px; border: 0px 0px 1px 0px solid @foreground; }
-entry { text-color: @foreground; placeholder: "Search apps..."; placeholder-color: @foreground; }
-listview { border: 0px; margin: 5px; scrollbar: false; lines: 7; spacing: 5px; }
-element { orientation: horizontal; border-radius: 10px 0px 20px 0px;
-          padding: 8px 10px; }
-element selected { background-color: @selected-normal-background;
-                   text-color: @selected-normal-foreground; }
+// KUHL-MANAGED. Adapted from MIT-licensed saatvik333/niri-dotfiles/rofi/config.rasi.
+@import "config.rasi"
+@import "color.rasi"
+window { width: 620px; border: 2px; border-color: @accent; border-radius: 12px;
+         background-color: @background; padding: 12px; }
+mainbox { children: [inputbar, listview]; spacing: 12px; }
+inputbar { padding: 12px; background-color: @surface; border-radius: 8px; }
+entry { text-color: @foreground; placeholder: "Search apps, commands, files…"; }
+listview { lines: 8; spacing: 4px; }
+element { padding: 10px; border-radius: 6px; }
+element selected { background-color: @surface; text-color: @accent; }
 element-text { text-color: inherit; }
-element-icon { size: 24px; margin: 0 10px 0 0; }

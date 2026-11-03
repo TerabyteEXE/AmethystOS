@@ -1,4 +1,4 @@
-# Kuhl Frontier recovery
+# Kuhl Recovery
 
 **GNOME stays installed.** If Niri freezes or a new setup refuses to launch, log out and select GNOME from GDM. Use a text console with `Ctrl+Alt+F3` when the graphical session is frozen. The installer does not remove GNOME or modify your Fedora bootloader.
 
@@ -22,7 +22,7 @@ This restores backed-up pre-Kuhl files and removes new Kuhl-managed files **only
 
 ### If your existing config survived installation
 
-Kuhl deliberately does not replace existing Niri/Waybar/Kitty/Mako/Rofi/Fuzzel configs by default. To get the new Frontier look, review them first, and run:
+Kuhl deliberately does not replace existing Niri/Waybar/Kitty/Mako/Rofi/Fuzzel configs by default. To get the new Niri rice, review them first, and run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash

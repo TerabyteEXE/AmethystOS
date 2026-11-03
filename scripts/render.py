@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kuhl's safe, standard-library-only Niri configuration deployment.
+"""Kuhl's safe, standard-library-only Fedora + Niri configuration deployment.
 
 Do not clobber pre-existing files, preserve manually-edited managed files,
 back up explicit replacements, and restore originals on uninstall.
@@ -90,209 +90,157 @@ def put(path: Path, content: bytes, m: dict, *, replace=False) -> bool:
 
 
 def template_files(source: Path):
-    """Deploy actual KyleOS config files (plus Kuhl integration) with rollback tracking."""
+    '''Deploy upstream-derived, Fedora-compatible config, with exact tracked backups.'''
     binary = str(HOME / '.local/bin/kuhl').replace('\\', '\\\\').replace('"', '\\"')
-    launchers = {}
-    for name, title, comment, arguments, icon in (
-        ('day', 'Kuhl Day', 'Switch to Day theme', 'theme day', 'preferences-desktop-theme'),
-        ('dusk', 'Kuhl Dusk', 'Switch to Dusk theme', 'theme dusk', 'preferences-desktop-theme'),
-        ('frontier', 'Kuhl Frontier', 'KyleOS palette; art by PrisonerCoin CC BY-NC-SA', 'theme frontier', 'preferences-desktop-theme'),
-        ('control', 'Kuhl Control Center', 'Themes, wallpaper, system and settings', 'menu --ui', 'preferences-system'),
-        ('keys', 'Kuhl Keyboard Guide', 'Search every Niri shortcut', 'keys --ui', 'input-keyboard'),
-        ('settings', 'Kuhl Settings', 'Display, interface, bar, sound and connections', 'settings', 'preferences-system'),
-    ):
-        content = (f'# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n'
-                   f'Name={title}\nComment={comment}\n'
-                   f'Exec="{binary}" {arguments}\n'
-                   f'Icon={icon}\nTerminal=false\nCategories=Settings;\n')
-        launchers[HOME / '.local/share/applications' / f'kuhl-{name}.desktop'] = content.encode()
-    for name in ('config', 'layout', 'autostart', 'output', 'binds', 'window-rules'):
-        launchers[CONFIG / f'niri/{name}.kdl'] = (source / f'niri/{name}.kdl').read_bytes()
-    for name in ('config.jsonc', 'style.css'):
-        launchers[CONFIG / f'waybar/{name}'] = (source / f'waybar/{name}').read_bytes()
-    launchers[CONFIG / 'kitty/kitty.conf'] = (source / 'kitty/kitty.conf').read_bytes()
-    for name in ('kuhl.rasi', 'gallery.rasi', 'power.rasi'):
-        launchers[CONFIG / f'rofi/{name}'] = (source / f'rofi/{name}').read_bytes()
-    return launchers
+    items = [
+        ('day','Kuhl Day','Light palette','theme day','preferences-desktop-theme'),
+        ('dusk','Kuhl Dusk','Warm charcoal palette','theme dusk','preferences-desktop-theme'),
+        ('sevens','Kuhl Sevens','Source-inspired slate and blue','theme sevens','preferences-desktop-theme'),
+        ('control','Kuhl Control Center','Kuhl desktop controls','menu --ui','preferences-system'),
+        ('keys','Kuhl Keyboard Guide','Search Niri shortcuts','keys --ui','input-keyboard'),
+        ('settings','Kuhl Settings','Desktop settings','settings','preferences-system'),
+    ]
+    files = {}
+    for name,title,comment,args,icon in items:
+        body = ('# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n'
+                f'Name={title}\nComment={comment}\nExec="{binary}" {args}\n'
+                f'Icon={icon}\nTerminal=false\nCategories=Settings;\n')
+        files[HOME/'.local/share/applications'/f'kuhl-{name}.desktop']=body.encode()
+    for name in ('config.kdl','binds.kdl','output.kdl'):
+        files[CONFIG/'niri'/name]=(source/'niri'/name).read_bytes()
+    for folder,names in {
+        'kitty':('kitty.conf',),
+        'alacritty':('alacritty.toml',),
+        'rofi':('config.rasi','kuhl.rasi','gallery.rasi','power.rasi'),
+        'waybar':('upstream-style.css',),
+    }.items():
+        for name in names:
+            files[CONFIG/folder/name]=(source/folder/name).read_bytes()
+    return files
 
 
 def theme_files(theme: str):
-    palettes = json.loads((DATA / 'themes.json').read_text(encoding='utf-8'))
-    if theme not in palettes:
-        raise SystemExit('Unknown theme; see kuhl theme list')
-    p = palettes[theme]
-    import desktop
-    prefs = desktop.preferences()
-    ui_font_scale = prefs['ui_scale']
-    niri = f'''// KUHL-MANAGED — automatically generated Kuhl {theme} palette
+    '''Render live palette and Waybar controls without modifying upstream snapshots.'''
+    from desktop import preferences, bar_files
+    palettes=json.loads((DATA/'themes.json').read_text(encoding='utf-8'))
+    if theme not in palettes: raise SystemExit('Unknown theme; try kuhl theme list')
+    p=palettes[theme]
+    scale=preferences()['ui_scale']
+    # Use the original borderless/source layout; palette applies only a small overlay.
+    niri=f'''// KUHL-MANAGED — theme {theme}
 layout {{
-  focus-ring {{ active-color "{p['accent']}"; inactive-color "{p['border']}"; }}
-  shadow {{ on; softness 20; spread 2; offset x=0 y=5; color "{p['shadow']}"; }}
+    focus-ring {{
+        width 0
+        active-color "{p['accent']}"
+    }}
 }}
-overview {{ backdrop-color "{p['bg']}"; }}
+overview {{
+    backdrop-color "{p['bg']}"
+}}
 '''
-    # Full-width edge-to-edge Waybar, retaining KyleOS's quiet status-line rhythm.
-    css = f'''/* KUHL-MANAGED — palette {theme}; KyleOS design reference (MIT, Rosenkranz). */
-* {{ border: none; border-radius: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; min-height: 0; }}
-window#waybar {{ background: {p['bg']}; color: {p['fg']}; border-bottom: 1px solid {p['border']}; }}
-#custom-kuhl, #workspaces, #clock, #pulseaudio, #network, #battery,
-#tray, #custom-keys, #custom-theme, #custom-power {{ color: {p['muted']}; padding: 0 11px; }}
-#custom-kuhl {{ color: {p['accent']}; font-weight: 800; padding-left: 18px; letter-spacing: 1px; }}
-#clock {{ color: {p['accent']}; font-weight: 600; letter-spacing: 1px; }}
-#workspaces {{ padding: 0 5px; }}
-#workspaces button {{ padding: 0 7px; color: {p['muted']}; }}
-#workspaces button.active {{ color: {p['accent']}; background: {p['surface2']}; box-shadow: inset 0 -2px {p['accent']}; }}
-#workspaces button:hover {{ color: {p['fg']}; background: {p['surface2']}; box-shadow: none; }}
-#custom-theme, #custom-keys {{ color: {p['accent']}; }}
-#custom-power {{ color: {p['accent']}; padding-right: 18px; }}
-#network {{ color: {p['muted']}; }}
-#pulseaudio {{ color: {p['accent2']}; }}
-#battery.warning {{ color: {p['accent']}; }}
-#battery.critical {{ color: #dc817d; }}
-tooltip {{ background: {p['surface']}; color: {p['fg']}; border: 1px solid {p['border']}; border-radius: 9px; }}
-'''
-    kitty = f'''# KUHL-MANAGED — generated {theme} terminal palette
-foreground {p['terminal_fg']}
+    kitty=f'''# KUHL-MANAGED colors; source Kitty configuration retained.
+foreground {p['fg']}
 background {p['terminal_bg']}
-selection_foreground {p['terminal_bg']}
+selection_foreground {p['bg']}
 selection_background {p['accent']}
 cursor {p['accent']}
-cursor_text_color {p['terminal_bg']}
-color0 {p['terminal_bg']}
-color1 #c77e7e
+color0 {p['bg']}
+color1 #f38ba8
 color2 {p['accent2']}
-color3 {p['accent']}
-color4 #9aaebd
-color5 #c2a7b8
-color6 #a0b8b4
-color7 {p['terminal_fg']}
-color8 {p['muted']}
-color9 #e5a09b
-color10 {p['accent2']}
-color11 {p['accent']}
-color12 #c2d6df
-color13 #d3b8d1
-color14 #afd8c9
-color15 {p['fg']}
+color3 #f9e2af
+color4 {p['accent']}
+color5 #cba6f7
+color6 #94e2d5
+color7 {p['fg']}
 '''
-    rgba = lambda color: color.lstrip('#') + 'ff'
-    fuzzel = f'''# KUHL-MANAGED — generated {theme} launcher palette
-[main]
-font=JetBrains Mono:size={max(10,round(12*ui_font_scale))}
-prompt=  Search  ›
-icon-theme=Papirus
-lines=8
-width=48
-horizontal-pad=22
-vertical-pad=16
-inner-pad=9
-layer=overlay
-[colors]
-background={rgba(p['surface'])}
-text={rgba(p['fg'])}
-match={rgba(p['accent'])}
-selection={rgba(p['surface2'])}
-selection-text={rgba(p['fg'])}
-selection-match={rgba(p['accent'])}
-border={rgba(p['border'])}
-[border]
-width=1
-radius=16
-selection-radius=8
-'''
-    mako = f'''# KUHL-MANAGED — generated {theme} notification palette
-font=JetBrains Mono {max(9,round(11*ui_font_scale))}
-background-color={p['surface']}
-text-color={p['fg']}
-border-color={p['border']}
-border-size=1
-border-radius=13
-padding=14
-margin=12
-default-timeout=5000
-icons=1
-'''
-    rofi = f'''/* KUHL-MANAGED — generated {theme} Rofi color variables */
-* {{ background: {p['surface']}; foreground: {p['fg']}; outline: {p['border']}; selection: {p['surface2']}; accent: {p['accent']}; }}
-'''
-    # Optional Vicinae stays opt-in. Kuhl does not configure its telemetry policy.
-    vicinae = '\n'.join([
-        f'# KUHL-MANAGED — {theme} Vicinae theme', '[meta]', 'version = 1',
-        f'name = "Kuhl {theme.title()}"', 'description = "Kuhl Frontier palette"',
-        f'variant = "{"light" if theme == "day" else "dark"}"',
-        f'inherits = "vicinae-{"light" if theme == "day" else "dark"}"',
-        '[colors.core]',
-        f'background = "{p["surface"]}"', f'foreground = "{p["fg"]}"',
-        f'secondary_background = "{p["bg"]}"',
-        f'border = "{p["border"]}"', f'accent = "{p["accent"]}"', ''
-    ])
-    upstream = DATA / 'templates/upstream/themes' / {'slowend':'SlowEnd'}.get(theme, theme.title())
-    if theme in {'frontier', 'dyson', 'puncture', 'slowend'}:
-        # These are the original, unmodified KyleOS theme files, kept under MIT.
-        # Don't reimplement their Niri focus ring, Rofi, Alacritty or Mako palettes.
-        niri = (upstream / 'niri.kdl').read_text(encoding='utf-8')
-        # The upstream tab-indicator has a malformed six-digit hex value without '#'.
-        niri = niri.replace('urgent-color "ff0000"', 'urgent-color "#ff0000"')
-        mako = (upstream / 'mako.config').read_text(encoding='utf-8')
-        rofi = (upstream / 'rofi.rasi').read_text(encoding='utf-8')
-        alacritty = (upstream / 'alacritty.toml').read_text(encoding='utf-8')
-    else:
-        # Kuhl's Day / Dusk use the complete upstream Rofi schema, so the unchanged
-        # KyleOS window/list/entry styles still have all their required color keys.
-        source_palette = (DATA / 'templates/upstream/themes/Frontier/rofi.rasi').read_text(encoding='utf-8')
-        import re
-        def rgba(key, fallback):
-            colors = {'red':'#c77e7e', 'blue':p['accent2'], 'lightfg':p['accent'],
-                      'lightbg':p['surface2'], 'foreground':p['fg'], 'background':p['bg']}
-            value = colors.get(key, fallback)
-            rgb = [int(value[i:i+2],16) for i in (1,3,5)]
-            return 'rgba ( '+', '.join(str(c) for c in rgb)+', 100 % )'
-        for key in ('red','blue','lightfg','lightbg','foreground','background'):
-            source_palette = re.sub(r'(?m)^(\s*'+key+r':\s*)rgba\s*\([^)]*\)',
-                                    lambda m: m.group(1)+rgba(key,''),source_palette,count=1)
-        rofi = source_palette
-        alacritty = f'''# KUHL-MANAGED — {theme} fallback Alacritty palette
+    alacritty=f'''# KUHL-MANAGED — dynamic Alacritty palette
 [colors.primary]
 background = "{p['terminal_bg']}"
 foreground = "{p['terminal_fg']}"
-[colors.cursor]
-text = "{p['terminal_bg']}"
-cursor = "{p['accent']}"
-[font]
-size = 12
+[colors.normal]
+black = "{p['bg']}"
+red = "#f38ba8"
+green = "{p['accent2']}"
+yellow = "#f9e2af"
+blue = "{p['accent']}"
+magenta = "#cba6f7"
+cyan = "#94e2d5"
+white = "{p['fg']}"
 '''
-    # Preserve upstream palettes but use an installed, legible font at every UI scale.
-    import re
-    alacritty = re.sub(r'(?m)^(size\s*=\s*)[0-9.]+',
-                       lambda m: m.group(1)+str(round(12*ui_font_scale,1)), alacritty)
-    alacritty = re.sub(r'(?m)^(normal\s*=\s*\{\s*family\s*=\s*)"[^"]+"',
-                       lambda m:m.group(1)+'"JetBrains Mono"',alacritty)
-    kitty = kitty.replace('foreground ', f'font_size {round(12*ui_font_scale,1)}\nforeground ', 1)
-    bar_conf, bar_style = desktop.bar_files(theme, p)
-    # Keep KyleOS's asymmetrical launcher's proportions but make type responsive.
-    rasi = (DATA / 'templates/rofi/kuhl.rasi').read_text(encoding='utf-8')
-    rasi = rasi.replace('font: "JetBrains Mono 14";',
-                        f'font: "JetBrains Mono {max(11, round(14*ui_font_scale))}";')
-    gtk_dark = theme != 'day'
-    gtk_settings = (f'[Settings]\n'
-                    f'gtk-theme-name={"Adwaita-dark" if gtk_dark else "Adwaita"}\n'
-                    f'gtk-icon-theme-name={"Papirus-Dark" if gtk_dark else "Papirus"}\n'
-                    f'gtk-application-prefer-dark-theme={1 if gtk_dark else 0}\n')
+    mako=f'''# KUHL-MANAGED — compact notifications
+font=JetBrains Mono {round(11*scale)}
+background-color={p['surface']}
+text-color={p['fg']}
+border-color={p['accent']}
+border-size=2
+border-radius=6
+padding=12
+margin=8
+width=340
+height=120
+default-timeout=5500
+'''
+    fuzzel=f'''[main]
+font=JetBrains Mono:size={round(13*scale)}
+prompt=Kuhl ❯
+lines=9
+width=48
+[colors]
+background={p['bg'].lstrip('#')}ee
+text={p['fg'].lstrip('#')}ff
+selection={p['surface2'].lstrip('#')}ff
+selection-text={p['fg'].lstrip('#')}ff
+border={p['accent'].lstrip('#')}ff
+'''
+    rofi=f'''/* KUHL-MANAGED — colors for the MIT source launcher configuration */
+* {{
+    background: {p['bg']};
+    foreground: {p['fg']};
+    accent: {p['accent']};
+    surface: {p['surface2']};
+}}
+'''
+    # Synchronize fonts with the independently adjustable Kuhl UI scaling setting.
+    kitty_config=(DATA/'templates/kitty/kitty.conf').read_text(encoding='utf-8')
+    kitty_config=__import__('re').sub(r'(?m)^font_size\s+\S+',
+                          f'font_size {round(12*scale,1)}',kitty_config)
+    alacritty_config=(DATA/'templates/alacritty/alacritty.toml').read_text(encoding='utf-8')
+    alacritty_config=__import__('re').sub(r'(?m)^size\s*=\s*[0-9.]+',
+                          f'size = {round(12*scale,1)}',alacritty_config)
+    rofi_config=(DATA/'templates/rofi/kuhl.rasi').read_text(encoding='utf-8')
+    rofi_config=f'* {{ font: "JetBrains Mono {max(11,round(13*scale))}"; }}\n'+rofi_config
+    waybar_config,waybar_css=bar_files(theme,p)
+    colors='''/* KUHL-MANAGED — source Waybar CSS variables. */\n'''
+    color_map={'background':p['bg'],'foreground':p['fg'],'cursor':p['accent'],
+        'color0':p['surface2'],'color1':'#f38ba8','color2':p['accent2'],
+        'color3':'#f9e2af','color4':p['accent'],'color5':'#cba6f7',
+        'color6':'#94e2d5','color7':p['fg'],'color8':p['muted']}
+    colors+=''.join(f'@define-color {k} {v};\n' for k,v in color_map.items())
+    colors+=''.join(f'@define-color color{i} {color_map["color"+str(i-8)]};\n' for i in range(9,16))
+    dark = theme != 'day'
+    gtk=(f'[Settings]\ngtk-theme-name={"Adwaita-dark" if dark else "Adwaita"}\n'
+         f'gtk-icon-theme-name={"Papirus-Dark" if dark else "Papirus"}\n'
+         f'gtk-application-prefer-dark-theme={int(dark)}\n')
+    vicinae='\n'.join(['# KUHL-MANAGED', '[meta]','version = 1',f'name = "Kuhl {theme}"',
+        'description = "Kuhl OS color palette"',f'variant = "{"dark" if dark else "light"}"',
+        f'inherits = "vicinae-{"dark" if dark else "light"}"',''])
     return {
-        CONFIG / 'gtk-3.0/settings.ini': gtk_settings.encode(),
-        CONFIG / 'gtk-4.0/settings.ini': gtk_settings.encode(),
-        CONFIG / 'waybar/config.jsonc': bar_conf,
-        CONFIG / 'waybar/style.css': bar_style,
-        CONFIG / 'rofi/kuhl.rasi': rasi.encode(),
-        CONFIG / 'niri/kuhl-theme.kdl': niri.encode(),
-        CONFIG / 'alacritty/alacritty.toml': alacritty.encode(),
-        CONFIG / 'kitty/colors.conf': kitty.encode(),
-        CONFIG / 'mako/config': mako.encode(),
-        CONFIG / 'fuzzel/fuzzel.ini': fuzzel.encode(),
-        CONFIG / 'rofi/color.rasi': rofi.encode(),
-        DATA.parent / 'vicinae/themes' / f'kuhl-{theme}.toml': vicinae.encode(),
+        CONFIG/'niri/kuhl-theme.kdl':niri.encode(),
+        CONFIG/'kitty/colors.conf':kitty.encode(),
+        CONFIG/'kitty/kitty.conf':kitty_config.encode(),
+        CONFIG/'alacritty/colors.toml':alacritty.encode(),
+        CONFIG/'alacritty/alacritty.toml':alacritty_config.encode(),
+        CONFIG/'mako/config':mako.encode(),
+        CONFIG/'fuzzel/fuzzel.ini':fuzzel.encode(),
+        CONFIG/'rofi/color.rasi':rofi.encode(),
+        CONFIG/'rofi/kuhl.rasi':rofi_config.encode(),
+        CONFIG/'waybar/config.jsonc':waybar_config,
+        CONFIG/'waybar/style.css':waybar_css,
+        CONFIG/'waybar/colors.css':colors.encode(),
+        CONFIG/'gtk-3.0/settings.ini':gtk.encode(),
+        CONFIG/'gtk-4.0/settings.ini':gtk.encode(),
+        DATA.parent/'vicinae/themes'/f'kuhl-{theme}.toml':vicinae.encode(),
     }
-
 
 def apply_theme(theme, m, replace=False):
     ok = 0
@@ -333,7 +281,7 @@ def uninstall():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['install', 'theme', 'uninstall', 'status'])
-    parser.add_argument('--theme', choices=['frontier', 'dyson', 'puncture', 'slowend', 'day', 'dusk'], default='frontier')
+    parser.add_argument('--theme', choices=['sevens', 'day', 'dusk'], default='sevens')
     parser.add_argument('--source', type=Path, default=DATA / 'templates')
     parser.add_argument('--replace-configs', action='store_true', help='backup and replace existing/edited files')
     args = parser.parse_args()

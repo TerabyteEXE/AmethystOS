@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Kuhl guide against the actual MIT-licensed KyleOS-derived bindings."""
+"""Verify Kuhl guide against the actual MIT-licensed niri-dotfiles-derived bindings."""
 import argparse, json, re, sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent.parent
@@ -9,7 +9,7 @@ DOC=ROOT/'docs/KEYBINDS.md'
 
 def make_doc(data):
     lines=['# Kuhl OS — complete keyboard reference', '',
-           'Based on the KyleOS Niri keybindings (MIT, Rosenkranz / Person-008).',
+           'Based on the niri-dotfiles workflow (MIT, Saatvik Sharma), adapted for Kuhl.',
            'Kuhl integration adds **Ctrl + Super + K** for the searchable guide.',
            'The exact bindings are in `configs/niri/binds.kdl`; this guide is checked against that file.', '']
     for section in data['sections']:
@@ -40,7 +40,7 @@ def main():
     if args.check:
         if DOC.read_text()!=doc:
             print('Keyboard documentation is out of date.',file=sys.stderr);return 1
-        print(f'[ok] {len(seen)} KyleOS / Kuhl shortcuts and guide synchronized')
+        print(f'[ok] {len(seen)} upstream / Kuhl shortcuts and guide synchronized')
     else:
         DOC.write_text(doc)
     return 0

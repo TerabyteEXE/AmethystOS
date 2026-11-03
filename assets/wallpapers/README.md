@@ -1,7 +1,5 @@
-# Kuhl wallpapers
+# Kuhl original (optional) wallpapers
 
-- `kuhl-default.png`, `kuhl-day.png`, `kuhl-dusk.png`: pre-existing Kuhl assets retained for compatibility.
-- `third-party/frontier.png`, `dyson.png`, `puncture.png`, `slowend.png`: modified frames from KyleOS's PrisonerCoin-based artwork, **CC BY-NC-SA 3.0, not MIT**; see `docs/CREDITS.md`.
-- If replacing wallpapers for a publicly distributed version, check artwork provenance and rights, not only filenames.
+This folder includes legacy Kuhl-generated Day/Dusk/default artwork from earlier prototypes. The default Niri rebase does not apply these images automatically. Use `kuhl wallpaper set PATH` to set your own artwork.
 
-`kuhl wallpaper set ~/Pictures/your-image.png` chooses your own image. `kuhl wallpaper reset` returns to automatic theme artwork, while Day/Dusk revert to solid colors.
+The separately hosted niri-dotfiles wallpaper Git submodule is not included. See `docs/CREDITS.md`.

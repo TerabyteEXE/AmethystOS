@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — the one-command entry point for Kuhl OS Frontier.
+# KUHL-MANAGED — the one-command entry point for Kuhl OS Niri Rebase.
 # Public install command:
 #   curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 # Runs with the current user; only DNF operations inside install.sh use sudo.
@@ -8,7 +8,7 @@ set -Eeuo pipefail
 SOURCE_URL='https://github.com/TerabyteEXE/Kuhl-OS/archive/refs/heads/main.tar.gz'
 
 if [[ "${1:-}" == --help || "${1:-}" == -h ]]; then
-  printf '%s\n' 'Kuhl OS Frontier — one-command installer' \
+  printf '%s\n' 'Kuhl OS Niri Rebase — one-command installer' \
     'Install from Fedora Workstation as your regular user:' \
     '  curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash' \
     'The installer opens a terminal menu to configure your desktop and backups.'
@@ -28,7 +28,7 @@ trap 'rm -rf -- "$tmp"' EXIT
 mkdir -p "$tmp/source"
 
 printf '\n\033[1;33m'
-printf '  ✳  K U H L   O S    /    R E L E A S E   C A N D I D A T E\n'
+printf '  ✳  K U H L   O S    /    N I R I   R E B A S E   B E T A\n'
 printf '\033[0m'
 printf '  Fedora + Niri · one-command desktop installer\n\n'
 printf '  [1/2] Downloading the current Kuhl OS release from GitHub...\n'

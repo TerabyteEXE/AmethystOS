@@ -41,8 +41,8 @@ def menu(screen, items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
     cursor = 0
     offset = 0
-    theme = 'frontier'
-    themes = ['frontier','dyson','puncture','slowend','day','dusk']
+    theme = 'sevens'
+    themes = ['sevens','dusk','day']
 
     def paint(row, col, content, style=0):
         height, width = screen.getmaxyx()
@@ -109,7 +109,7 @@ def menu(screen, items):
         paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
         for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
             paint(row, 3, part)
-        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL OS 1.0 RC2   ·   Q / ESC to cancel', muted)
+        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL OS Niri Rebase   ·   Q / ESC to cancel', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
@@ -135,7 +135,7 @@ def menu(screen, items):
 
 def plain(items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
-    print('\n✳ KUHL OS 1.0 RC2  /  FEDORA + NIRI  /  TEXT MODE')
+    print('\n✳ KUHL OS Niri Rebase  /  FEDORA + NIRI  /  TEXT MODE')
     for index, item in enumerate(items, 1):
         marker = 'x' if item['id'] in selected else ' '
         lock = ' [required]' if item.get('required') else ''
@@ -154,8 +154,8 @@ def plain(items):
                 selected.remove(item['id'])
             else:
                 selected.add(item['id'])
-    theme = input('Palette: [frontier]/dyson/puncture/slowend/day/dusk: ').strip().lower() or 'frontier'
-    if theme not in ('frontier','dyson','puncture','slowend','day','dusk'):
+    theme = input('Palette: [sevens]/dusk/day: ').strip().lower() or 'sevens'
+    if theme not in ('sevens','dusk','day'):
         raise ValueError('Unknown palette')
     print('GNOME is retained. ' + ('Existing configs will be backed up and replaced with REPLACE confirmation.' if 'replace_existing' in selected else 'Existing personal configurations are preserved.'))
     if 'vicinae' in selected:
@@ -172,7 +172,7 @@ def main():
     args = parser.parse_args()
     items = rows(args.config)
     if args.defaults:
-        result = {'theme': 'frontier', 'selected': sorted(r['id'] for r in items if r.get('default') or r.get('required'))}
+        result = {'theme': 'sevens', 'selected': sorted(r['id'] for r in items if r.get('default') or r.get('required'))}
     else:
         if not sys.stdin.isatty() or not sys.stdout.isatty():
             raise RuntimeError('Interactive installation requires a terminal. Use --defaults for automation.')

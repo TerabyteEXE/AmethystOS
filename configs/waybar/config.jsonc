@@ -1,53 +1,30 @@
 {
-	"layer": "bottom",
-	"spacing": 0,
-	"height": 30,
-	"margin-bottom": 0, 
-	"margin-top": 0,
-	"position": "top",
-	"margin-right": 0,
-	"margin-left": 0,
-
-	"modules-left": ["pulseaudio", "battery", "niri/language"],
-	"modules-center": ["clock"],
-	"modules-right": ["network"],
-
-	"clock": {
-		"format": "{:%Y.%m.%d - %H:%M}",
-        "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui'"
-	},
-
-	"network": {
-		"format-wifi": "{bandwidthDownBits}   {bandwidthUpBits}    ",
-		"format-ethernet": "{bandwidthDownBits}   {bandwidthUpBits}   󰈀 ",
-		"format-disconnected": "⚠  No Network ⚠ ",
-		"interval": 1,
-		"tooltip": false
-	},
-
-	"battery": {
-		"states": {
-			"good": 80,
-			"warning": 30,
-			"critical": 15
-		},
-		"format": "{icon} {capacity}%",
-		"format-icons": ["󰂎", "󱊡", "󱊢", "󱊣"]
-	},
-	"pulseaudio": {
-		"scroll-step": 5,
-		"max-volume": 150,
-		"format": "{format_source}  {icon}  {volume}%",
-		"format-muted": "   --%",
-		"on-click" : "pavucontrol",
-		"tooltip": false,
-		"format-source": "󰍬",
-		"format-source-muted": "󰍭",
-            	"format-icons": ["", "", ""]
-	},
-	"niri/language": {
-		"format": "{}",
-		"format-en": "US",
-		"format-de": "DE"
-	}
+  "reload_style_on_change": true,
+  "toggle": true,
+  "layer": "top",
+  "position": "left",
+  "margin-top": 0,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "spacing": 0,
+  "modules-left": [
+    "custom/kuhl",
+    "clock",
+    "cpu"
+  ],
+  "modules-center": [
+    "mpris",
+    "niri/workspaces"
+  ],
+  "modules-right": [
+    "network",
+    "bluetooth",
+    "pulseaudio",
+    "battery",
+    "custom/settings",
+    "custom/close",
+    "tray"
+  ],
+  "width": 44
 }

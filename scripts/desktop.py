@@ -23,111 +23,96 @@ PREF_PATH = STATE / 'preferences.json'
 SCALES = (0.75, 0.85, 1.0, 1.10, 1.25, 1.5, 1.75, 2.0)
 DEFAULT = {
     'bar_scale': 1.0,
-    'bar_position': 'top',
+    'bar_position': 'left',
     'ui_scale': 1.0,
-    'bar_modules': {'brand': True, 'audio': True, 'battery': True,
-                    'language': False, 'clock': True, 'network': True,
-                    'workspaces': False, 'tray': False, 'settings': True,
-                    'close': True},
+    'bar_modules': {'brand': True, 'clock': True, 'cpu': True, 'music': True,
+       'workspaces': True, 'network': True, 'bluetooth': True, 'audio': True,
+       'battery': True, 'tray': True, 'settings': True, 'close': True, 'language': False},
 }
 MODULES = {
-    'brand': 'custom/kuhl', 'audio': 'pulseaudio', 'battery': 'battery',
-    'language': 'niri/language', 'clock': 'clock', 'network': 'network',
-    'workspaces': 'niri/workspaces', 'tray': 'tray', 'settings': 'custom/settings',
-    'close': 'custom/close'
+    'brand':'custom/kuhl','clock':'clock','cpu':'cpu','music':'mpris',
+    'workspaces':'niri/workspaces','network':'network','bluetooth':'bluetooth',
+    'audio':'pulseaudio','battery':'battery','tray':'tray',
+    'settings':'custom/settings','close':'custom/close', 'language':'niri/language',
 }
 
 
 def preferences():
     p = copy.deepcopy(DEFAULT)
     if PREF_PATH.is_file():
-        data = json.loads(PREF_PATH.read_text(encoding='utf8'))
-        if isinstance(data, dict):
-            for key in ('bar_scale', 'bar_position', 'ui_scale'):
-                if key in data: p[key] = data[key]
-            if isinstance(data.get('bar_modules'), dict):
+        data=json.loads(PREF_PATH.read_text(encoding='utf8'))
+        if isinstance(data,dict):
+            for key in ('bar_scale','bar_position','ui_scale'):
+                if key in data: p[key]=data[key]
+            if isinstance(data.get('bar_modules'),dict):
                 p['bar_modules'].update({k:bool(v) for k,v in data['bar_modules'].items() if k in MODULES})
     return p
 
 
 def save_preferences(p):
-    STATE.mkdir(parents=True, exist_ok=True)
-    temp = PREF_PATH.with_suffix('.tmp')
-    temp.write_text(json.dumps(p, indent=2, sort_keys=True)+'\n', encoding='utf8')
-    os.chmod(temp, 0o600)
-    temp.replace(PREF_PATH)
+    STATE.mkdir(parents=True,exist_ok=True)
+    tmp=PREF_PATH.with_suffix('.tmp')
+    tmp.write_text(json.dumps(p,indent=2,sort_keys=True)+'\n')
+    os.chmod(tmp,0o600)
+    tmp.replace(PREF_PATH)
 
 
-def scale_value(value, low=0.75, high=2.0):
+def scale_value(value,low=.75,high=2.0):
     try:
-        value = str(value).replace('%','').strip()
-        n = float(value)
-        if n > 10: n /= 100
-        if not low <= n <= high: raise ValueError()
-        return round(n, 2)
+        n=float(str(value).replace('%','').strip())
+        if n>10: n/=100
+        if not low<=n<=high:raise ValueError()
+        return round(n,2)
     except ValueError:
         raise SystemExit(f'Scale must be {low:.2f}–{high:.2f}, or {low*100:.0f}–{high*100:.0f}%.')
 
 
-def bar_files(theme, p):
-    """Build a KyleOS-shaped bar with readable fonts and independent scale controls."""
-    pref = preferences()
-    factor = pref['bar_scale']
-    height = round(34 * factor)
-    modules = pref['bar_modules']
-    def enabled(*names): return [MODULES[x] for x in names if modules[x]]
-    conf = {
-        'layer': 'top', 'position': pref['bar_position'],
-        'height': height, 'spacing': 0, 'margin-top': 0, 'margin-bottom': 0,
-        'margin-left': 0, 'margin-right': 0,
-        'modules-left': enabled('brand','audio','battery','language'),
-        'modules-center': enabled('workspaces','clock'),
-        'modules-right': enabled('network','tray','settings','close'),
-        'clock': {'format': '{:%a %b %d  ·  %I:%M %p}', 'tooltip-format': '{:%A %B %d, %Y}',
-                  'on-click': '$HOME/.local/bin/kuhl settings'},
-        'network': {'format-wifi':'Wi-Fi {essid}', 'format-ethernet':'Ethernet',
-                    'format-disconnected':'Offline', 'tooltip': True, 'on-click': '$HOME/.local/bin/kuhl settings network'},
-        'battery': {'format':'Battery {capacity}%', 'format-charging':'Charging {capacity}%',
-                    'states':{'warning':30,'critical':15}},
-        'pulseaudio':{'format':'Vol {volume}%', 'format-muted':'Muted', 'scroll-step':5,
-                      'on-click':'$HOME/.local/bin/kuhl settings audio', 'tooltip':True},
-        'niri/language':{'format':'{}'},
-        'niri/workspaces': {'format': '{index}'},
-        'tray': {'spacing': 8},
-        'custom/kuhl': {'format':'✳ kuhl', 'tooltip':'Open Kuhl Control Center',
-                        'on-click':'$HOME/.local/bin/kuhl menu --ui'},
-        'custom/settings': {'format':'Settings', 'tooltip':'Customize Kuhl OS',
-                            'on-click':'$HOME/.local/bin/kuhl settings'},
-        'custom/close': {'format':'×', 'tooltip':'Close focused window (Super+Q)',
-                         'on-click':'niri msg action close-window'},
+def bar_files(theme,p):
+    '''Keep MIT source's vertical sidebar and colors; make controls and size configurable.'''
+    pref=preferences();factor=pref['bar_scale'];modules=pref['bar_modules']
+    pos=pref['bar_position']
+    if pos not in ('left','right','top','bottom'):pos='left'
+    vertical=pos in ('left','right')
+    def enabled(*names):return [MODULES[x] for x in names if modules.get(x)]
+    conf={
+       'layer':'top','position':pos,'spacing':0,
+       'margin-top':0,'margin-right':0,'margin-bottom':0,'margin-left':0,
+       'reload_style_on_change':True,
+       'modules-left':enabled('brand','clock','cpu'),
+       'modules-center':enabled('music','workspaces'),
+       'modules-right':enabled('network','bluetooth','audio','battery','settings','close','tray'),
+       'custom/kuhl':{'format':'◆','tooltip':'Kuhl Control Center','on-click':'$HOME/.local/bin/kuhl menu --ui'},
+       'clock':{'interval':1,'format':'{:%H\n%M}' if vertical else '{:%a %d  %H:%M}',
+           'tooltip-format':'{:%A, %B %d, %Y}','on-click':'$HOME/.local/bin/kuhl settings'},
+       'cpu':{'format':'CPU' if vertical else 'CPU {usage}%','tooltip-format':'CPU {usage}%'},
+       'mpris':{'format':'♫','tooltip-format':'{title} — {artist}',
+          'on-click':'playerctl play-pause'},
+       'niri/workspaces':{'on-click':'activate','format':'{index}'},
+       'network':{'format-wifi':'󰤨' if vertical else 'WiFi','format-ethernet':'󰈀' if vertical else 'LAN',
+          'format-disconnected':'×','on-click':'$HOME/.local/bin/kuhl settings network'},
+       'bluetooth':{'format-on':'ᛒ','format-off':'','format-connected':'ᛒ',
+          'on-click':'$HOME/.local/bin/kuhl settings bluetooth'},
+       'pulseaudio':{'format':'♪' if vertical else 'Vol {volume}%',
+          'format-muted':'×','scroll-step':5,'on-click':'$HOME/.local/bin/kuhl settings audio'},
+       'battery':{'format':'{capacity}%' if vertical else 'Battery {capacity}%',
+          'format-charging':'⚡{capacity}%','states':{'warning':30,'critical':15}},
+       'custom/settings':{'format':'⚙','tooltip':'Kuhl Settings','on-click':'$HOME/.local/bin/kuhl settings'},
+       'custom/close':{'format':'×','tooltip':'Close focused window',
+          'on-click':'niri msg action close-window'},
+       'tray':{'spacing':4,'icon-size':max(12,round(16*factor))},
     }
-    font = max(10, round(13 * factor))
-    pad = max(5, round(12 * factor))
-    # KyleOS dark geometric palette; full-width, flat strip. No giant 30px fonts.
-    fg = p['fg'] if theme == 'day' else '#e0dccf'
-    css = f'''/* KUHL-MANAGED — responsive KyleOS-inspired status strip; {theme}. */
-* {{ border: none; border-radius: 0; min-height: 0;
-    font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace;
-    font-size: {font}px; }}
-window#waybar {{ background: {p['bg']}; color: {fg}; border-bottom: 1px solid {p['border']}; }}
-window#waybar.bottom {{ border-bottom: none; border-top: 1px solid {p['border']}; }}
-#custom-kuhl, #pulseaudio, #battery, #language, #workspaces, #clock,
-#network, #tray, #custom-settings, #custom-close {{ padding: 0 {pad}px; }}
-#custom-kuhl {{ color: {p['accent']}; font-weight: 800; letter-spacing: 1px; }}
-#clock {{ color: {p['accent']}; font-weight: bold; }}
-#custom-settings {{ color: {p['accent2']}; }}
-#custom-close {{ color: {p['accent']}; font-size: {max(15,round(19*factor))}px; }}
-#custom-close:hover, #custom-settings:hover, #custom-kuhl:hover {{ background: {p['surface2']}; }}
-#pulseaudio, #network, #battery, #language {{ color: {fg}; }}
-#battery.warning {{ color: {p['accent']}; }}
-#battery.critical {{ color: #e88787; }}
-#workspaces button {{ padding: 0 {max(3,round(5*factor))}px; color: {fg}; }}
-#workspaces button.active {{ color: {p['accent']}; background: {p['surface2']}; }}
-#workspaces button:hover {{ background: {p['surface2']}; }}
-#tray > .passive {{ -gtk-icon-effect: dim; }}
-tooltip {{ background: {p['surface']}; color: {fg}; border: 1px solid {p['border']}; }}
-'''
-    return (json.dumps(conf, indent=2)+'\n').encode(), css.encode()
+    conf['width' if vertical else 'height']=max(28,round((44 if vertical else 36)*factor))
+    # CSS is derived from source (preserved in upstream-style.css) but adapts for font scaling.
+    src=(DATA/'templates/waybar/upstream-style.css')
+    css=src.read_text(encoding='utf-8') if src.is_file() else ''
+    css=css.replace('JetBrainsMono Nerd Font Propo','JetBrains Mono')
+    css=css.replace('font-size: 16px;',f'font-size: {max(11,round(15*factor))}px;')
+    css=css.replace('padding: 6px 0;',f'padding: {max(3,round(6*factor))}px 0;')
+    css+='\n/* Kuhl controls appended to the MIT source style. */\n'
+    css+='#custom-kuhl, #custom-settings, #custom-close { color: @color4; padding: 5px 0; }\n'
+    css+='#custom-kuhl:hover, #custom-settings:hover, #custom-close:hover { background: @color0; }\n'
+    if not vertical:css+='\n#clock, #cpu, #network, #battery { padding: 0 12px; }\n'
+    return (json.dumps(conf,indent=2,ensure_ascii=False)+'\n').encode(), css.encode()
 
 
 def gtk_call(action, key, value=None):
@@ -187,7 +172,7 @@ def restore_gtk():
 
 def apply_pref(p):
     import render
-    current = (STATE/'theme').read_text().strip() if (STATE/'theme').exists() else 'frontier'
+    current = (STATE/'theme').read_text().strip() if (STATE/'theme').exists() else 'sevens'
     backup = preferences()
     # Refuse partial preferences deployment when managed appearance files were edited.
     m=render.manifest_load()
@@ -293,7 +278,7 @@ def main():
     a=ap.parse_args()
     if a.command=='appearance':
         if a.action=='restore': restore_gtk();return 0
-        theme=a.theme or ((STATE/'theme').read_text().strip() if (STATE/'theme').exists() else 'frontier')
+        theme=a.theme or ((STATE/'theme').read_text().strip() if (STATE/'theme').exists() else 'sevens')
         sync_gtk(theme);return 0
     if a.command=='display':
         if a.action=='outputs':
@@ -311,13 +296,13 @@ def main():
             if a.arg is None:ap.error('bar scale requires a percentage such as 125')
             p['bar_scale']=scale_value(a.arg)
         elif a.action=='position':
-            if a.arg not in ('top','bottom'): ap.error('bar position top|bottom')
+            if a.arg not in ('left','right','top','bottom'): ap.error('bar position left|right|top|bottom')
             p['bar_position']=a.arg
         elif a.action=='module':
             if a.arg not in MODULES or a.value not in ('on','off'): ap.error('bar module MODULE on|off')
             p['bar_modules'][a.arg]=(a.value=='on')
         else:
-            p['bar_scale']=1.;p['bar_position']='top';p['bar_modules']=copy.deepcopy(DEFAULT['bar_modules'])
+            p['bar_scale']=1.;p['bar_position']='left';p['bar_modules']=copy.deepcopy(DEFAULT['bar_modules'])
         apply_pref(p);print('[kuhl] Bar settings updated.');return 0
     if a.action=='show':print(f'UI scale: {p["ui_scale"]*100:.0f}%');return 0
     if a.action=='scale':

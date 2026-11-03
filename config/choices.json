@@ -4,7 +4,7 @@
       "id": "core",
       "section": "The desktop",
       "title": "Kuhl core desktop",
-      "description": "Fedora-packaged Niri, KyleOS status bar, graphical Rofi launcher, Fuzzel fallback, Alacritty and Kitty, Mako, Kuhl Settings, core audio/network utilities, wallpaper and Wayland essentials. GNOME stays as fallback.",
+      "description": "Official Fedora packages: Niri compositor, vertical Waybar, Rofi/Fuzzel launcher, Alacritty/Kitty, Mako, audio/network settings and Kuhl controls. GNOME is retained.",
       "default": true,
       "required": true,
       "type": "core"
@@ -12,8 +12,8 @@
     {
       "id": "theme",
       "section": "The desktop",
-      "title": "Kuhl Frontier / six coordinated themes",
-      "description": "Art-led Frontier, Dyson, Puncture and Slow End palettes, plus original Kuhl Day/Dusk. Includes exact source Niri, Rofi, Alacritty and Mako palettes, plus compatible Kuhl fallback colors; attribution and CC terms documented.",
+      "title": "Kuhl Sevens / Day / Dusk",
+      "description": "Three coordinated palettes. Default Sevens uses upstream MIT Niri/Waybar styling. Add your own wallpaper later.",
       "default": true,
       "required": true,
       "type": "appearance"
@@ -30,7 +30,7 @@
       "id": "vicinae",
       "section": "The desktop",
       "title": "Vicinae Spotlight-style search (optional COPR)",
-      "description": "Optional macOS-style launcher/search, file index and clipboard tools. Explicit consent required for third-party COPR quadratech188/vicinae. Without it, Super+Space launches the original KyleOS Rofi theme with Fuzzel fallback.",
+      "description": "Optional Spotlight-like launcher through a third-party COPR; review package source and give explicit consent. Otherwise Rofi/Fuzzel is configured.",
       "default": false,
       "type": "copr",
       "value": "quadratech188/vicinae"
@@ -43,60 +43,6 @@
       "default": true,
       "type": "dnf",
       "value": "network-manager-applet blueman pavucontrol brightnessctl playerctl"
-    },
-    {
-      "id": "flatseal",
-      "section": "Optional tools",
-      "title": "Flatseal",
-      "description": "Inspect and edit Flatpak sandbox permissions. Uses Flathub for current user only.",
-      "default": false,
-      "type": "flatpak",
-      "value": "com.github.tchx84.Flatseal"
-    },
-    {
-      "id": "pika",
-      "section": "Optional tools",
-      "title": "Pika Backup",
-      "description": "Graphical encrypted backups. Uses Flathub for current user only.",
-      "default": false,
-      "type": "flatpak",
-      "value": "org.gnome.World.PikaBackup"
-    },
-    {
-      "id": "vlc",
-      "section": "Optional apps",
-      "title": "VLC",
-      "description": "Video and audio player (Flathub).",
-      "default": false,
-      "type": "flatpak",
-      "value": "org.videolan.VLC"
-    },
-    {
-      "id": "gimp",
-      "section": "Optional apps",
-      "title": "GIMP",
-      "description": "Image editing (Flathub).",
-      "default": false,
-      "type": "flatpak",
-      "value": "org.gimp.GIMP"
-    },
-    {
-      "id": "inkscape",
-      "section": "Optional apps",
-      "title": "Inkscape",
-      "description": "Vector editing (Flathub).",
-      "default": false,
-      "type": "flatpak",
-      "value": "org.inkscape.Inkscape"
-    },
-    {
-      "id": "office",
-      "section": "Optional apps",
-      "title": "LibreOffice",
-      "description": "Offline office suite (Flathub).",
-      "default": false,
-      "type": "flatpak",
-      "value": "org.libreoffice.LibreOffice"
     }
   ]
 }
