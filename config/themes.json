@@ -1,8 +1,14 @@
 {
   "day": {
-    "name":"Kuhl Day", "bg":"#f8f2e8", "surface":"#fffaf0", "surface2":"#ede3d4", "fg":"#2c3531", "muted":"#66726a", "accent":"#b97d54", "accent2":"#8eaf98", "border":"#d9d0bd", "shadow":"#352a2425", "terminal_bg":"#fcf7ec", "terminal_fg":"#293a35", "wallpaper":"kuhl-day.png", "gtk":"prefer-light"
+    "name":"Kuhl Day", "bg":"#eae4d8", "surface":"#f3eee4", "surface2":"#e2d8c8",
+    "fg":"#353631", "muted":"#78766a", "accent":"#8b7950", "accent2":"#6e8975",
+    "border":"#c3b9a8", "shadow":"#2b241d42", "terminal_bg":"#f3eee4",
+    "terminal_fg":"#37362f", "wallpaper":"", "gtk":"prefer-light"
   },
   "dusk": {
-    "name":"Kuhl Dusk", "bg":"#191f23", "surface":"#242d30", "surface2":"#2f3a3b", "fg":"#f5e8d5", "muted":"#adb9b0", "accent":"#eeb674", "accent2":"#91b9a3", "border":"#475750", "shadow":"#0a0d1070", "terminal_bg":"#1a2327", "terminal_fg":"#f2e8d6", "wallpaper":"kuhl-default.png", "gtk":"prefer-dark"
+    "name":"Kuhl Dusk", "bg":"#2c2c2c", "surface":"#302e2c", "surface2":"#423d35",
+    "fg":"#e9e2d5", "muted":"#aba596", "accent":"#e4c977", "accent2":"#a6b5a3",
+    "border":"#777063", "shadow":"#090909a0", "terminal_bg":"#211f1c",
+    "terminal_fg":"#e4ddd0", "wallpaper":"", "gtk":"prefer-dark"
   }
 }

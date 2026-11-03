@@ -1,27 +1,80 @@
 {
-  "// kuhl-managed": "Kuhl OS 0.6.1 Waybar layout",
+  "// kuhl-managed": "Kuhl OS Studio / original centered capsule design",
   "layer": "top",
-  "reload_style_on_change": true,
   "position": "top",
-  "height": 36,
-  "spacing": 5,
-  "margin-top": 8,
-  "margin-left": 13,
-  "margin-right": 13,
-  "modules-left": ["custom/kuhl", "niri/workspaces", "niri/window"],
-  "modules-center": ["clock"],
-  "modules-right": ["pulseaudio", "network", "battery", "tray", "custom/lock"],
+  "height": 34,
+  "width": 646,
+  "exclusive": true,
+  "fixed-center": true,
+  "reload_style_on_change": true,
+  "margin-top": 5,
+  "margin-bottom": 1,
+  "modules-left": [],
+  "modules-center": [
+    "custom/kuhl",
+    "niri/workspaces",
+    "clock",
+    "custom/theme",
+    "pulseaudio",
+    "network",
+    "battery",
+    "tray",
+    "custom/keys",
+    "custom/power"
+  ],
+  "modules-right": [],
   "custom/kuhl": {
-    "format": "✳  kuhl",
-    "tooltip": "Super + Space · Search",
-    "on-click": "$HOME/.local/bin/kuhl launcher"
+    "format": "✳",
+    "tooltip": "Kuhl control center · Super+D",
+    "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui'"
   },
-  "niri/workspaces": { "format": "{index}", "on-click": "activate", "all-outputs": false },
-  "niri/window": { "format": "{title}", "max-length": 38, "separate-outputs": true },
-  "clock": { "format": "{:%a  %b %d  ·  %I:%M %p}", "tooltip-format": "{:%A, %B %d %Y}" },
-  "pulseaudio": { "format": "vol {volume}%", "format-muted": "muted", "on-click": "pavucontrol" },
-  "network": { "format-wifi": "wifi {signalStrength}%", "format-ethernet": "wired", "format-disconnected": "offline", "tooltip-format": "{ifname}: {ipaddr}" },
-  "battery": { "format": "bat {capacity}%", "format-charging": "bat +{capacity}%" },
-  "tray": { "spacing": 8 },
-  "custom/lock": { "format": "lock", "tooltip": "Lock · Super + Shift + L", "on-click": "swaylock -f -c 191f23" }
+  "niri/workspaces": {
+    "format": "{index}",
+    "all-outputs": false,
+    "on-click": "activate"
+  },
+  "clock": {
+    "format": "{:%d %b · %H:%M}",
+    "tooltip-format": "{:%A, %B %d %Y}"
+  },
+  "custom/theme": {
+    "format": "●",
+    "tooltip": "Choose Kuhl theme · Super+Shift+T",
+    "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui --page themes'"
+  },
+  "pulseaudio": {
+    "format": "♪ {volume}%",
+    "format-muted": "♪ off",
+    "on-click": "pavucontrol",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
+  },
+  "network": {
+    "format-wifi": "◈",
+    "format-ethernet": "◇",
+    "format-disconnected": "×",
+    "tooltip-format": "{ifname} · {ipaddr}",
+    "on-click": "nm-connection-editor"
+  },
+  "battery": {
+    "format": "▰ {capacity}%",
+    "format-charging": "⚡{capacity}%",
+    "states": {
+      "warning": 25,
+      "critical": 12
+    }
+  },
+  "custom/keys": {
+    "format": "?",
+    "tooltip": "All shortcuts · Ctrl+Super+K",
+    "on-click": "sh -c '$HOME/.local/bin/kuhl keys --ui'"
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": "Power and session options",
+    "on-click": "sh -c '$HOME/.local/bin/kuhl menu --ui --page power'"
+  },
+  "tray": {
+    "spacing": 4
+  }
 }

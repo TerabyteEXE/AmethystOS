@@ -52,8 +52,10 @@ def menu(screen, items):
         while True:
             screen.erase()
             height, width = screen.getmaxyx()
-            paint(1, 3, '✳  KUHL OS  /  REVIEW', accent | curses.A_BOLD)
-            paint(3, 3, f'Palette   {theme.upper()}     |     {len(selected)} selected components', good)
+            if height >= 18 and width >= 62: screen.border()
+            paint(1, 3, '✳  KUHL OS   /   FINAL REVIEW', accent | curses.A_BOLD)
+            paint(3, 3, f'PALETTE  {theme.upper()}   /   {len(selected)} COMPONENTS', good)
+            paint(4, 3, 'INSTALLATION   [━━━━━━━━━━━━━━━━━━━━]  02/02 REVIEW', accent)
             start = 5
             selected_items = [i for i in items if i['id'] in selected]
             for index, item in enumerate(selected_items[:max(0, height - 12)]):
@@ -75,17 +77,19 @@ def menu(screen, items):
     while True:
         screen.erase()
         height, width = screen.getmaxyx()
-        if height < 18 or width < 62:
-            paint(0, 0, 'Resize terminal to at least 62 x 18 (Q to exit).')
+        if height < 19 or width < 66:
+            paint(0, 0, 'Resize terminal to at least 66 x 19 (Q to exit).')
             screen.refresh()
             if screen.getch() in (ord('q'), ord('Q'), 27):
                 return None
             continue
-        paint(1, 3, '✳  K U H L  O S', accent | curses.A_BOLD)
-        paint(2, 3, 'F E D O R A    /    N I R I    /    S E T U P', muted)
-        paint(4, 3, 'Pick your desktop. Nothing changes until you confirm.', curses.A_BOLD)
+        screen.border()
+        paint(1, 3, '✳  K U H L    /    O S', accent | curses.A_BOLD)
+        paint(2, 3, 'S T U D I O    E D I T I O N   /   F E D O R A   +   N I R I', muted)
+        paint(4, 3, '✳  Build your Kuhl desktop. Your existing files stay safe.', curses.A_BOLD)
         paint(5, 3, 'UP/DOWN  navigate    SPACE  select    T  Day/Dusk    ENTER  review', muted)
-        paint(7, 3, f'THEME  {theme.upper():<6}     COMPONENTS  {len(selected):02} / {len(items):02}', accent)
+        paint(6, 3, 'INSTALLATION   [━━━━━━━━━━··········]  01/02 CHOICES', accent)
+        paint(7, 3, f'PALETTE {theme.upper():<6}     COMPONENTS {len(selected):02}/{len(items):02}   /   USER-CONTROLLED', good)
         screen.hline(8, 3, curses.ACS_HLINE, width-6)
         visible = max(1, height - 18)
         if cursor < offset:
@@ -104,7 +108,7 @@ def menu(screen, items):
         paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
         for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
             paint(row, 3, part)
-        paint(height-2, 3, f'{cursor+1}/{len(items)}   •   Kuhl 0.6.1 preview   •   Q to exit', muted)
+        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL STUDIO 0.7   ·   Q / ESC to cancel', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
@@ -130,7 +134,7 @@ def menu(screen, items):
 
 def plain(items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
-    print('\n✳ KUHL OS 0.6.1  /  FEDORA + NIRI  /  TEXT MODE')
+    print('\n✳ KUHL OS 0.7  /  FEDORA + NIRI  /  TEXT MODE')
     for index, item in enumerate(items, 1):
         marker = 'x' if item['id'] in selected else ' '
         lock = ' [required]' if item.get('required') else ''

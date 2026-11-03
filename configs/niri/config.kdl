@@ -1,6 +1,6 @@
-// KUHL-MANAGED - Kuhl OS 0.6 / Niri (minimum 25.11)
-// This file is Kuhl-managed. Put personal overrides at the very end in custom.kdl.
-// An existing non-Kuhl config is NEVER replaced automatically.
+// KUHL-MANAGED — Kuhl OS Studio Edition / Fedora + Niri
+// Designed independently for Kuhl, inspired visually by low-clutter centered-bar rices.
+// Changes live reload. Validate after manual edits: niri validate
 prefer-no-csd
 
 input {
@@ -14,62 +14,74 @@ input {
 }
 
 layout {
-    gaps 12
-    default-column-width {
-        proportion 0.5
-    }
+    gaps 13
+    default-column-width { proportion 0.5; }
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
         proportion 0.66667
     }
-    focus-ring {
-        width 2
-    }
-    border {
-        off
-    }
+    focus-ring { width 2; }
+    border { off; }
 }
 
 window-rule {
-    geometry-corner-radius 12
+    geometry-corner-radius 13
     clip-to-geometry true
 }
 
-// All session components launch only inside Niri, not in GNOME.
+// Kuhl's searchable shortcut guide opens in its own floating terminal.
+window-rule {
+    match app-id=r#"^kuhl-keys$"#
+    open-floating true
+}
+window-rule {
+    match app-id=r#"^kuhl-control$"#
+    open-floating true
+}
+
+// Only launched when starting the Niri session. GNOME stays untouched.
 spawn-at-startup "waybar"
 spawn-at-startup "mako"
 spawn-at-startup "sh" "-c" "$HOME/.local/bin/kuhl wallpaper apply"
 spawn-at-startup "sh" "-c" "command -v vicinae >/dev/null 2>&1 && exec vicinae server || true"
 spawn-at-startup "sh" "-c" "command -v nm-applet >/dev/null 2>&1 && exec nm-applet --indicator || true"
-spawn-at-startup "swayidle" "-w" "timeout" "900" "swaylock -f -c 191f23" "before-sleep" "swaylock -f -c 191f23"
+spawn-at-startup "sh" "-c" "command -v blueman-applet >/dev/null 2>&1 && exec blueman-applet || true"
+spawn-at-startup "swayidle" "-w" "timeout" "900" "swaylock -f -c 1c1b1a" "before-sleep" "swaylock -f -c 1c1b1a"
 
-hotkey-overlay {
-    skip-at-startup
-}
+hotkey-overlay { skip-at-startup; }
 
 binds {
+    // BEGIN KUHL GENERATED KEYBINDS
+    // Start here
     Mod+Space repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl launcher"; }
+    Ctrl+Super+K repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl keys --ui"; }
+    Mod+D repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl menu --ui"; }
     Mod+Return { spawn "kitty"; }
     Mod+T { spawn "kitty"; }
     Mod+E { spawn "thunar"; }
-    Mod+Shift+L { spawn "swaylock" "-f" "-c" "191f23"; }
-    Mod+Shift+Q { close-window; }
-    Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+Shift+T { spawn "sh" "-c" "$HOME/.local/bin/kuhl menu --ui --page themes"; }
+
+    // Windows
     Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
     Mod+J { focus-window-down; }
     Mod+K { focus-window-up; }
-    Mod+L { focus-column-right; }
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
     Mod+Ctrl+H { move-column-left; }
     Mod+Ctrl+L { move-column-right; }
     Mod+Ctrl+J { move-window-down; }
-    Mod+Ctrl+K { move-window-up; }
-    Mod+F { maximize-column; }
-    Mod+Shift+F { fullscreen-window; }
     Mod+R { switch-preset-column-width; }
     Mod+Shift+R { switch-preset-window-height; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
     Mod+V { toggle-window-floating; }
-    Mod+Shift+E { quit; }
+    Mod+Shift+Q { close-window; }
+
+    // Workspaces
     Mod+1 { focus-workspace 1; }
     Mod+2 { focus-workspace 2; }
     Mod+3 { focus-workspace 3; }
@@ -80,13 +92,23 @@ binds {
     Mod+Shift+3 { move-column-to-workspace 3; }
     Mod+Shift+4 { move-column-to-workspace 4; }
     Mod+Shift+5 { move-column-to-workspace 5; }
+
+    // System & media
+    Mod+Shift+P repeat=false { spawn "sh" "-c" "$HOME/.local/bin/kuhl menu --ui --page power"; }
+    Mod+Alt+L { spawn "swaylock" "-f" "-c" "1c1b1a"; }
+    Mod+Shift+E { quit; }
+    Mod+Shift+Slash { show-hotkey-overlay; }
     Print { screenshot; }
+    Ctrl+Print { screenshot-screen; }
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
     XF86AudioMute allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+    XF86AudioPlay { spawn "playerctl" "play-pause"; }
+
+    // END KUHL GENERATED KEYBINDS
 }
 
-// Theme is replaced independently of keybindings and layout.
+// Owned separately so Day/Dusk can change without touching personal binds.
 include "kuhl-theme.kdl"
-// Created by you, not overwritten by Kuhl (optional, from niri >= 26.04).
-// To use a custom file: add `include "custom.kdl"` here manually.

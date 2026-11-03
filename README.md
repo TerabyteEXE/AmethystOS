@@ -1,126 +1,115 @@
-# Kuhl OS 0.6.1 — Fedora + Niri
+# ✳ Kuhl OS 0.7 — Studio Edition
 
-A warm, keyboard-first **Fedora Workstation + Niri desktop experience**. Kuhl is **not** a separate distribution, ISO, modified kernel, or package manager. It adds a Niri scrolling-tiling session to Fedora while keeping GNOME as a fallback.
+**The tiny, elegant desktop that gets out of your way.** Kuhl OS is an independently designed Fedora Workstation + Niri experience: scrolling tiling, a centered capsule bar, Day/Dusk palettes, quick search, a searchable shortcut guide, a keyboard-driven control center, and a branded terminal installer.
 
-> **Status: experimental developer preview.** Configuration is based on documented Niri 26.04 and Fedora 43–45 packaging; static and simulated tests pass. No physical Fedora installation or full GUI login has been executed in the build environment. Test in a VM or spare machine before daily driving.
+Kuhl is **not** a separate distro, a replacement kernel, an ISO or a Fedora fork. Fedora continues providing updates and packages, and GNOME remains installed as a fallback.
 
-Website: `main.html` (publish to your GitHub Pages repository). The website's desktop graphic is a concept illustration, **not a screenshot**.
+> **Status: experimental release.** Static functional tests pass, but this build environment cannot perform a real Fedora / Niri compositor login. On Fedora the install script validates both palettes with the real `niri validate` parser before modifying personal configs. Try on a spare machine or VM first. Development focus: Fedora 44 on x86_64.
 
-## What changed from 0.5
+## Gallery and reference
 
-- Replaced the old GNOME extension-dependent desktop with **Niri**: scrollable tiling, rounded corners, live-reloading KDL, and comfortable workspace shortcuts.
-- Added **Waybar**, **Kitty**, **Mako**, **Swaybg**, **Swaylock**, **Swayidle**, **Fuzzel**, XWayland satellite and recommended XDG portals.
-- **Super + Space** opens **Fuzzel** out of the box. Both launchers can find Kuhl Day and Kuhl Dusk as application entries. Optional **Vicinae** offers a more macOS/Raycast-style search experience with file indexing, actions and clipboard features.
-- Kept the original Kuhl wallpapers and warm Day/Dusk aesthetic. `kuhl theme day|dusk` updates Niri's focus colors, bar, terminal, notifications, Fuzzel and the default wallpaper together. Theme entries also appear in application search.
-- Removed obsolete GNOME-extension manifests, installer logic and misleading website copy. Kuhl does **not** disable GNOME or remove existing apps.
-- Added non-destructive file ownership tracking, backups before explicitly requested replacement, and user-edit-aware uninstall.
+`main.html` is the GitHub Pages-ready website with an explicitly labeled **concept** preview. It does not impersonate a live Niri screenshot. The Studio look uses a small **centered status pill**, generous corner radii, minimal charcoal/cream colors and gold highlights. This visual direction was inspired by screenshots in a user-provided low-spec Niri reference. **No code, images, fonts, scripts, or wallpaper assets from that unlicensed reference are included here**; the new configs are independently written for Kuhl.
 
-## Requirements
+The original Kuhl wallpapers are retained for compatibility, but **not enabled by default**. The default desktop is a soft, solid Day/Dusk color. Add your own wallpaper later (see below).
 
-Regular **Fedora Workstation 43 or newer**, x86_64; Fedora 44/45 are the primary targets, at least 8 GB RAM recommended, working Wayland-capable graphics and internet for package installation. Do not use on Silverblue/Kinoite or other rpm-ostree systems. Keep a functional GNOME session as a safety net.
+## Install / upgrade
 
-No AI services, telemetry, scheduled jobs, proprietary drivers, alternate update daemon, or ISO build system are included.
+Requirements: regular Fedora Workstation 43+ (Fedora 44 target), x86_64, a Wayland-compatible GPU/driver, internet, and sufficient `/` space. At least 8 GB RAM recommended for a full Fedora system, although the Kuhl components themselves are lightweight. The installer declines to run with under 700 MiB of root filesystem space (unless you explicitly override with `KUHL_ALLOW_LOW_DISK=1`, not advised). It doesn't work on rpm-ostree editions such as Silverblue.
 
-## Install (review files first)
-
-Use the downloaded ZIP or, **after publishing this updated code to your Kuhl-OS repo**:
+From **this extracted ZIP** or a GitHub repository that you've actually updated to the Studio version:
 
 ```bash
-git clone https://github.com/TerabyteEXE/Kuhl-OS.git
-cd Kuhl-OS
 bash tests/validate.sh
 bash install.sh --dry-run
 bash install.sh
 ```
 
-Run `install.sh` as your **normal user**, not as root. A Python curses menu lets you choose Day/Dusk and optional apps. Fedora packages are installed via sudo as needed. The optional Vicinae COPR is **off by default** and, if chosen, requires typing `VICINAE` to authorize the extra repository.
+Run as your **regular Fedora user**, never `sudo bash install.sh`. Choose Day/Dusk and optional extras in the Kuhl terminal menu. Fedora-packaged Niri, Waybar, Kitty, Fuzzel, Mako, Swaybg, lock/idle helpers, Wayland portals and XWayland satellite are installed through DNF. Optional Vicinae is **not** installed unless you select and explicitly authorize its third-party COPR.
 
-When installation finishes, **log out**, choose **Niri** in GDM, and sign in. GNOME stays available on the same login screen. `kuhl doctor` checks required commands and validates your Niri config; `kuhl keys` prints the keybinding reference.
-
-Already on old Kuhl GNOME v0.5? Install 0.6 as a separate Niri session. The GNOME theme, extension state, captured settings and old assets are **not automatically removed or reverted**. Back them up separately if you plan to retire the GNOME variant.
-
-### Config collision protection
-
-By default, Kuhl **never replaces existing** `~/.config/niri/config.kdl`, Waybar config, Kitty config, or Mako or Fuzzel config that it cannot identify as unchanged Kuhl-managed files. It prints a warning for preserved files. If you want Kuhl to own your existing Niri setup, review your dotfiles first and run:
+On upgrade from v0.6.x or other Niri configurations, Kuhl deliberately **preserves edited/existing dotfiles**. If you want the new centered bar and bindings, run:
 
 ```bash
 bash install.sh --replace-configs
 ```
 
-Type `REPLACE` at the confirmation prompt; originals are backed up under `~/.local/state/kuhl/backups`. **Edited Kuhl-managed configs are also preserved on future installs** unless you explicitly request replacement. To add personal Niri customizations, edit your config and know that Kuhl will preserve it rather than silently overwriting it.
+Carefully review the warning and type `REPLACE`. Your replaced personal files are backed up under `~/.local/state/kuhl/backups/`. After installation, **log out and select Niri** at Fedora's login screen; GNOME stays available. You don't need to reboot.
 
-`--defaults` skips the menu and uses only Fedora-packaged components; it does not silently install Vicinae or Flathub apps. `--dry-run` shows all default selections without modifying your system and is runnable even on non-Fedora machines for review.
+### Installer features
 
-## Core keyboard shortcuts
+- Branded, keyboard-operated terminal option selector (arrow keys / J/K, Space, T, Enter)
+- Six honest progress milestones during package install, config checking, optional apps and deployment
+- Free-space check before DNF's transaction; guidance when the VM disk is too small
+- Validates both Niri palette configurations *before* writing personal config files
+- Tracks owned files by hash, preserves user edits and backs up explicit replacements
+- Optional Flatpaks and Vicinae are opt-in; no automatic system reboot
 
-| Action | Shortcut |
+## A desktop you can learn
+
+| Key | Action |
 | --- | --- |
-| Spotlight-style search (Vicinae or Fuzzel) | **Super + Space** |
-| Terminal | Super + Enter / T |
-| Files | Super + E |
-| Focus left/right column | Super + H / L |
-| Focus up/down | Super + K / J |
-| Move column/window | Super + Ctrl + H/J/K/L |
-| Workspace | Super + 1–5 |
-| Move column to workspace | Super + Shift + 1–5 |
-| Resize column | Super + R |
-| Toggle floating | Super + V |
-| Lock screen | Super + Shift + L |
-| Quit window | Super + Shift + Q |
-| Log out of Niri (confirmation) | Super + Shift + E |
-| Screenshot | Print |
+| **Super + Space** | Search (Vicinae if installed, otherwise Fuzzel) |
+| **Ctrl + Super + K** | **Searchable, categorized shortcut atlas** |
+| **Super + D** | Kuhl terminal control center |
+| **Super + Enter** | Kitty terminal |
+| **Super + E** | Thunar file manager |
+| **Super + H/J/K/L** | Navigate columns and stacked windows |
+| **Super + Shift + H/J/K/L** | Move columns and stacked windows |
+| **Super + 1–5** | Change workspace |
+| **Super + Shift + 1–5** | Move column to workspace |
+| **Super + Shift + T** | Palette picker |
+| **Super + R** | Cycle column width |
+| **Super + F** | Maximize column |
+| **Super + Alt + L** | Lock screen |
+| **Super + Shift + P** | Power / session menu |
 
-See `docs/KEYBINDS.md` for the full list and practical tips.
+Full list: [`docs/KEYBINDS.md`](docs/KEYBINDS.md), generated from **`config/keys.json`**. The actual Niri `binds {}` block is generated from the same manifest with `python3 scripts/sync_keys.py`. Run `--check` in tests to detect if files get out of sync.
 
-## Commands
+**Migration note:** v0.6.x used Super+Ctrl+K for moving a window up and Super+Shift+L to lock. In v0.7, these are **Super+Shift+K** (move up) and **Super+Alt+L** (lock), reserving Ctrl+Super+K for the guide and Shift+L for moving a column right. Old Ctrl+Super+H/J/L aliases remain. 
+
+## Kuhl commands
 
 ```bash
-kuhl theme day          # light palette and wallpaper
-kuhl theme dusk         # warm dark palette and wallpaper
-kuhl wallpaper day      # pin the Day wallpaper even in Dusk mode
-kuhl wallpaper dusk     # pin Dusk wallpaper
-kuhl wallpaper default  # use original Kuhl default wallpaper
-kuhl status             # audit managed file state
-kuhl doctor             # check programs / validate Niri config
-kuhl keys               # printable hotkeys
-kuhl uninstall          # remove only unchanged Kuhl-owned config files
+kuhl menu                            # Kuhl Control Center (Super+D)
+kuhl keys --ui                       # keyboard atlas (Ctrl+Super+K)
+kuhl keys                            # print full shortcut guide
+kuhl launcher                        # Spotlight-style search (Super+Space)
+kuhl theme dusk                      # charcoal/gold theme
+kuhl theme day                       # warm-cream theme
+kuhl wallpaper set ~/Pictures/my-wallpaper.jpg  # your own image
+kuhl wallpaper reset                 # solid background, no generated art
+kuhl wallpaper day                   # optional legacy Day wallpaper
+kuhl wallpaper dusk                  # optional legacy Dusk wallpaper
+kuhl wallpaper default               # optional legacy original wallpaper
+kuhl status                          # check managed file state
+kuhl doctor                          # verify session and Niri config
+kuhl uninstall                       # restore unchanged tracked dotfiles
 ```
 
-To return to automatic theme-based wallpaper switching, remove `~/.local/state/kuhl/wallpaper-choice` or set its contents to `auto`, then run `kuhl wallpaper apply` in Niri.
+The control center and keyboard atlas are made with Python curses; no new GUI shell, Electron app, JavaScript runtime, or external script is required. The power menu asks before restart or power-off.
 
-## Safety and recovery
+## Make it yours
 
-If Niri fails to start, use GDM's gear/session menu to log into **GNOME** instead. Review `~/.local/state/kuhl/install.log`, run `niri validate` and `kuhl doctor` from GNOME. If your existing Niri dotfiles conflicted, the installer intentionally left them in place; review the warning and decide whether to use `--replace-configs`. The installer validates both bundled Niri themes in isolation before deploying configs. If the active user Niri configuration is invalid afterwards, it stops without automatically deleting previously managed files. Use `kuhl uninstall` to restore tracked, unmodified files if needed.
+- **Themes:** tweak `config/themes.json` (then reinstall). Applies matching Niri ring/shadow, Waybar, Kitty, Mako, Fuzzel and optional Vicinae theme files. Note that Kuhl preserves your manual edits instead of overwriting them during palette switches.
+- **Hotkeys:** edit `config/keys.json`, then run `python3 scripts/sync_keys.py`. It updates both the Niri binding block and Markdown reference. Reinstall with `--replace-configs` if you changed your managed config intentionally.
+- **Bar:** `configs/waybar/config.jsonc` (small fixed-width floating capsule) and generated CSS in `scripts/render.py`.
+- **Terminal:** `configs/kitty/kitty.conf`. Keep backgrounds opaque to remain fast on older GPUs.
+- **Wallpaper:** `kuhl wallpaper set PATH` selects a local PNG/JPG/WebP and remembers it separately from themes. `reset` uses only the Kuhl palette color. Your image is never uploaded, modified or deleted.
 
-`kuhl uninstall` removes or restores Kuhl-managed config files **only if they have not been modified since Kuhl generated them**. It retains RPMs, any enabled COPR, Flatpaks, the GNOME fallback, installed wallpapers, and backup/state logs to avoid deleting unrelated work. See `docs/RECOVERY.md` for manual cleanup.
+Files are installed under `~/.local/share/kuhl` and managed user configs in `~/.config`. `kuhl uninstall` only removes or restores **unchanged** tracked files; modified files are left intact. Wallpapers/assets and backups remain for manual recovery. See [`docs/RECOVERY.md`](docs/RECOVERY.md).
 
-For changes to the repo, start with `bash tests/validate.sh`. On Fedora, additionally run `python3 scripts/validate_niri.py`; this validates both themes with the real Niri parser, without touching user dotfiles. CI executes the Fedora/Niri check on every push/PR. A real Fedora guest is required to test login, workspace animations, portal screen sharing, input devices, notifications, suspend, X11 apps and battery behavior. See `docs/TESTING.md`.
+## Verify and troubleshoot
 
-## Project structure
-
-```text
-Kuhl-OS/
-├── assets/                   # Original wallpapers and branding
-├── bin/kuhl                  # Theme, diagnostics, search and recovery command
-├── bootstrap.sh              # Optional GitHub source downloader
-├── config/
-│   ├── choices.json          # Terminal installer menu choices
-│   └── themes.json           # Day/Dusk color tokens
-├── configs/                  # Niri/Waybar/Kitty base configurations
-├── docs/                     # Design, testing, keybindings and recovery
-├── install.sh                # Fedora installer
-├── lib/common.sh             # Installer environment helpers
-├── main.html                 # Website, interactive launcher demo
-├── scripts/menu.py           # Curses TUI
-├── scripts/render.py         # Safe, manifest-backed config deployment
-├── scripts/validate_niri.py  # Real Niri validation before config deployment
-└── tests/validate.sh         # Static + isolated functional tests
+```bash
+bash tests/validate.sh          # syntax, manifests, dry-run, file safety tests
+python3 scripts/validate_niri.py # on Fedora with Niri: native validation of both themes
+niri validate                   # validate your active configuration
+kuhl doctor
 ```
 
-### Sources and licenses
+The repository's GitHub Actions workflow also runs the native Niri parser in a Fedora container. An actual hardware/VM login is still necessary to verify portal screen sharing, media keys, GPU acceleration, lock screen, multiple displays and Bluetooth. If Niri fails, choose GNOME from the login screen and consult [`docs/TESTING.md`](docs/TESTING.md) and [`docs/RECOVERY.md`](docs/RECOVERY.md).
 
-Niri: https://github.com/niri-wm/niri · Fedora packages: https://packages.fedoraproject.org/pkgs/niri/niri/ · Vicinae Fedora packaging: https://docs.vicinae.com/install/linux · Niri + Vicinae: https://docs.vicinae.com/quickstart/niri · Waybar: https://github.com/Alexays/Waybar
+**Known limitations:** Vicinae is third-party software with its own privacy settings and requirements; Kuhl does not control them. On very old AMD GPUs, Mesa/Wayland acceleration must be tested separately. A fixed 646-pixel Waybar capsule is intended for typical laptop/desktop displays, not very narrow screens. The Kuhl terminal guide is a floating Kitty window; visual appearance can vary slightly by installed terminal fonts.
 
-All these components are third-party software distributed under their respective licenses. Kuhl and its branding do not imply endorsement by Fedora, Red Hat, Niri, Vicinae or their maintainers. See `LICENSE` for the license of this repository's original code.
+## Licenses and independence
 
-**Vicinae theming:** Kuhl installs a `kuhl-day.toml` or `kuhl-dusk.toml` theme file into your user Vicinae theme directory when you apply that palette. Use Vicinae’s **Set Theme** command if automatic selection does not take effect on your version.
+The Kuhl project retains its existing [`LICENSE`](LICENSE). Third-party Fedora packages are installed from their respective repositories under their own licenses. The low-spec Niri reference provided by the project author was **used only as a high-level visual reference** and is not redistributed. The name Kuhl does not imply endorsement by Fedora, Red Hat, Niri, Waybar, Vicinae or their creators. No bundled AI integration, telemetry collector, hosted backend, or automatic background updater is installed by Kuhl.

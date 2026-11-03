@@ -1,18 +1,10 @@
-# Testing protocol
+# Kuhl Studio 0.7 testing plan
 
-`bash tests/validate.sh` performs shell syntax checks, Python compilation, manifest and HTML content checks, menu default serialization, and isolated config generation / safe overwrite / theme / uninstall checks. It does not need Fedora or root. If Niri is installed, it also runs the native Niri parser against both themes. GitHub Actions has a dedicated Fedora 44 Niri validation job.
+1. `bash tests/validate.sh` — static/bash/python manifest checks, generated keys check, isolated deployment, modified-file preservation and uninstall.
+2. On **Fedora with Niri installed**: `python3 scripts/validate_niri.py` — *real* Niri parser validates Day and Dusk in a temporary folder. It does not change personal configs.
+3. Before replacing an existing rice, `bash install.sh --dry-run` to review defaults. For the new rice, explicitly run `bash install.sh --replace-configs` and type `REPLACE` after reviewing the files being replaced.
+4. On the login screen, enter Niri. Verify the centered capsule, launcher Super+Space, shortcut guide Ctrl+Super+K, control center Super+D, theme picker Super+Shift+T, Super+Shift+P power choices, keyboard actions, and wallpaper set/reset.
+5. Test safe recovery: GNOME login works, `kuhl doctor` reports all expected binaries, and `kuhl uninstall` restores unchanged tracked configs.
+6. On a real AMD/NVIDIA GPU, test GPU acceleration, suspend/lock/unlock, screenshots, dual displays, network and Bluetooth tray, volume/media keys and screen sharing with XDG portals. This cannot be simulated by the static tests.
 
-**On a clean Fedora 44/45 Workstation guest:**
-
-Before testing the graphical session, run `python3 scripts/validate_niri.py` to verify both Day and Dusk in isolated temporary directories using Fedora's own Niri binary. No user configs are modified.
-
-1. Save a VM snapshot; confirm GNOME can log in and that `bash install.sh --dry-run` changes nothing.
-2. Run the TUI installer with defaults. Sign out and log in to Niri from GDM.
-3. Verify Super+Space opens Fuzzel, Kitty/Thunar launch, Waybar's Niri workspaces update and mouse/touchpad controls work.
-4. Test `kuhl theme day`, `kuhl theme dusk` and wallpaper choices while in Niri; check Waybar reload and Mako styling.
-5. Test PipeWire volume, NetworkManager, Bluetooth (if present), X11 apps through Xwayland-satellite, screen sharing via xdg-desktop-portal-gnome, notifications and suspend/lock.
-6. Enable Vicinae in an interactive run, explicitly consent to COPR, sign back into Niri and retest Super+Space and file search.
-7. Test idempotence: rerun installer, manually edit a Kuhl config, rerun and ensure edit is preserved; then test explicit `--replace-configs` backups.
-8. Test `kuhl uninstall`, verify managed unmodified files are removed/restored and personal files unchanged; confirm GNOME still works.
-
-The build environment cannot execute these real-GUI tests. Do not label a build “stable” solely because CI passes.
+A working screenshot of the desktop is **not** bundled; the website preview is an illustration of intended layout. Do not represent it as live proof until personally tested.

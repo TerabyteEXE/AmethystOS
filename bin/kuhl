@@ -1,125 +1,175 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED - Kuhl OS 0.6.1 management command
+# KUHL-MANAGED — original Kuhl OS desktop control CLI
 set -Eeuo pipefail
 ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/kuhl"
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/kuhl"
 THEME_FILE="$STATE/theme"
+SELF="$HOME/.local/bin/kuhl"
+mkdir -p "$STATE"
 command_name="${1:-help}"
 [[ $# -eq 0 ]] || shift
+in_niri() { [[ "${XDG_CURRENT_DESKTOP:-}" == *niri* || "${XDG_CURRENT_DESKTOP:-}" == *Niri* || -n "${NIRI_SOCKET:-}" ]]; }
+
+show_ui() {
+  local name="$1"; shift
+  [[ -r "$ROOT/kuhl_ui.py" ]] || { echo 'Kuhl interface not installed.' >&2; exit 1; }
+  if command -v kitty >/dev/null 2>&1 && [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
+    # Separate Kuhl panel window so it floats automatically under Niri.
+    kitty --class "kuhl-${name}" --title "Kuhl OS / ${name}" \
+      -o font_size=11.5 -o initial_window_width=920 -o initial_window_height=650 \
+      -e python3 "$ROOT/kuhl_ui.py" "$name" "$@"
+  else
+    python3 "$ROOT/kuhl_ui.py" "$name" "$@"
+  fi
+}
+
+apply_wallpaper() {
+  if ! in_niri; then echo 'Wallpaper choice saved. Apply when logged into Niri.'; return 0; fi
+  command -v swaybg >/dev/null 2>&1 || { echo 'swaybg is not installed.' >&2; return 1; }
+  local choice img bg pid oldcmd
+  choice="$(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
+  if [[ "$choice" == custom ]]; then
+    img="$(cat "$STATE/wallpaper-custom" 2>/dev/null || true)"
+  else
+    case "$choice" in
+      day) img="$ROOT/wallpapers/kuhl-day.png";;
+      dusk) img="$ROOT/wallpapers/kuhl-dusk.png";;
+      default) img="$ROOT/wallpapers/kuhl-default.png";;
+      auto|solid) img='';;
+      *) echo 'Unrecognized wallpaper setting; using solid background.' >&2; img='';;
+    esac
+  fi
+  if [[ -n "$img" && ! -r "$img" ]]; then
+    echo "Cannot read wallpaper: $img. Using solid background." >&2
+    img=''
+  fi
+  # Stop only the background process Kuhl itself started.
+  if [[ -r "$STATE/swaybg.pid" ]]; then
+    pid="$(cat "$STATE/swaybg.pid")"
+    if [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]]; then
+      oldcmd="$(tr '\0' ' ' < "/proc/$pid/cmdline")"
+      if [[ "$oldcmd" == swaybg\ * || "$oldcmd" == */swaybg\ * ]]; then
+        kill "$pid" 2>/dev/null || true
+      fi
+    fi
+  fi
+  if [[ -n "$img" ]]; then
+    swaybg -i "$img" -m fill >/dev/null 2>&1 &
+  else
+    local color
+    color='#2c2c2c'
+    [[ "$(cat "$THEME_FILE" 2>/dev/null || echo dusk)" != day ]] || color='#eae4d8'
+    swaybg -c "$color" >/dev/null 2>&1 &
+  fi
+  printf '%s\n' "$!" > "$STATE/swaybg.pid"
+}
+
 case "$command_name" in
   theme)
     [[ $# -eq 1 && ( "$1" == day || "$1" == dusk ) ]] || { echo 'Usage: kuhl theme day|dusk' >&2; exit 2; }
-    [[ -f "$ROOT/render.py" ]] || { echo 'Kuhl desktop is not installed.' >&2; exit 1; }
+    [[ -r "$ROOT/render.py" ]] || { echo 'Kuhl desktop is not installed.' >&2; exit 1; }
     python3 "$ROOT/render.py" theme --theme "$1"
-    if [[ "${XDG_CURRENT_DESKTOP:-}" == *niri* || -n "${NIRI_SOCKET:-}" ]]; then
+    if in_niri; then
       pkill -USR2 -u "$(id -u)" -x waybar 2>/dev/null || true
       if command -v makoctl >/dev/null 2>&1; then makoctl reload >/dev/null 2>&1 || true; fi
-      "$HOME/.local/bin/kuhl" wallpaper apply || true
-      if command -v vicinae >/dev/null 2>&1; then
-        vicinae "vicinae://theme/set/kuhl-${1}" >/dev/null 2>&1 || true
-      fi
+      "$SELF" wallpaper apply || true
+      # Vicinae may need its built-in theme selector on some versions.
     fi
-    printf 'Kuhl %s applied (existing user-edited configs are left untouched).\n' "$1"
+    printf 'Kuhl %s palette activated (edited personal configs are preserved).\n' "$1"
     ;;
   launcher)
     if command -v vicinae >/dev/null 2>&1; then
-      vicinae toggle || fuzzel
+      vicinae toggle || exec fuzzel
     else
       exec fuzzel
     fi
     ;;
   wallpaper)
-    [[ $# -eq 1 ]] || { echo 'Usage: kuhl wallpaper apply|default|day|dusk' >&2; exit 2; }
-    case "$1" in
-      default|day|dusk) printf '%s\n' "$1" > "$STATE/wallpaper-choice"; set -- apply ;;
-      apply) ;;
-      *) echo 'Usage: kuhl wallpaper apply|default|day|dusk' >&2; exit 2;;
+    op="${1:-help}"; [[ $# -eq 0 ]] || shift
+    case "$op" in
+      set)
+        [[ $# -eq 1 ]] || { echo 'Usage: kuhl wallpaper set /full/path/to/image.png' >&2; exit 2; }
+        [[ -f "$1" && -r "$1" ]] || { echo "Wallpaper not found: $1" >&2; exit 1; }
+        case "${1,,}" in *.png|*.jpg|*.jpeg|*.webp) ;; *) echo 'Use a PNG, JPG or WebP wallpaper.' >&2; exit 2;; esac
+        realpath -e -- "$1" > "$STATE/wallpaper-custom"
+        printf 'custom\n' > "$STATE/wallpaper-choice"
+        apply_wallpaper
+        ;;
+      reset|auto|solid) printf 'auto\n' > "$STATE/wallpaper-choice"; apply_wallpaper;;
+      day|dusk|default) printf '%s\n' "$op" > "$STATE/wallpaper-choice"; apply_wallpaper;;
+      apply) apply_wallpaper;;
+      *) echo 'Usage: kuhl wallpaper set PATH|reset|day|dusk|default|apply' >&2; exit 2;;
     esac
-    [[ "${XDG_CURRENT_DESKTOP:-}" == *niri* || -n "${NIRI_SOCKET:-}" ]] || { echo 'Wallpaper choice saved. Apply while logged into Niri.'; exit 0; }
-    choice="$(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
-    if [[ "$choice" == auto ]]; then choice="$(cat "$THEME_FILE" 2>/dev/null || echo dusk)"; fi
-    case "$choice" in
-      day) img="$ROOT/wallpapers/kuhl-day.png" ;;
-      dusk) img="$ROOT/wallpapers/kuhl-default.png" ;;
-      default) img="$ROOT/wallpapers/kuhl-default.png" ;;
-      *) echo 'Invalid wallpaper setting' >&2; exit 1;;
-    esac
-    [[ -r "$img" ]] || { echo "Missing wallpaper: $img" >&2; exit 1; }
-    if [[ -f "$STATE/swaybg.pid" ]]; then
-      pid="$(cat "$STATE/swaybg.pid")"
-      if [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] &&
-         tr '\0' ' ' < "/proc/$pid/cmdline" | grep -Fq "swaybg -i $ROOT/wallpapers/"; then
-        kill "$pid" 2>/dev/null || true
-      fi
-    fi
-    swaybg -i "$img" -m fill >/dev/null 2>&1 &
-    echo "$!" > "$STATE/swaybg.pid"
     ;;
   keys)
-    cat <<'TXT'
-KUHL OS · KEYBOARD
-  Super + Space     Search (Vicinae if installed, otherwise Fuzzel)
-  Super + Enter/T   Terminal       Super + E         Files
-  Super + H / L     Focus left/right column
-  Super + J / K     Focus down/up window
-  Super + Ctrl + H/J/K/L   Move columns or windows
-  Super + 1..5      Switch workspace
-  Super + Shift + 1..5   Move current column to workspace
-  Super + F         Maximize column
-  Super + Shift + F Fullscreen window
-  Super + R         Change column width
-  Super + V         Toggle floating
-  Super + Shift + Q Close window
-  Super + Shift + L Lock
-  Super + Shift + E Exit Niri (with confirmation)
-  Super + Shift + / Show Niri's shortcut overlay
-  Print             Screenshot
-TXT
+    if [[ "${1:-}" == --ui ]]; then
+      shift
+      show_ui keys "$@"
+    else
+      python3 - "$ROOT/keys.json" <<'PY'
+import json,sys
+from pathlib import Path
+p=Path(sys.argv[1]);d=json.loads(p.read_text())
+for section in d['sections']:
+ print(f'\n  {section.upper()}')
+ for row in [r for r in d['bindings'] if r['section']==section]:
+  print(f'  {row["show"]:<25}  {row["title"]}')
+print('\n  Ctrl + Super + K  ·  Open searchable guide in Niri')
+PY
+    fi
+    ;;
+  menu)
+    [[ "${1:-}" == --ui ]] && shift
+    [[ $# -eq 0 || ( $# -eq 2 && "$1" == --page ) ]] || { echo 'Usage: kuhl menu [--ui] [--page main|themes|power]' >&2; exit 2; }
+    show_ui control menu "$@"
     ;;
   status)
-    echo 'Kuhl OS 0.6.1 — Fedora + Niri desktop edition'
+    echo 'Kuhl OS 0.7 · Studio Edition · Fedora + Niri'
     echo "Theme: $(cat "$THEME_FILE" 2>/dev/null || echo not-installed)"
     echo "Desktop: ${XDG_CURRENT_DESKTOP:-unknown}"
     echo "Launcher: $(command -v vicinae >/dev/null && echo Vicinae || echo 'Fuzzel fallback')"
-    echo "Configs: ${XDG_CONFIG_HOME:-$HOME/.config}/{niri,waybar,kitty,mako}"
+    echo "Wallpaper: $(cat "$STATE/wallpaper-choice" 2>/dev/null || echo auto)"
     [[ ! -f "$ROOT/render.py" ]] || python3 "$ROOT/render.py" status
     ;;
   doctor)
     problems=0
-    [[ -r /etc/fedora-release ]] && echo '[ok] Fedora detected' || { echo '[warn] Not Fedora'; problems=$((problems+1)); }
-    for cmd in niri waybar fuzzel kitty mako swaybg swaylock swayidle python3; do
-      command -v "$cmd" >/dev/null 2>&1 && echo "[ok] $cmd" || { echo "[warn] Missing $cmd"; problems=$((problems+1)); }
+    [[ -r /etc/fedora-release ]] && echo '[ok] Fedora found' || { echo '[warn] Not running Fedora'; problems=$((problems+1)); }
+    for c in niri waybar fuzzel kitty mako swaybg swaylock swayidle python3 thunar; do
+      command -v "$c" >/dev/null 2>&1 && echo "[ok] $c" || { echo "[warn] Missing $c"; problems=$((problems+1)); }
     done
     if command -v niri >/dev/null 2>&1; then
-      niri validate && echo '[ok] Niri KDL validates' || { echo '[warn] Niri configuration failed validation'; problems=$((problems+1)); }
+      niri validate && echo '[ok] Niri configuration valid' || { echo '[warn] Niri validation failed'; problems=$((problems+1)); }
     fi
-    [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]] || { echo '[warn] Niri user config not installed'; problems=$((problems+1)); }
-    if command -v vicinae >/dev/null; then echo '[ok] Optional Vicinae installed'; else echo '[info] Fuzzel is used for search'; fi
-    [[ -n "${NIRI_SOCKET:-}" ]] && echo '[ok] Running Niri session' || echo '[info] Log into Niri from your login screen to test the actual desktop'
-    printf '%s check(s) require attention.\n' "$problems"
-    (( problems == 0 ))
+    [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/niri/config.kdl" ]] || { echo '[warn] Niri config absent'; problems=$((problems+1)); }
+    [[ -r "$ROOT/keys.json" ]] && echo '[ok] Searchable Kuhl keyboard reference present' || { echo '[warn] Kuhl keys missing'; problems=$((problems+1)); }
+    [[ -n "${NIRI_SOCKET:-}" ]] && echo '[ok] Running Niri session' || echo '[info] Log into Niri to test the session'
+    printf '%s concern(s) detected.\n' "$problems"
+    (( problems==0 ))
     ;;
   uninstall)
     [[ $# -eq 0 ]] || { echo 'Usage: kuhl uninstall' >&2; exit 2; }
-    echo 'Removing only Kuhl-tracked desktop configs (edited files are preserved)...'
+    echo 'Restoring only unchanged Kuhl-managed configuration files...'
     [[ ! -r "$ROOT/render.py" ]] || python3 "$ROOT/render.py" uninstall || true
-    rm -f "$HOME/.local/bin/kuhl"
-    echo "Kuhl management command removed. Fedora packages, third-party repos, GNOME and previous GNOME Kuhl settings were NOT removed."
-    echo "Kuhl assets and backups remain in $ROOT and $STATE for safe inspection."
+    rm -f -- "$SELF"
+    echo 'Kuhl command removed. Fedora, GNOME, RPMs, wallpaper assets and backups remain.'
     ;;
   help|-h|--help)
-    cat <<'TXT'
-KUHL OS 0.6.1 · Fedora + Niri
-  kuhl theme day|dusk        Apply matching Waybar, Niri, Kitty and Mako palette
-  kuhl wallpaper day|dusk|default|apply
-  kuhl launcher               Vicinae search, or Fuzzel fallback
-  kuhl keys                   Show keyboard cheat sheet
-  kuhl status                 Show managed config state
-  kuhl doctor                 Check installed desktop and configuration
-  kuhl uninstall              Remove/restore only unmodified Kuhl configs
+    cat <<'HELP'
+KUHL OS · STUDIO EDITION 0.7
+  kuhl menu                         Keyboard-operated desktop control center
+  kuhl keys --ui                    Searchable shortcut atlas · Ctrl+Super+K
+  kuhl keys                         Print every shortcut
+  kuhl launcher                     Vicinae / Fuzzel search · Super+Space
+  kuhl theme day|dusk               Apply the palette across components
+  kuhl wallpaper set /path/image   Bring your own wallpaper
+  kuhl wallpaper reset             Return to a solid palette background
+  kuhl wallpaper day|dusk|default  Use previous Kuhl images (optional)
+  kuhl doctor                       Diagnose installed desktop
+  kuhl status                       Managed-file status
+  kuhl uninstall                    Restore unchanged managed dotfiles
 
-  Re-run the local install.sh to update. No background auto-update, AI or telemetry.
-TXT
+No background updater or bundled AI. GNOME is kept for recovery.
+HELP
     ;;
-  *) echo "Unknown command: $command_name (run: kuhl help)" >&2; exit 2 ;;
+  *) echo "Unknown command: $command_name (run: kuhl help)" >&2; exit 2;;
 esac

@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "sections": [
+    "Start here",
+    "Windows",
+    "Workspaces",
+    "System & media"
+  ],
+  "bindings": [
+    {
+      "section": "Start here",
+      "key": "Mod+Space",
+      "show": "Super + Space",
+      "title": "Search apps and files",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl launcher\";",
+      "repeat": false
+    },
+    {
+      "section": "Start here",
+      "key": "Ctrl+Super+K",
+      "show": "Ctrl + Super + K",
+      "title": "All keyboard shortcuts",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl keys --ui\";",
+      "repeat": false
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+D",
+      "show": "Super + D",
+      "title": "Kuhl control center",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl menu --ui\";",
+      "repeat": false
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+Return",
+      "show": "Super + Enter",
+      "title": "Open terminal",
+      "action": "spawn \"kitty\";"
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+T",
+      "show": "Super + T",
+      "title": "Open terminal (alternative)",
+      "action": "spawn \"kitty\";"
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+E",
+      "show": "Super + E",
+      "title": "Open Files",
+      "action": "spawn \"thunar\";"
+    },
+    {
+      "section": "Start here",
+      "key": "Mod+Shift+T",
+      "show": "Super + Shift + T",
+      "title": "Choose Day / Dusk",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl menu --ui --page themes\";"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+H",
+      "show": "Super + H",
+      "title": "Focus column left",
+      "action": "focus-column-left;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+L",
+      "show": "Super + L",
+      "title": "Focus column right",
+      "action": "focus-column-right;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+J",
+      "show": "Super + J",
+      "title": "Focus window below",
+      "action": "focus-window-down;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+K",
+      "show": "Super + K",
+      "title": "Focus window above",
+      "action": "focus-window-up;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+H",
+      "show": "Super + Shift + H",
+      "title": "Move column left",
+      "action": "move-column-left;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+L",
+      "show": "Super + Shift + L",
+      "title": "Move column right",
+      "action": "move-column-right;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+J",
+      "show": "Super + Shift + J",
+      "title": "Move window down",
+      "action": "move-window-down;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+K",
+      "show": "Super + Shift + K",
+      "title": "Move window up",
+      "action": "move-window-up;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Ctrl+H",
+      "show": "Super + Ctrl + H",
+      "title": "Move column left (legacy)",
+      "action": "move-column-left;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Ctrl+L",
+      "show": "Super + Ctrl + L",
+      "title": "Move column right (legacy)",
+      "action": "move-column-right;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Ctrl+J",
+      "show": "Super + Ctrl + J",
+      "title": "Move window down (legacy)",
+      "action": "move-window-down;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+R",
+      "show": "Super + R",
+      "title": "Cycle column width",
+      "action": "switch-preset-column-width;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+R",
+      "show": "Super + Shift + R",
+      "title": "Cycle window height",
+      "action": "switch-preset-window-height;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+F",
+      "show": "Super + F",
+      "title": "Maximize column",
+      "action": "maximize-column;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+F",
+      "show": "Super + Shift + F",
+      "title": "Toggle fullscreen",
+      "action": "fullscreen-window;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+V",
+      "show": "Super + V",
+      "title": "Toggle floating",
+      "action": "toggle-window-floating;"
+    },
+    {
+      "section": "Windows",
+      "key": "Mod+Shift+Q",
+      "show": "Super + Shift + Q",
+      "title": "Close focused window",
+      "action": "close-window;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+1",
+      "show": "Super + 1",
+      "title": "Go to workspace 1",
+      "action": "focus-workspace 1;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+2",
+      "show": "Super + 2",
+      "title": "Go to workspace 2",
+      "action": "focus-workspace 2;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+3",
+      "show": "Super + 3",
+      "title": "Go to workspace 3",
+      "action": "focus-workspace 3;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+4",
+      "show": "Super + 4",
+      "title": "Go to workspace 4",
+      "action": "focus-workspace 4;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+5",
+      "show": "Super + 5",
+      "title": "Go to workspace 5",
+      "action": "focus-workspace 5;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+Shift+1",
+      "show": "Super + Shift + 1",
+      "title": "Move column to workspace 1",
+      "action": "move-column-to-workspace 1;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+Shift+2",
+      "show": "Super + Shift + 2",
+      "title": "Move column to workspace 2",
+      "action": "move-column-to-workspace 2;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+Shift+3",
+      "show": "Super + Shift + 3",
+      "title": "Move column to workspace 3",
+      "action": "move-column-to-workspace 3;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+Shift+4",
+      "show": "Super + Shift + 4",
+      "title": "Move column to workspace 4",
+      "action": "move-column-to-workspace 4;"
+    },
+    {
+      "section": "Workspaces",
+      "key": "Mod+Shift+5",
+      "show": "Super + Shift + 5",
+      "title": "Move column to workspace 5",
+      "action": "move-column-to-workspace 5;"
+    },
+    {
+      "section": "System & media",
+      "key": "Mod+Shift+P",
+      "show": "Super + Shift + P",
+      "title": "Power and session menu",
+      "action": "spawn \"sh\" \"-c\" \"$HOME/.local/bin/kuhl menu --ui --page power\";",
+      "repeat": false
+    },
+    {
+      "section": "System & media",
+      "key": "Mod+Alt+L",
+      "show": "Super + Alt + L",
+      "title": "Lock screen",
+      "action": "spawn \"swaylock\" \"-f\" \"-c\" \"1c1b1a\";"
+    },
+    {
+      "section": "System & media",
+      "key": "Mod+Shift+E",
+      "show": "Super + Shift + E",
+      "title": "Exit Niri (with confirmation)",
+      "action": "quit;"
+    },
+    {
+      "section": "System & media",
+      "key": "Mod+Shift+Slash",
+      "show": "Super + Shift + /",
+      "title": "Native Niri help",
+      "action": "show-hotkey-overlay;"
+    },
+    {
+      "section": "System & media",
+      "key": "Print",
+      "show": "Print Screen",
+      "title": "Interactive screenshot",
+      "action": "screenshot;"
+    },
+    {
+      "section": "System & media",
+      "key": "Ctrl+Print",
+      "show": "Ctrl + Print",
+      "title": "Screenshot whole monitor",
+      "action": "screenshot-screen;"
+    },
+    {
+      "section": "System & media",
+      "key": "XF86AudioRaiseVolume",
+      "show": "Volume +",
+      "title": "Volume up",
+      "action": "spawn \"wpctl\" \"set-volume\" \"@DEFAULT_AUDIO_SINK@\" \"5%+\";",
+      "locked": true
+    },
+    {
+      "section": "System & media",
+      "key": "XF86AudioLowerVolume",
+      "show": "Volume −",
+      "title": "Volume down",
+      "action": "spawn \"wpctl\" \"set-volume\" \"@DEFAULT_AUDIO_SINK@\" \"5%-\";",
+      "locked": true
+    },
+    {
+      "section": "System & media",
+      "key": "XF86AudioMute",
+      "show": "Mute",
+      "title": "Toggle mute",
+      "action": "spawn \"wpctl\" \"set-mute\" \"@DEFAULT_AUDIO_SINK@\" \"toggle\";",
+      "locked": true
+    },
+    {
+      "section": "System & media",
+      "key": "XF86MonBrightnessUp",
+      "show": "Brightness +",
+      "title": "Screen brighter",
+      "action": "spawn \"brightnessctl\" \"set\" \"5%+\";"
+    },
+    {
+      "section": "System & media",
+      "key": "XF86MonBrightnessDown",
+      "show": "Brightness −",
+      "title": "Screen dimmer",
+      "action": "spawn \"brightnessctl\" \"set\" \"5%-\";"
+    },
+    {
+      "section": "System & media",
+      "key": "XF86AudioPlay",
+      "show": "Play / Pause",
+      "title": "Media playback",
+      "action": "spawn \"playerctl\" \"play-pause\";"
+    }
+  ]
+}

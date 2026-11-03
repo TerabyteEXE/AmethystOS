@@ -90,17 +90,20 @@ def put(path: Path, content: bytes, m: dict, *, replace=False) -> bool:
 
 
 def template_files(source: Path):
-    # Desktop entries make theme switching discoverable in either Fuzzel or Vicinae.
-    # The quoted executable handles home directory names containing spaces.
+    """Original desktop templates plus launcher entries for discoverable Kuhl tools."""
     binary = str(HOME / '.local/bin/kuhl').replace('\\', '\\\\').replace('"', '\\"')
     launchers = {}
-    for theme in ('day', 'dusk'):
-        label = theme.title()
-        content = (f"# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n"
-                   f"Name=Kuhl {label}\nComment=Switch to Kuhl {label} appearance\n"
-                   f'Exec="{binary}" theme {theme}\n'
-                   f"Icon=preferences-desktop-theme\nTerminal=false\nCategories=Settings;\n")
-        launchers[HOME / '.local/share/applications' / f'kuhl-{theme}.desktop'] = content.encode()
+    for name, title, comment, arguments, icon in (
+        ('day', 'Kuhl Day', 'Use the Kuhl Day palette', 'theme day', 'preferences-desktop-theme'),
+        ('dusk', 'Kuhl Dusk', 'Use the Kuhl Dusk palette', 'theme dusk', 'preferences-desktop-theme'),
+        ('control', 'Kuhl Control Center', 'Themes, wallpaper, system and settings', 'menu --ui', 'preferences-system'),
+        ('keys', 'Kuhl Keyboard Guide', 'Search all Kuhl shortcuts', 'keys --ui', 'input-keyboard'),
+    ):
+        content = (f'# KUHL-MANAGED\n[Desktop Entry]\nType=Application\n'
+                   f'Name={title}\nComment={comment}\n'
+                   f'Exec="{binary}" {arguments}\n'
+                   f'Icon={icon}\nTerminal=false\nCategories=Settings;\n')
+        launchers[HOME / '.local/share/applications' / f'kuhl-{name}.desktop'] = content.encode()
     return {
         **launchers,
         CONFIG / 'niri/config.kdl': (source / 'niri/config.kdl').read_bytes(),
@@ -117,30 +120,36 @@ def theme_files(theme: str):
     niri = f'''// KUHL-MANAGED — automatically generated Kuhl {theme} palette
 layout {{
   focus-ring {{ active-color "{p['accent']}"; inactive-color "{p['border']}"; }}
-  shadow {{ on; softness 26; spread 3; offset x=0 y=6; color "{p['shadow']}"; }}
+  shadow {{ on; softness 20; spread 2; offset x=0 y=5; color "{p['shadow']}"; }}
 }}
 overview {{ backdrop-color "{p['bg']}"; }}
 '''
-    css = f'''/* KUHL-MANAGED — generated {theme} palette */
-* {{ border: none; border-radius: 0; font-family: "Noto Sans", sans-serif; font-size: 12px; min-height: 0; }}
-window#waybar {{ background: transparent; color: {p['fg']}; }}
-.modules-left, .modules-center, .modules-right {{ margin: 0 5px; }}
-#custom-kuhl, #workspaces, #window, #clock, #pulseaudio, #network, #battery, #tray, #custom-lock {{
-  background: {p['surface']}; color: {p['fg']}; border: 1px solid {p['border']};
-  border-radius: 14px; padding: 5px 14px; margin: 0 3px;
+    css = f'''/* KUHL-MANAGED — original Kuhl Studio {theme} palette */
+* {{ border: 0; border-radius: 0; font-family: "JetBrains Mono", monospace; font-size: 11px; min-height: 0; }}
+window#waybar {{
+  background: {p['surface']}; color: {p['fg']};
+  border: 1px solid {p['border']}; border-radius: 22px;
 }}
-#custom-kuhl {{ background: {p['accent']}; color: {p['bg']}; font-weight: 800; }}
-#workspaces {{ padding: 3px 7px; }}
-#workspaces button {{ padding: 2px 10px; margin: 0 2px; border-radius: 9px; color: {p['muted']}; }}
-#workspaces button.active {{ background: {p['surface2']}; color: {p['accent']}; }}
-#workspaces button:hover {{ background: {p['surface2']}; box-shadow: none; }}
-#window {{ color: {p['muted']}; }}
-#clock {{ color: {p['accent']}; font-weight: 700; }}
-#tray {{ padding: 5px 10px; }}
-#custom-lock {{ color: {p['muted']}; }}
-#battery.warning, #battery.critical {{ color: #d9827c; }}
+.modules-center {{ margin: 0 7px; }}
+#custom-kuhl, #workspaces, #clock, #custom-theme, #pulseaudio,
+#network, #battery, #tray, #custom-keys, #custom-power {{
+  color: {p['muted']}; padding: 0 6px; margin: 0 1px;
+}}
+#custom-kuhl {{ font-size: 18px; font-weight: 900; padding: 0 8px; color: {p['accent']}; }}
+#clock {{ color: {p['fg']}; font-weight: 700; padding: 0 8px; }}
+#workspaces {{ padding: 0 0 0 3px; }}
+#workspaces button {{ padding: 0 5px; margin: 4px 1px; color: {p['muted']}; border-radius: 8px; }}
+#workspaces button.active {{ background: {p['surface2']}; color: {p['accent']}; font-weight: 800; }}
+#workspaces button:hover {{ background: {p['surface2']}; color: {p['fg']}; box-shadow: none; }}
+#custom-theme {{ color: {p['accent']}; font-size: 17px; }}
+#tray {{ padding: 0 5px; }}
+#custom-keys {{ color: {p['accent']}; font-weight: 700; }}
+#custom-power {{ color: #e5a69e; padding-right: 12px; font-size: 15px; }}
+#battery.warning {{ color: {p['accent']}; }}
+#battery.critical {{ color: #e5a69e; }}
+tooltip {{ background-color: {p['surface']}; color: {p['fg']}; border: 1px solid {p['border']}; border-radius: 10px; }}
 '''
-    kitty = f'''# KUHL-MANAGED — generated {theme} palette
+    kitty = f'''# KUHL-MANAGED — generated {theme} terminal palette
 foreground {p['terminal_fg']}
 background {p['terminal_bg']}
 selection_foreground {p['terminal_bg']}
@@ -148,34 +157,33 @@ selection_background {p['accent']}
 cursor {p['accent']}
 cursor_text_color {p['terminal_bg']}
 color0 {p['terminal_bg']}
-color1 #d98b85
+color1 #c77e7e
 color2 {p['accent2']}
 color3 {p['accent']}
-color4 #93b5c3
-color5 #c4a3bd
-color6 #9dc8ba
+color4 #9aaebd
+color5 #c2a7b8
+color6 #a0b8b4
 color7 {p['terminal_fg']}
 color8 {p['muted']}
 color9 #e5a09b
 color10 {p['accent2']}
 color11 {p['accent']}
-color12 #b7d3de
+color12 #c2d6df
 color13 #d3b8d1
 color14 #afd8c9
 color15 {p['fg']}
 '''
-    # Fedora-packaged Fuzzel is Kuhl's dependable, themed search fallback.
     rgba = lambda color: color.lstrip('#') + 'ff'
-    fuzzel = f'''# KUHL-MANAGED — generated {theme} palette
+    fuzzel = f'''# KUHL-MANAGED — generated {theme} launcher palette
 [main]
 font=JetBrains Mono:size=12
-prompt=  Search >
+prompt=  Search  ›
 icon-theme=Papirus
 lines=8
 width=48
 horizontal-pad=22
-vertical-pad=14
-inner-pad=8
+vertical-pad=16
+inner-pad=9
 layer=overlay
 [colors]
 background={rgba(p['surface'])}
@@ -184,40 +192,34 @@ match={rgba(p['accent'])}
 selection={rgba(p['surface2'])}
 selection-text={rgba(p['fg'])}
 selection-match={rgba(p['accent'])}
-border={rgba(p['accent'])}
+border={rgba(p['border'])}
 [border]
-width=2
-radius=15
-selection-radius=9
+width=1
+radius=16
+selection-radius=8
 '''
-    mako = f'''# KUHL-MANAGED — generated {theme} palette
-font=Noto Sans 11
+    mako = f'''# KUHL-MANAGED — generated {theme} notification palette
+font=JetBrains Mono 10
 background-color={p['surface']}
 text-color={p['fg']}
-border-color={p['accent']}
-border-size=2
-border-radius=12
-padding=15
+border-color={p['border']}
+border-size=1
+border-radius=13
+padding=14
 margin=12
-default-timeout=5500
+default-timeout=5000
 icons=1
 '''
-    # Optional Vicinae can reuse the same palette; files are not activated by default.
+    # Optional Vicinae stays opt-in. Kuhl does not configure its telemetry policy.
     vicinae = '\n'.join([
-        f'# KUHL-MANAGED — {theme} Vicinae theme',
-        '[meta]',
-        'version = 1',
-        f'name = "Kuhl {theme.title()}"',
-        'description = "Warm Kuhl OS search palette"',
+        f'# KUHL-MANAGED — {theme} Vicinae theme', '[meta]', 'version = 1',
+        f'name = "Kuhl {theme.title()}"', 'description = "Kuhl Studio palette"',
         f'variant = "{"dark" if theme == "dusk" else "light"}"',
         f'inherits = "vicinae-{"dark" if theme == "dusk" else "light"}"',
         '[colors.core]',
-        f'background = "{p["surface"]}"',
-        f'foreground = "{p["fg"]}"',
+        f'background = "{p["surface"]}"', f'foreground = "{p["fg"]}"',
         f'secondary_background = "{p["bg"]}"',
-        f'border = "{p["border"]}"',
-        f'accent = "{p["accent"]}"',
-        ''
+        f'border = "{p["border"]}"', f'accent = "{p["accent"]}"', ''
     ])
     return {
         CONFIG / 'niri/kuhl-theme.kdl': niri.encode(),

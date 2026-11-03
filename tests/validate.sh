@@ -3,7 +3,7 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 for f in bootstrap.sh install.sh uninstall.sh bin/kuhl lib/common.sh tests/validate.sh; do bash -n "$f"; done
-python3 -m py_compile scripts/menu.py scripts/render.py scripts/validate_niri.py
+python3 -m py_compile scripts/menu.py scripts/render.py scripts/validate_niri.py scripts/sync_keys.py scripts/kuhl_ui.py scripts/progress.py
 python3 - <<'PY'
 import json,re,struct
 from pathlib import Path
@@ -21,15 +21,23 @@ for p in Path('assets/wallpapers').glob('*.png'):
 conf=Path('configs/niri/config.kdl').read_text()
 assert 'include "kuhl-theme.kdl"' in conf and 'Mod+Space repeat=false' in conf
 assert 'Mod+Shift+E { quit;' in conf
+assert 'Ctrl+Super+K repeat=false' in conf
+assert 'Mod+Shift+K { move-window-up; }' in conf
+assert 'window-rule {' in conf and 'kuhl-keys' in conf
 assert 'keyboard {\n        numlock\n    }' in conf
 assert 'keyboard { numlock }' not in conf
 site=Path('main.html').read_text()
-assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','bash install.sh','Kuhl OS'])
+assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','bash install.sh','Kuhl OS','Ctrl + Super + K','keySearch','copyInstall'])
 assert 'kuhl.example' not in site and 'coming soon' not in site.lower()
 assert 'ctrl+space' not in site.lower()
 assert 'https://github.com/TerabyteEXE/Kuhl-OS.git' in site
+assert Path('config/keys.json').is_file()
+assert 'default-wallpaper' not in conf
 print('[test] Bundled config, site and manifest: OK')
 PY
+python3 scripts/sync_keys.py --check
+python3 scripts/progress.py 6 'Finished' | grep -q '100%'
+echo '[test] Keyboard manifest, generated documentation and progress UI: OK'
 OUT="$(mktemp)"
 python3 scripts/menu.py --config config/choices.json --output "$OUT" --defaults
 python3 - "$OUT" <<'PY'
@@ -52,6 +60,8 @@ python3 scripts/render.py install --source configs --theme dusk >/dev/null
 [[ -f "$XDG_CONFIG_HOME/waybar/style.css" ]]
 [[ -f "$XDG_CONFIG_HOME/fuzzel/fuzzel.ini" ]]
 [[ -f "$HOME/.local/share/applications/kuhl-day.desktop" ]]
+[[ -f "$HOME/.local/share/applications/kuhl-control.desktop" ]]
+[[ -f "$HOME/.local/share/applications/kuhl-keys.desktop" ]]
 [[ -f "$XDG_DATA_HOME/vicinae/themes/kuhl-dusk.toml" ]]
 # Explicit replacement saves original, and uninstall restores it.
 python3 scripts/render.py install --source configs --theme dusk --replace-configs >/dev/null
@@ -67,6 +77,15 @@ python3 scripts/render.py uninstall >/dev/null || true
 grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
 [[ ! -e "$XDG_CONFIG_HOME/kitty/colors.conf" ]]
 echo '[test] Config protection, theme, backup restore, uninstall: OK'
+"$ROOT/bin/kuhl" wallpaper set "$ROOT/assets/wallpapers/kuhl-day.png" >/dev/null
+[[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == custom ]]
+[[ -r "$XDG_STATE_HOME/kuhl/wallpaper-custom" ]]
+"$ROOT/bin/kuhl" wallpaper reset >/dev/null
+[[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == auto ]]
+# The searchable atlas is also available as plain text without a GUI.
+install -m 644 config/keys.json "$XDG_DATA_HOME/kuhl/keys.json"
+"$ROOT/bin/kuhl" keys | grep -q 'Ctrl + Super + K'
+echo '[test] Custom wallpaper choice, reset, and CLI keyboard atlas: OK'
 if command -v niri >/dev/null 2>&1; then
   python3 scripts/validate_niri.py
 else
