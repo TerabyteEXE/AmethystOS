@@ -1,3 +1,0 @@
-@import "kuhl.rasi"
-window { width: 640px; }
-entry { placeholder: "Choose a Kuhl theme"; }
