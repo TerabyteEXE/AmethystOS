@@ -12,6 +12,7 @@ ids=[i['id'] for i in choices]
 assert len(ids)==len(set(ids))
 assert {'core','theme','vicinae'} <= set(ids)
 assert not next(i for i in choices if i['id']=='vicinae')['default']
+assert not next(i for i in choices if i['id']=='replace_existing')['default']
 assert all(x.get('description') for x in choices)
 for x in ('day','dusk'):
  assert x in json.loads(Path('config/themes.json').read_text())
@@ -27,10 +28,13 @@ assert 'window-rule {' in conf and 'kuhl-keys' in conf
 assert 'keyboard {\n        numlock\n    }' in conf
 assert 'keyboard { numlock }' not in conf
 site=Path('main.html').read_text()
-assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','bash install.sh','Kuhl OS','Ctrl + Super + K','keySearch','copyInstall'])
+assert all(x in site for x in ['Niri','Super','Vicinae','Fuzzel','curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash','Kuhl OS','Ctrl + Super + K','keySearch','copyInstall'])
 assert 'kuhl.example' not in site and 'coming soon' not in site.lower()
 assert 'ctrl+space' not in site.lower()
-assert 'https://github.com/TerabyteEXE/Kuhl-OS.git' in site
+assert 'https://github.com/TerabyteEXE/Kuhl-OS' in site
+assert 'git clone https://github.com/TerabyteEXE/Kuhl-OS.git' not in site
+assert 'const commands=' in site
+assert 'https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh' in Path('bootstrap.sh').read_text()
 assert Path('config/keys.json').is_file()
 assert 'default-wallpaper' not in conf
 print('[test] Bundled config, site and manifest: OK')
@@ -42,12 +46,16 @@ OUT="$(mktemp)"
 python3 scripts/menu.py --config config/choices.json --output "$OUT" --defaults
 python3 - "$OUT" <<'PY'
 import json,sys
-v=json.load(open(sys.argv[1])); assert v['theme']=='dusk'; assert {'core','theme'} <= set(v['selected']); assert 'vicinae' not in v['selected']
+v=json.load(open(sys.argv[1])); assert v['theme']=='dusk'; assert {'core','theme'} <= set(v['selected']); assert 'vicinae' not in v['selected']; assert 'replace_existing' not in v['selected']
 PY
 rm -f "$OUT"
 echo '[test] Python TUI defaults: OK'
 bash install.sh --dry-run >/dev/null
-echo '[test] Installer dry-run: OK'
+bash bootstrap.sh --help | grep -q 'one-command'
+# Selection/upgrade contract: the one-command TUI can opt in to replacing existing dotfiles.
+grep -q 'chosen replace_existing; then REPLACE_CONFIGS=1' install.sh
+grep -q 'Existing dotfiles will be backed up, then replaced' scripts/menu.py
+echo '[test] One-command entry point, safe upgrade choice, installer dry-run: OK'
 TMP="$(mktemp -d -t kuhl-tests.XXXXXXXX)"
 trap 'rm -rf -- "$TMP"' EXIT
 export HOME="$TMP/home" XDG_CONFIG_HOME="$TMP/config" XDG_DATA_HOME="$TMP/data" XDG_STATE_HOME="$TMP/state"
@@ -77,7 +85,6 @@ python3 scripts/render.py uninstall >/dev/null || true
 grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
 [[ ! -e "$XDG_CONFIG_HOME/kitty/colors.conf" ]]
 echo '[test] Config protection, theme, backup restore, uninstall: OK'
-# Invoke the CLI through bash so the repo script works even when the file mode is not executable in Git.
 bash "$ROOT/bin/kuhl" wallpaper set "$ROOT/assets/wallpapers/kuhl-day.png" >/dev/null
 [[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == custom ]]
 [[ -r "$XDG_STATE_HOME/kuhl/wallpaper-custom" ]]

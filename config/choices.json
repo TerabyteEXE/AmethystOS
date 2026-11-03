@@ -1,14 +1,102 @@
 {
   "choices": [
-    {"id":"core","section":"The desktop","title":"Kuhl core desktop","description":"Fedora-packaged Niri, Waybar, Fuzzel, Kitty, Mako, wallpapers, screen lock and essential XWayland/portal integration. Leaves GNOME installed as fallback.","default":true,"required":true,"type":"core"},
-    {"id":"theme","section":"The desktop","title":"Kuhl Day / Dusk appearance","description":"Install coordinated Kuhl colors, wallpapers, terminal, bar, notifications and Niri theme includes. Switch later with kuhl theme day or kuhl theme dusk.","default":true,"required":true,"type":"appearance"},
-    {"id":"vicinae","section":"The desktop","title":"Vicinae Spotlight-style search (optional COPR)","description":"Advanced macOS/Raycast-style search, file index and clipboard tools. REQUIRES explicit consent to enable third-party COPR quadratech188/vicinae. Without this, Super+Space opens Fedora-packaged Fuzzel.","default":false,"type":"copr","value":"quadratech188/vicinae"},
-    {"id":"desktop_helpers","section":"Everyday essentials","title":"Network, Bluetooth and audio helpers","description":"NetworkManager tray applet, Blueman Bluetooth interface, pavucontrol, brightnessctl and playerctl. Makes a standalone Niri session friendlier.","default":true,"type":"dnf","value":"network-manager-applet blueman pavucontrol brightnessctl playerctl"},
-    {"id":"flatseal","section":"Optional tools","title":"Flatseal","description":"Inspect and edit Flatpak sandbox permissions. Uses Flathub for current user only.","default":false,"type":"flatpak","value":"com.github.tchx84.Flatseal"},
-    {"id":"pika","section":"Optional tools","title":"Pika Backup","description":"Graphical encrypted backups. Uses Flathub for current user only.","default":false,"type":"flatpak","value":"org.gnome.World.PikaBackup"},
-    {"id":"vlc","section":"Optional apps","title":"VLC","description":"Video and audio player (Flathub).","default":false,"type":"flatpak","value":"org.videolan.VLC"},
-    {"id":"gimp","section":"Optional apps","title":"GIMP","description":"Image editing (Flathub).","default":false,"type":"flatpak","value":"org.gimp.GIMP"},
-    {"id":"inkscape","section":"Optional apps","title":"Inkscape","description":"Vector editing (Flathub).","default":false,"type":"flatpak","value":"org.inkscape.Inkscape"},
-    {"id":"office","section":"Optional apps","title":"LibreOffice","description":"Offline office suite (Flathub).","default":false,"type":"flatpak","value":"org.libreoffice.LibreOffice"}
+    {
+      "id": "core",
+      "section": "The desktop",
+      "title": "Kuhl core desktop",
+      "description": "Fedora-packaged Niri, Waybar, Fuzzel, Kitty, Mako, wallpapers, screen lock and essential XWayland/portal integration. Leaves GNOME installed as fallback.",
+      "default": true,
+      "required": true,
+      "type": "core"
+    },
+    {
+      "id": "theme",
+      "section": "The desktop",
+      "title": "Kuhl Day / Dusk appearance",
+      "description": "Install coordinated Kuhl colors, wallpapers, terminal, bar, notifications and Niri theme includes. Switch later with kuhl theme day or kuhl theme dusk.",
+      "default": true,
+      "required": true,
+      "type": "appearance"
+    },
+    {
+      "id": "replace_existing",
+      "section": "Installation safety",
+      "title": "Replace existing desktop settings (with backups)",
+      "description": "For upgrading an existing Niri/Kuhl setup. Back up then replace current Niri, Waybar, Kitty, Mako and launcher configurations. Off by default; requires typing REPLACE before changes.",
+      "default": false,
+      "type": "installation"
+    },
+    {
+      "id": "vicinae",
+      "section": "The desktop",
+      "title": "Vicinae Spotlight-style search (optional COPR)",
+      "description": "Advanced macOS/Raycast-style search, file index and clipboard tools. REQUIRES explicit consent to enable third-party COPR quadratech188/vicinae. Without this, Super+Space opens Fedora-packaged Fuzzel.",
+      "default": false,
+      "type": "copr",
+      "value": "quadratech188/vicinae"
+    },
+    {
+      "id": "desktop_helpers",
+      "section": "Everyday essentials",
+      "title": "Network, Bluetooth and audio helpers",
+      "description": "NetworkManager tray applet, Blueman Bluetooth interface, pavucontrol, brightnessctl and playerctl. Makes a standalone Niri session friendlier.",
+      "default": true,
+      "type": "dnf",
+      "value": "network-manager-applet blueman pavucontrol brightnessctl playerctl"
+    },
+    {
+      "id": "flatseal",
+      "section": "Optional tools",
+      "title": "Flatseal",
+      "description": "Inspect and edit Flatpak sandbox permissions. Uses Flathub for current user only.",
+      "default": false,
+      "type": "flatpak",
+      "value": "com.github.tchx84.Flatseal"
+    },
+    {
+      "id": "pika",
+      "section": "Optional tools",
+      "title": "Pika Backup",
+      "description": "Graphical encrypted backups. Uses Flathub for current user only.",
+      "default": false,
+      "type": "flatpak",
+      "value": "org.gnome.World.PikaBackup"
+    },
+    {
+      "id": "vlc",
+      "section": "Optional apps",
+      "title": "VLC",
+      "description": "Video and audio player (Flathub).",
+      "default": false,
+      "type": "flatpak",
+      "value": "org.videolan.VLC"
+    },
+    {
+      "id": "gimp",
+      "section": "Optional apps",
+      "title": "GIMP",
+      "description": "Image editing (Flathub).",
+      "default": false,
+      "type": "flatpak",
+      "value": "org.gimp.GIMP"
+    },
+    {
+      "id": "inkscape",
+      "section": "Optional apps",
+      "title": "Inkscape",
+      "description": "Vector editing (Flathub).",
+      "default": false,
+      "type": "flatpak",
+      "value": "org.inkscape.Inkscape"
+    },
+    {
+      "id": "office",
+      "section": "Optional apps",
+      "title": "LibreOffice",
+      "description": "Offline office suite (Flathub).",
+      "default": false,
+      "type": "flatpak",
+      "value": "org.libreoffice.LibreOffice"
+    }
   ]
 }

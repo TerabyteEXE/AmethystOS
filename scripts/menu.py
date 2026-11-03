@@ -61,7 +61,7 @@ def menu(screen, items):
             for index, item in enumerate(selected_items[:max(0, height - 12)]):
                 paint(start + index, 4, f'• {item["title"]}')
             warning_line = min(height - 6, start + len(selected_items) + 1)
-            paint(warning_line, 3, 'Existing dotfiles are preserved. GNOME stays installed.', muted)
+            paint(warning_line, 3, ('Existing dotfiles will be backed up, then replaced.' if 'replace_existing' in selected else 'Existing dotfiles are preserved.') + ' GNOME stays.', muted)
             if 'vicinae' in selected:
                 paint(warning_line + 1, 3, 'Vicinae requires separate COPR consent in the installer.', accent)
             paint(height - 3, 3, 'Y  Install    N  Back to choices    Q  Cancel', curses.A_BOLD)
@@ -108,7 +108,7 @@ def menu(screen, items):
         paint(detail_y+1, 3, f'{current["section"].upper()}  /  {current["title"]}', accent | curses.A_BOLD)
         for row, part in enumerate(textwrap.wrap(current['description'], max(30, width - 10))[:3], start=detail_y+2):
             paint(row, 3, part)
-        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL STUDIO 0.7   ·   Q / ESC to cancel', muted)
+        paint(height-2, 3, f'{cursor+1:02}/{len(items):02}   ·   KUHL STUDIO 0.7.2   ·   Q / ESC to cancel', muted)
         screen.refresh()
         key = screen.getch()
         if key in (curses.KEY_DOWN, ord('j')):
@@ -134,7 +134,7 @@ def menu(screen, items):
 
 def plain(items):
     selected = {r['id'] for r in items if r.get('default') or r.get('required')}
-    print('\n✳ KUHL OS 0.7  /  FEDORA + NIRI  /  TEXT MODE')
+    print('\n✳ KUHL OS 0.7.2  /  FEDORA + NIRI  /  TEXT MODE')
     for index, item in enumerate(items, 1):
         marker = 'x' if item['id'] in selected else ' '
         lock = ' [required]' if item.get('required') else ''
@@ -156,7 +156,7 @@ def plain(items):
     theme = input('Palette: [dusk]/day: ').strip().lower() or 'dusk'
     if theme not in ('day', 'dusk'):
         raise ValueError('Unknown palette')
-    print('GNOME is retained. Existing personal configurations are preserved.')
+    print('GNOME is retained. ' + ('Existing configs will be backed up and replaced with REPLACE confirmation.' if 'replace_existing' in selected else 'Existing personal configurations are preserved.'))
     if 'vicinae' in selected:
         print('Vicinae requires separate third-party COPR consent.')
     answer = input(f'Apply Kuhl {theme.upper()} with {len(selected)} components? [y/N] ').strip().lower()

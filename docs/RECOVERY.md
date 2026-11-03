@@ -25,10 +25,10 @@ This restores backed-up pre-Kuhl files and removes new Kuhl-managed files **only
 Kuhl deliberately does not replace existing Niri/Waybar/Kitty/Mako/Fuzzel configs by default. To get the new Studio look, review them first, and run:
 
 ```bash
-bash install.sh --replace-configs
+curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 ```
 
-Confirm with `REPLACE`, allow the native validator to pass, and log out and back into Niri. Older shortcuts differ: Ctrl+Super+K is now keyboard help; moving a window up is Super+Shift+K. Lock is Super+Alt+L.
+In the Kuhl terminal menu, select **Replace existing desktop settings (with backups)**, then type `REPLACE` at the separate confirmation. Allow the native validator to pass, and log out and back into Niri. Older shortcuts differ: Ctrl+Super+K is now keyboard help; moving a window up is Super+Shift+K. Lock is Super+Alt+L.
 
 ### Small VM storage
 

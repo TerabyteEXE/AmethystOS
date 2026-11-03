@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# KUHL-MANAGED — Kuhl OS 0.7, Fedora + Niri edition (not a Linux distro/ISO).
+# KUHL-MANAGED — Kuhl OS 0.7.2, Fedora + Niri edition (not a Linux distro/ISO).
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/common.sh
@@ -10,12 +10,13 @@ REPLACE_CONFIGS=0
 NO_REBOOT=1
 usage() {
   cat <<'TXT'
-Kuhl OS 0.7 — Fedora Workstation + Niri
-Usage: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
+Kuhl OS 0.7.2 — Fedora Workstation + Niri
+Recommended: curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
+Internal/advanced: bash install.sh [--defaults] [--dry-run] [--replace-configs] [--no-reboot]
   --defaults         Use default choices without opening the text UI.
   --dry-run          Preview choices; never installs anything (works on any OS).
-  --replace-configs  BACK UP and overwrite existing Niri, Waybar, Kitty, Mako configs.
-                     Only use after reviewing your personal dotfiles.
+  --replace-configs  Advanced override: back up and replace desktop configurations.
+                     For normal use, select this option in the terminal menu instead.
   --no-reboot        Retained for compatibility. Kuhl no longer reboots for you.
 
 Run as your normal Fedora user, not with sudo. GNOME is kept as a fallback.
@@ -63,6 +64,8 @@ print(v)
 PY
 )"
 chosen() { local x; for x in "${SELECTED[@]}"; do [[ "$x" != "$1" ]] || return 0; done; return 1; }
+# A single public command launches this menu; upgrades can be selected here, no extra flags needed.
+if chosen replace_existing; then REPLACE_CONFIGS=1; fi
 if (( DRY_RUN )); then
   echo 'KUHL OS — DRY RUN (nothing changed)'
   echo "  Theme: $THEME"
@@ -99,7 +102,7 @@ fi
 mkdir -p "$KUHL_STATE" "$KUHL_DATA" "$HOME/.local/bin"
 LOG="$KUHL_STATE/install.log"
 exec > >(tee -a "$LOG") 2>&1
-printf '\n✳ KUHL OS 0.7 — FEDORA + NIRI\n'
+printf '\n✳ KUHL OS 0.7.2 — FEDORA + NIRI\n'
 printf 'Fedora %s / Kuhl %s\n' "${VERSION_ID:-unknown}" "$THEME"
 [[ $(awk '/MemTotal:/ {print $2}' /proc/meminfo) -ge 7340032 ]] || kuhl_warn '8 GB RAM recommended, but not required.'
 # Avoid letting DNF fail at transaction commit on a small VM root partition.

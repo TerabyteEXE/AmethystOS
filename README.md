@@ -1,4 +1,4 @@
-# ✳ Kuhl OS 0.7 — Studio Edition
+# ✳ Kuhl OS 0.7.2 — Studio Edition
 
 **The tiny, elegant desktop that gets out of your way.** Kuhl OS is an independently designed Fedora Workstation + Niri experience: scrolling tiling, a centered capsule bar, Day/Dusk palettes, quick search, a searchable shortcut guide, a keyboard-driven control center, and a branded terminal installer.
 
@@ -12,11 +12,23 @@ Kuhl is **not** a separate distro, a replacement kernel, an ISO or a Fedora fork
 
 The original Kuhl wallpapers are retained for compatibility, but **not enabled by default**. The default desktop is a soft, solid Day/Dusk color. Add your own wallpaper later (see below).
 
-## Install / upgrade
+## One-command install / upgrade
 
-Requirements: regular Fedora Workstation 43+ (Fedora 44 target), x86_64, a Wayland-compatible GPU/driver, internet, and sufficient `/` space. At least 8 GB RAM recommended for a full Fedora system, although the Kuhl components themselves are lightweight. The installer declines to run with under 700 MiB of root filesystem space (unless you explicitly override with `KUHL_ALLOW_LOW_DISK=1`, not advised). It doesn't work on rpm-ostree editions such as Silverblue.
+On **Fedora Workstation 43+ (Fedora 44 target), x86_64**, open Terminal as your **normal user** and paste **one command**:
 
-From **this extracted ZIP** or a GitHub repository that you've actually updated to the Studio version:
+```bash
+curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
+```
+
+That's it. The bootstrap downloads the current project from the public [`TerabyteEXE/Kuhl-OS`](https://github.com/TerabyteEXE/Kuhl-OS) `main` branch, checks that the archive is complete, then launches the **branded Kuhl terminal installer**. No ZIP extraction, manual `git clone`, `cd`, or separate validation command is required. The installer handles packages, native Niri checks, backups and the six progress stages. Its options include a Day/Dusk palette and optional Vicinae (which separately requires approval for a third-party COPR).
+
+**Already running Kuhl or another Niri rice?** In the terminal menu, enable **“Replace existing desktop settings (with backups)”**. Review the confirmation and type `REPLACE` to overwrite managed target configurations; otherwise your existing files are kept. Kuhl records original files under `~/.local/state/kuhl/backups/`, and keeps GNOME installed as a fallback.
+
+When complete, log out and select **Niri** at the login screen. No automatic reboot. Wallpapers can be set later with `kuhl wallpaper set ~/Pictures/my-wallpaper.png`.
+
+**Before using a remote installer:** inspect [bootstrap.sh](https://github.com/TerabyteEXE/Kuhl-OS/blob/main/bootstrap.sh) and [install.sh](https://github.com/TerabyteEXE/Kuhl-OS/blob/main/install.sh). The one-line command runs code from your public GitHub repository. It will install the version currently published there, so **publish this entire revised project to `main` before using the command**. Kuhl does not support Fedora Atomic/rpm-ostree installations; working Wayland graphics and sufficient `/` space are required. Try it on a spare machine or VM first.
+
+For **development/testing from a downloaded source ZIP** (not the public install path):
 
 ```bash
 bash tests/validate.sh
@@ -24,23 +36,13 @@ bash install.sh --dry-run
 bash install.sh
 ```
 
-Run as your **regular Fedora user**, never `sudo bash install.sh`. Choose Day/Dusk and optional extras in the Kuhl terminal menu. Fedora-packaged Niri, Waybar, Kitty, Fuzzel, Mako, Swaybg, lock/idle helpers, Wayland portals and XWayland satellite are installed through DNF. Optional Vicinae is **not** installed unless you select and explicitly authorize its third-party COPR.
-
-On upgrade from v0.6.x or other Niri configurations, Kuhl deliberately **preserves edited/existing dotfiles**. If you want the new centered bar and bindings, run:
-
-```bash
-bash install.sh --replace-configs
-```
-
-Carefully review the warning and type `REPLACE`. Your replaced personal files are backed up under `~/.local/state/kuhl/backups/`. After installation, **log out and select Niri** at Fedora's login screen; GNOME stays available. You don't need to reboot.
-
 ### Installer features
 
-- Branded, keyboard-operated terminal option selector (arrow keys / J/K, Space, T, Enter)
+- Single copy-and-paste command opens the branded, keyboard-operated terminal option selector (arrow keys / J/K, Space, T, Enter)
 - Six honest progress milestones during package install, config checking, optional apps and deployment
 - Free-space check before DNF's transaction; guidance when the VM disk is too small
 - Validates both Niri palette configurations *before* writing personal config files
-- Tracks owned files by hash, preserves user edits and backs up explicit replacements
+- Tracks owned files by hash, preserves user edits and backs up explicitly chosen replacements
 - Optional Flatpaks and Vicinae are opt-in; no automatic system reboot
 
 ## A desktop you can learn
