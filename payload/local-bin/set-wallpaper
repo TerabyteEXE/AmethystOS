@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+WALLDIR="${FUZZEL_WALLPAPER_DIR:-$HOME/Pictures/wallpapers}"
+mkdir -p "$WALLDIR"
+mapfile -d '' files < <(find "$WALLDIR" -maxdepth 1 -type f \
+  \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print0 | sort -z)
+if (( ${#files[@]} == 0 )); then
+  notify-send 'Wallpapers' "Add images to $WALLDIR" || true
+  exit 0
+fi
+names=()
+for f in "${files[@]}"; do names+=("${f##*/}"); done
+choice=$(printf '%s\n' "${names[@]}" | fuzzel --dmenu --prompt 'Wallpaper: ') || exit 0
+[[ -n "$choice" ]] || exit 0
+for f in "${files[@]}"; do
+  if [[ "${f##*/}" == "$choice" ]]; then
+    pkill -x swaybg 2>/dev/null || true
+    nohup swaybg -i "$f" -m fill >/dev/null 2>&1 &
+    mkdir -p "$HOME/.local/state/kuhl-base-v1"
+    printf '%s\n' "$f" > "$HOME/.local/state/kuhl-base-v1/wallpaper"
+    exit 0
+  fi
+done

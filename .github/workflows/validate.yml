@@ -1,0 +1,15 @@
+name: Validate Kuhl OS Niri Base
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  fedora-niri:
+    runs-on: ubuntu-latest
+    container: fedora:44
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test tools and Fedora Niri parser
+        run: dnf install -y niri python3 bash findutils coreutils
+      - name: Run installer and configuration validation
+        run: bash tests/validate.sh
