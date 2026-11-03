@@ -77,14 +77,15 @@ python3 scripts/render.py uninstall >/dev/null || true
 grep -q 'user edit' "$XDG_CONFIG_HOME/waybar/style.css"
 [[ ! -e "$XDG_CONFIG_HOME/kitty/colors.conf" ]]
 echo '[test] Config protection, theme, backup restore, uninstall: OK'
-"$ROOT/bin/kuhl" wallpaper set "$ROOT/assets/wallpapers/kuhl-day.png" >/dev/null
+# Invoke the CLI through bash so the repo script works even when the file mode is not executable in Git.
+bash "$ROOT/bin/kuhl" wallpaper set "$ROOT/assets/wallpapers/kuhl-day.png" >/dev/null
 [[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == custom ]]
 [[ -r "$XDG_STATE_HOME/kuhl/wallpaper-custom" ]]
-"$ROOT/bin/kuhl" wallpaper reset >/dev/null
+bash "$ROOT/bin/kuhl" wallpaper reset >/dev/null
 [[ "$(cat "$XDG_STATE_HOME/kuhl/wallpaper-choice")" == auto ]]
 # The searchable atlas is also available as plain text without a GUI.
 install -m 644 config/keys.json "$XDG_DATA_HOME/kuhl/keys.json"
-"$ROOT/bin/kuhl" keys | grep -q 'Ctrl + Super + K'
+bash "$ROOT/bin/kuhl" keys | grep -q 'Ctrl + Super + K'
 echo '[test] Custom wallpaper choice, reset, and CLI keyboard atlas: OK'
 if command -v niri >/dev/null 2>&1; then
   python3 scripts/validate_niri.py
