@@ -48,6 +48,26 @@ kuhl doctor
 
 The default is **Kuhl Sevens**, using the MIT source's gapless Niri layout, animations, clean slate/blue palette, and compact vertical Waybar. Kuhl Day and Dusk remain available. The source's separately maintained wallpaper submodule is not included; use your own image.
 
+
+## Upgrading a repository that still contains older release files
+
+Uploading a ZIP over an existing GitHub repository does **not** automatically delete old files.
+Unused `third_party/KyleOS/` or `assets/wallpapers/third-party/` folders from earlier versions
+may remain visible on GitHub. The validation script warns about these leftovers, but
+does not fail, since the new Fedora installer does not use them.
+
+For a clean public release, review the Git diff and remove *tracked* legacy paths
+from the repository in a separate commit if you no longer need them:
+
+```bash
+git rm -r --cached --ignore-unmatch third_party/KyleOS assets/wallpapers/third-party
+git status
+# Review the proposed changes before committing and pushing.
+```
+
+This does not delete your local copies. It removes those paths from Git's index.
+GitHub Pages uses `index.html`; `main.html` is only an optional convenience copy.
+
 ## Test before releasing
 
 ```bash
