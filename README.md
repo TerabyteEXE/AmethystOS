@@ -1,6 +1,6 @@
-# Kuhl OS — Fedora + Niri, MIT dotfiles rebase
+# Kuhl OS — Fedora + Niri
 
-An easy-to-install **Fedora Workstation desktop customization**, not a standalone Linux distribution or ISO. Includes Niri tiling, a vertical Waybar based on Sevens dotfiles, Kuhl's installer, searchable shortcut guide, and settings tools.
+An easy-to-install **Fedora Workstation desktop customization**, not a standalone Linux distribution or ISO(yet). Includes Niri tiling, a vertical Waybar based on Sevens dotfiles, Kuhl's installer, searchable shortcut guide, and settings tools.
 
 **Experimental beta / AI-assisted / not security-audited.** Before installing, review the scripts and dependencies, understand the risks, and back up your files. See [Security](docs/SECURITY.md) and [Credits](docs/CREDITS.md).
 
