@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c1014"><meta name="description" content="Install Kuhl OS on Fedora Workstation with one command.">
+<title>Installation — Kuhl OS</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css"><script src="assets/site.js" defer></script></head>
+<body><a class="skip-link" href="#content">Skip to content</a>
+<header class="topbar"><div class="wrap nav-inner">
+<a href="index.html" class="brand" aria-label="Kuhl OS home"><span class="brand-mark" aria-hidden="true">K</span>Kuhl OS</a>
+<button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
+<nav id="site-nav" class="navlinks" data-navlinks aria-label="Main navigation"><a href="index.html">Home</a><a href="install.html" aria-current="page">Install</a><a href="wiki/index.html">Wiki</a><a href="wiki/keybinds.html">Keybinds</a><a class="nav-github" href="https://github.com/TerabyteEXE/Kuhl-OS" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
+</div></header><main id="content"><div class="wrap"><div class="page-title"><p class="eyebrow">Kuhl OS / Setup</p><h1>Install Kuhl OS.</h1><p class="lead">Start with Fedora Workstation. Add Kuhl OS as a separate Niri session. Keep GNOME available if you need it.</p></div><div class="doc-shell">
+<aside class="side-nav"><p class="side-label">On this page</p><a href="#requirements">Requirements</a><a href="#command">One-command setup</a><a href="#manual">Manual install</a><a href="#after">After installation</a><a href="#restore">Restore or remove</a><a href="wiki/index.html">Open wiki ↗</a></aside>
+<article class="doc-content"><h2 id="requirements">Before you start</h2><ul>
+<li><strong>Fedora Workstation</strong>, an internet connection, sudo privileges, and enough storage for the Niri desktop packages. The installer checks that at least 1 GiB is free on <span class="inline-code">/</span> before installing.</li>
+<li><strong>Use a normal user account.</strong> The installer requests sudo only when installing packages. Do not launch it as root.</li>
+<li><strong>Make a backup.</strong> Existing dotfiles prompt before replacement and are backed up, but you should keep your own backup of important data.</li>
+<li><strong>This isn't a new operating-system image.</strong> Install Fedora normally first; Kuhl adds a session rather than replacing your OS.</li></ul>
+<h2 id="command">One-command setup</h2><p>On Fedora, open Terminal and paste the command below. It fetches the repository's current <span class="inline-code">main</span> branch, so read the <a href="https://github.com/TerabyteEXE/Kuhl-OS/blob/main/bootstrap.sh">bootstrap script</a> first.</p>
+<div class="code-box"><div class="code-head"><span>Fedora Terminal</span><button type="button" class="copy-btn" data-copy="install-command" aria-label="Copy command">Copy</button></div><pre id="install-command"><code>curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash</code></pre></div>
+<div class="note"><strong>Security:</strong> This command executes remotely downloaded code. It isn't pinned to a release commit. Review the source, and use the manual method below if you prefer inspecting files first.</div>
+<div class="steps"><div class="step"><span class="no">1</span><div><h3>Check the environment</h3><p>The installer checks Fedora, permissions, disk space and repository files.</p></div></div><div class="step"><span class="no">2</span><div><h3>Install the desktop</h3><p>DNF installs Niri, Waybar, Fuzzel, notifications and supporting packages. Optional apps such as Starship don't block setup when unavailable.</p></div></div><div class="step"><span class="no">3</span><div><h3>Configure safely</h3><p>When existing dotfiles are found, choose whether to replace them after creating a recoverable backup.</p></div></div><div class="step"><span class="no">4</span><div><h3>Finish and log in</h3><p>The installer validates the Niri configuration before deploying it. Log out, choose Niri at your login screen and sign back in.</p></div></div></div>
+<h2 id="manual">Manual installation</h2><p>To inspect the project before running any code:</p>
+<div class="code-box"><div class="code-head"><span>Fedora Terminal</span><button type="button" class="copy-btn" data-copy="manual-command" aria-label="Copy command">Copy</button></div><pre id="manual-command"><code>git clone https://github.com/TerabyteEXE/Kuhl-OS.git
+cd Kuhl-OS
+less bootstrap.sh
+less install.sh
+bash install.sh --dry-run
+bash install.sh</code></pre></div>
+<p>Local testing can be run with <span class="inline-code">bash tests/validate.sh</span>. The included native Niri parser runs only where Niri is installed.</p>
+<h2 id="after">After installation</h2><ul><li>At login, select <strong>Niri</strong> using the session selector (often a gear icon).</li><li>Press <span class="inline-code">Super + Enter</span> to open the terminal or <span class="inline-code">Super + Space</span> for the launcher.</li><li>Press <span class="inline-code">Super + Shift + /</span> to display Niri's built-in hotkey overlay.</li><li>For all configured shortcuts, open the <a href="wiki/keybinds.html">keybinding reference</a>.</li></ul>
+<h2 id="restore">Backups and recovery</h2><p>Kuhl stores backup state at <span class="inline-code">~/.local/state/kuhl-base-v1/</span>. If you need your previous desktop settings, use the repository's restore script:</p>
+<div class="code-box"><div class="code-head"><span>From a local repository checkout</span><button type="button" class="copy-btn" data-copy="restore-command" aria-label="Copy command">Copy</button></div><pre id="restore-command"><code>cd Kuhl-OS
+bash uninstall.sh</code></pre></div>
+<p>Run the clone command from the manual installation section first if you installed remotely and no longer have the repository directory. The restore script avoids deleting configs that you've modified since installation. It does not uninstall Fedora packages or remove GNOME.</p>
+<div class="note">Having trouble? Start with the <a href="wiki/troubleshooting.html">troubleshooting guide</a>. Never delete <span class="inline-code">~/.config/niri</span> without checking backups.</div>
+</article></div></div></main>
+<footer class="footer"><div class="wrap footer-inner"><div>
+<p><strong style="color:var(--text)">Kuhl OS</strong> · Fedora + Niri. Independent community project, not affiliated with Fedora, Niri or Omarchy.</p>
+<p>Desktop config adapted from <a href="https://github.com/youngcoder45/New-Niri-minimal-dots">New Niri Minimal Dots</a> by Aditya Verma (MIT). AI-assisted project; inspect code before installing. No separate ISO is offered.</p></div>
+<div class="footer-links"><a href="wiki/index.html">Documentation</a><a href="wiki/troubleshooting.html">Support</a><a href="https://github.com/TerabyteEXE/Kuhl-OS">Source code</a></div>
+</div></footer></body></html>

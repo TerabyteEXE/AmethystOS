@@ -36,16 +36,16 @@ command -v python3 >/dev/null || { echo 'Python 3 is required' >&2; exit 2; }
 
 printf '\033[?25l'
 trap 'printf "\033[?25h"' EXIT
-BOLD=$'\033[1m'; DIM=$'\033[2m'; GOLD=$'\033[38;5;179m'; RESET=$'\033[0m'
+BOLD=$'\033[1m'; DIM=$'\033[2m'; AQUA=$'\033[38;5;116m'; RESET=$'\033[0m'
 step() {
   local i=$1 label=$2 done=0 bar='' n=0
   done=$((i*4))
   for ((n=0;n<20;n++)); do if ((n<done)); then bar+='━'; else bar+='─'; fi; done
-  printf '\n%s [%d/5] %s\n %s[%s]%s\n' "$GOLD" "$i" "$label" "$RESET" "$bar" "$RESET"
+  printf '\n%s [%d/5] %s\n %s[%s]%s\n' "$AQUA" "$i" "$label" "$RESET" "$bar" "$RESET"
 }
 
-printf '\n%sKUHL OS%s  /  BASE v1\n%sFedora + Niri  ·  one desktop, one installer%s\n' "$BOLD$GOLD" "$RESET" "$DIM" "$RESET"
-printf 'This installer adds the upstream Niri desktop to your existing Fedora system.\n'
+printf '\n%sKUHL OS%s  /  BASE v1\n%sFedora + Niri  ·  one desktop, one installer%s\n' "$BOLD$AQUA" "$RESET" "$DIM" "$RESET"
+printf 'This installer adds a configured Niri desktop to Fedora Workstation.\n'
 printf 'GNOME, the login manager, and your personal files are not removed.\n'
 printf 'Code is MIT-licensed; please review the security notes before use.\n\n'
 
@@ -105,6 +105,16 @@ if [[ $DRY -eq 1 ]]; then
   echo 'Dry-run complete. No changes made.'
 else
   mkdir -p "$HOME/Pictures/wallpapers" "$HOME/Pictures/Screenshots"
+  # Offer one calm default image only on systems that do not already have a wallpaper.
+  # Existing wallpaper folders and saved wallpaper selections are never replaced.
+  if [[ -f "$ROOT/assets/wallpapers/kuhl-still.png" ]]; then
+    existing_wallpaper=$(find "$HOME/Pictures/wallpapers" -maxdepth 1 -type f \
+      \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit)
+    if [[ -z "$existing_wallpaper" ]]; then
+      install -m 0644 "$ROOT/assets/wallpapers/kuhl-still.png" "$HOME/Pictures/wallpapers/kuhl-still.png"
+      echo 'Installed Kuhl Still wallpaper (your existing wallpaper settings were untouched).'
+    fi
+  fi
   echo 'Done. Log out and choose Niri from the Fedora login screen.'
   echo 'Keybinds: Super+Return terminal; Super+Space search; Super+Q close; Super+P power menu.'
   echo 'Restore previous settings: bash uninstall.sh (checks for user modifications first).'

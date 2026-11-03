@@ -1,72 +1,88 @@
-# Kuhl OS — Base v1 (Niri, RC1.1)
+# Kuhl OS
 
-**One desktop. One installer. No extras.**
+**A quieter way to use Linux.**
 
-Kuhl OS v1 is a **Fedora Workstation + Niri configuration/installer**, not a separately built Linux distribution or ISO. This fresh repository installs an adapted version of **[New Niri Minimal Dots](https://github.com/youngcoder45/New-Niri-minimal-dots)** by Aditya Verma. It does not include the previous Kuhl website, themes, control center, custom launchers, or old repository code.
+Kuhl OS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a small, guided installer. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
 
-## Install on Fedora Workstation
+**[Website](https://terabyteexe.github.io/Kuhl-OS/) · [Installation](https://terabyteexe.github.io/Kuhl-OS/install.html) · [Wiki](https://terabyteexe.github.io/Kuhl-OS/wiki/index.html) · [Keybindings](https://terabyteexe.github.io/Kuhl-OS/wiki/keybinds.html)**
 
-After publishing this repository to `TerabyteEXE/Kuhl-OS` on `main`:
+## Installation
+
+Start with a working Fedora Workstation installation. Run as your normal user:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
 ```
 
-**Read scripts before running a remote command.** This command downloads and executes the latest source from GitHub; it is *not pinned to a commit*. For a safer manual installation, download the ZIP, inspect its scripts, then run `bash install.sh`.
+**Security note:** The command above downloads and executes the current repository `main` branch, not a version-pinned or checksum-verified release. Read [`bootstrap.sh`](bootstrap.sh), [`install.sh`](install.sh), and [`docs/SECURITY.md`](docs/SECURITY.md) before running, especially on a daily-use machine. This project was built with AI assistance and has not received an independent security audit.
 
-The installer uses **Fedora packages from enabled repositories** (with Starship and visual extras optional), checks free disk space, validates the Niri configuration with `niri validate` on Fedora, backs up existing dotfiles before replacing them, and **does not** remove GNOME or alter the default shell or login manager. An existing desktop prompts for backup-and-replace confirmation.
-
-When installation finishes, **log out, select Niri at the login screen**, then log back in.
-
-## Keybindings from the original Niri setup
-
-| Action | Keys |
-|---|---|
-| Terminal | `Super + Enter` |
-| App search | `Super + Space` |
-| Close focused window | `Super + Q` |
-| Navigate columns | `Super + H` / `Super + L` |
-| Next/previous workspace | `Super + Up` / `Super + Down` |
-| Window overview | `Super + O` |
-| Power menu | `Super + P` |
-| Show Niri keyboard help | `Super + Shift + /` |
-
-The original keymap is preserved as far as Fedora compatibility allows. No new Kuhl shortcut scheme has been layered on top. See `payload/niri/keybinds.kdl`.
-
-## Wallpapers
-
-The original bundled wallpaper photographs/illustrations are **not redistributed** because their separate artwork rights could not be verified. Add your own `.jpg`, `.png`, or `.webp` images to `~/Pictures/wallpapers/`, then use `~/.local/bin/set-wallpaper`. Until then, the session uses a neutral dark background. All other styling is derived from the source dotfiles.
-
-## Install and recovery
+For an inspectable local install:
 
 ```bash
-bash install.sh --dry-run        # no changes
-bash install.sh                  # Fedora native install
-bash install.sh --replace        # back up + replace old configs
-bash uninstall.sh                # restore previous configs (if unmodified)
-bash tests/validate.sh           # portable tests + native Niri parser when present
+git clone https://github.com/TerabyteEXE/Kuhl-OS.git
+cd Kuhl-OS
+bash install.sh --dry-run
+bash install.sh
 ```
 
-Config backups live at `~/.local/state/kuhl-base-v1/backups/`. Packages are not uninstalled during restoration. GNOME remains available as a fallback. If you've edited Kuhl-managed configs since installation, restoration stops rather than deleting your changes.
+When the installer is complete, **log out, choose Niri at the Fedora login screen**, and log back in. GNOME stays installed. Existing dotfiles require explicit approval and are backed up before replacement.
 
-## Scope
+## What's included
 
-- Included: Niri, Waybar, Fuzzel, Mako, GTK/Qt appearance, terminal configuration, clipboard, power menu, wallpaper picker, screen lock, portals, and Fish configuration with optional Starship prompt styling, and optional btop/Cava styling.
-- Excluded: old Kuhl projects and website, Arch/AUR installer, bundled wallpapers of uncertain rights, personally customized dev/game apps, shell changes, SDDM replacement, and automatic third-party repositories.
-- Fedora-native adjustments: autostart and Polkit integration, session portals, paths and font fallback, GTK lock command, and removal of machine-specific/Arch-only launcher references.
+| Desktop element | Project |
+| --- | --- |
+| Scrollable tiling compositor | Niri |
+| Status bar | Waybar |
+| App launcher | Fuzzel |
+| Terminal | Alacritty (Kitty also configured) |
+| Notifications | Mako |
+| Wallpaper | Swaybg and a wallpaper picker |
+| Lock screen | GTKLock |
+| Audio and network integration | Fedora packages and supporting desktop tools |
 
-## Credits and security
+**Kuhl Still**, an original minimal wallpaper, is included under `assets/wallpapers/`. On first installation only, it is copied if `~/Pictures/wallpapers/` does not contain any image. Your current wallpaper and selection are not replaced.
 
-The desktop configuration is adapted from **New Niri Minimal Dots** by **Aditya Verma**, © 2026, MIT licensed. The exact original copyright/license text is in `LICENSE.upstream`. See `docs/UPSTREAM.md` for the original repository and the changes to the source.
+## First shortcuts
 
-**AI-assisted software; not security audited.** Inspect the installer, verify packages, maintain backups, and test in a VM/spare system before deploying to a daily driver. See `docs/SECURITY.md`.
+| Keys | Action |
+| --- | --- |
+| `Super + Enter` | Terminal |
+| `Super + Space` | App launcher |
+| `Super + Q` | Close focused window |
+| `Super + H / L` | Navigate columns |
+| `Super + Up / Down` | Navigate workspaces |
+| `Super + O` | Overview |
+| `Super + Shift + /` | Niri built-in keybinding overlay |
+
+The [complete 125-shortcut reference](wiki/keybinds.html) is **generated directly from** [`payload/niri/keybinds.kdl`](payload/niri/keybinds.kdl). Refresh it after editing shortcuts with `python3 scripts/build_site.py`.
+
+## Local commands
+
+```bash
+bash install.sh --dry-run   # inspect the plan without modifying anything
+bash install.sh             # install on Fedora Workstation
+bash install.sh --replace   # replace existing dotfiles with backups
+bash uninstall.sh           # restore tracked configs, if unmodified
+bash tests/validate.sh      # portable tests and Niri validation, where available
+```
+
+Backups live at `~/.local/state/kuhl-base-v1/backups/`. Restore deliberately protects files you've edited after installation. Packages installed through DNF are not removed by the restore script.
+
+## Website and docs
+
+The website is **static, dependency-free HTML/CSS/JavaScript**, ready for GitHub Pages. Its routes are `index.html`, `install.html`, `wiki/index.html`, `wiki/keybinds.html`, `wiki/customization.html`, and `wiki/troubleshooting.html`.
+
+```bash
+python3 scripts/build_site.py         # regenerate the site & keybinding reference
+python3 scripts/build_site.py --check # ensure generated pages aren't stale
+```
+
+To publish it, go to **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`. See [`docs/GITHUB_PAGES.md`](docs/GITHUB_PAGES.md).
+
+## Source and credit
+
+The desktop rice is adapted from **[New Niri Minimal Dots](https://github.com/youngcoder45/New-Niri-minimal-dots)** by **Aditya Verma**. Its MIT copyright notice is retained in [`LICENSE.upstream`](LICENSE.upstream); Fedora portability changes are listed in [`docs/UPSTREAM.md`](docs/UPSTREAM.md). Kuhl OS is a separate project and is not affiliated with Fedora, Niri, or Omarchy. It does not include unverified third-party wallpaper assets.
 
 ## Status
 
-**v1 base candidate, not a verified stable release.** Portable tests can run here; actual login, hardware support, and the Fedora-native Niri validation require a Fedora machine or the included Fedora CI workflow. See `docs/TESTING.md`.
-
-### Fedora package availability
-
-The core Niri stack is installed in a required DNF transaction. Already-installed packages are handled normally by DNF. Optional extras (including **Starship**) are attempted separately using `--skip-unavailable`. On Fedora 44, `starship` may not be offered by the enabled repositories; that **will not abort** a Kuhl OS installation. Fish already falls back to its normal prompt when Starship is not installed.
-
-Kuhl OS does not silently enable COPR repositories or pipe external installation scripts into a privileged shell. If you want Starship, review [Starship's official installation guide](https://starship.rs/guide/) and decide whether to trust the optional repository.
+**v1 site release candidate.** The desktop has been tested by its maintainer, but specific Fedora versions, other GPUs, display configurations, and third-party components still need wider testing. Local automated checks do not prove all hardware and graphical integrations work on every computer. See [`docs/TESTING.md`](docs/TESTING.md) and [`docs/SECURITY.md`](docs/SECURITY.md).

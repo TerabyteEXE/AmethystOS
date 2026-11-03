@@ -9,7 +9,15 @@ test -s LICENSE
 test -s README.md
 test -s payload/niri/config.kdl
 test -s payload/waybar/config.jsonc
-test ! -e index.html
+test -s index.html
+ test -s install.html
+ test -s wiki/index.html
+ test -s wiki/keybinds.html
+ test -s assets/site.css
+ test -s assets/site.js
+ test -s assets/wallpapers/kuhl-still.png
+ python3 scripts/build_site.py --check
+ python3 tests/test_site.py
 for script in install.sh uninstall.sh bootstrap.sh; do bash -n "$script"; done
 find payload -name '*.sh' -type f -print0 | while IFS= read -r -d '' shfile; do
   if head -n1 "$shfile" | grep -q python; then python3 -m py_compile "$shfile"; else bash -n "$shfile"; fi
