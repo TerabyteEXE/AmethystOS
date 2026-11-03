@@ -5,8 +5,8 @@ ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC1091
 source "$ROOT/scripts/packages.sh"
 
-[[ " ${KUHL_REQUIRED[*]} " != *' starship '* ]] || { echo 'starship is in the essential set' >&2; exit 1; }
-[[ " ${KUHL_OPTIONAL[*]} " == *' starship '* ]] || { echo 'starship is not optional' >&2; exit 1; }
+[[ " ${AMETHYSTOS_REQUIRED[*]} " != *' starship '* ]] || { echo 'starship is in the essential set' >&2; exit 1; }
+[[ " ${AMETHYSTOS_OPTIONAL[*]} " == *' starship '* ]] || { echo 'starship is not optional' >&2; exit 1; }
 
 calls=0
 sudo() {
@@ -24,7 +24,7 @@ sudo() {
   fi
   return 0
 }
-kuhl_install_fedora_packages
+amethystos_install_fedora_packages
 [[ $calls -eq 2 ]] || { echo "Expected 2 DNF operations, got $calls" >&2; exit 1; }
 
 echo '[test] Missing Fedora 44 Starship cannot block required desktop packages: OK'

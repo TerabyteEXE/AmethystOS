@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="11" fill="#94e2d5"/><path d="M17 14v36h10V37l4-5 14 18h12L38 26l17-12H42L27 28V14Z" fill="#0c1014"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AmethystOS">
+  <rect width="64" height="64" rx="11" fill="#0c1014"/>
+  <path fill="#94e2d5" d="M17 13h30l12 14-27 29L5 27z"/>
+  <path fill="#b8a7ea" d="M17 13 5 27h21l6 29 6-29h21L47 13z"/>
+  <path fill="#8e80c1" d="m17 13 9 14h12l9-14z"/>
+  <path fill="#635a9a" d="M26 27h12l-6 29z"/>
+</svg>

@@ -1,9 +1,8 @@
 {
-  // ───────── Arch logo ─────────
-  // Reference: small Arch Linux glyph at the far left, immediately left of
-  // the workspace numbers. Pango markup tints it to the bar's muted cyan.
+  // ───────── AmethystOS minimal diamond symbol ─────────
+  // Small, accessible Unicode diamond at the bar edge; no icon font required.
   "custom/logo": {
-    "format": "<span foreground='#9fb4c0'>󰣇</span>",
+    "format": "<span foreground='#9fb4c0'>◆</span>",
     "tooltip": false,
     "on-click": "~/.config/waybar/scripts/powermenu.sh"
   }

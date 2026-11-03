@@ -1,17 +1,21 @@
-# Kuhl OS
+<img src="assets/logo.svg" alt="AmethystOS gem logo" width="42" height="42">
+
+# AmethystOS
 
 **A straightforward Fedora + Niri desktop.**
 
-Kuhl OS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a small, guided installer. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
+AmethystOS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a small, guided installer. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
 
-**[Website](https://terabyteexe.github.io/Kuhl-OS/) · [Installation](https://terabyteexe.github.io/Kuhl-OS/install.html) · [Wiki](https://terabyteexe.github.io/Kuhl-OS/wiki/index.html) · [Keybindings](https://terabyteexe.github.io/Kuhl-OS/wiki/keybinds.html)**
+**[Website](https://terabyteexe.github.io/AmethystOS/) · [Installation](https://terabyteexe.github.io/AmethystOS/install.html) · [Wiki](https://terabyteexe.github.io/AmethystOS/wiki/index.html) · [Keybindings](https://terabyteexe.github.io/AmethystOS/wiki/keybinds.html)**
 
 ## Installation
+
+**Before using the command, rename your repository to `TerabyteEXE/AmethystOS` and publish these files to its `main` branch.** The command will not fetch this ZIP until the renamed repo contains the updated `bootstrap.sh`.
 
 Start with a working Fedora Workstation installation. Run as your normal user:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/AmethystOS/main/bootstrap.sh | bash
 ```
 
 **Security note:** The command above downloads and executes the current repository `main` branch, not a version-pinned or checksum-verified release. Read [`bootstrap.sh`](bootstrap.sh), [`install.sh`](install.sh), and [`docs/SECURITY.md`](docs/SECURITY.md) before running, especially on a daily-use machine. This project was built with AI assistance and has not received an independent security audit.
@@ -19,8 +23,8 @@ curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.
 For an inspectable local install:
 
 ```bash
-git clone https://github.com/TerabyteEXE/Kuhl-OS.git
-cd Kuhl-OS
+git clone https://github.com/TerabyteEXE/AmethystOS.git
+cd AmethystOS
 bash install.sh --dry-run
 bash install.sh
 ```
@@ -40,7 +44,7 @@ When the installer is complete, **log out, choose Niri at the Fedora login scree
 | Lock screen | GTKLock |
 | Audio and network integration | Fedora packages and supporting desktop tools |
 
-**Kuhl Still**, an original minimal wallpaper, is included under `assets/wallpapers/`. On first installation only, it is copied if `~/Pictures/wallpapers/` does not contain any image. Your current wallpaper and selection are not replaced.
+**Amethyst Still**, an original minimal wallpaper, is included under `assets/wallpapers/`. On first installation only, it is copied if `~/Pictures/wallpapers/` does not contain any image. Your current wallpaper and selection are not replaced.
 
 ## First shortcuts
 
@@ -66,7 +70,7 @@ bash uninstall.sh           # restore tracked configs, if unmodified
 bash tests/validate.sh      # portable tests and Niri validation, where available
 ```
 
-Backups live at `~/.local/state/kuhl-base-v1/backups/`. Restore deliberately protects files you've edited after installation. Packages installed through DNF are not removed by the restore script.
+Backups live at `~/.local/state/amethystos-base-v1/backups/`. Restore deliberately protects files you've edited after installation. Packages installed through DNF are not removed by the restore script.
 
 ## Website and docs
 
@@ -83,7 +87,11 @@ To publish it, go to **Settings → Pages → Build and deployment**, choose **D
 
 ## Source and credit
 
-The desktop rice is adapted from **[New Niri Minimal Dots](https://github.com/youngcoder45/New-Niri-minimal-dots)** by **Aditya Verma**. Its MIT copyright notice is retained in [`LICENSE.upstream`](LICENSE.upstream); Fedora portability changes are listed in [`docs/UPSTREAM.md`](docs/UPSTREAM.md). Kuhl OS is a separate project and is not affiliated with Fedora, Niri, or Omarchy. It does not include unverified third-party wallpaper assets.
+The desktop rice is adapted from **[New Niri Minimal Dots](https://github.com/youngcoder45/New-Niri-minimal-dots)** by **Aditya Verma**. Its MIT copyright notice is retained in [`LICENSE.upstream`](LICENSE.upstream); Fedora portability changes are listed in [`docs/UPSTREAM.md`](docs/UPSTREAM.md). AmethystOS is a separate project and is not affiliated with Fedora, Niri, or Omarchy. It does not include unverified third-party wallpaper assets.
+
+## Upgrading from an older installation
+
+If you are switching from an earlier installation, read [the upgrade notes](docs/UPGRADING.md) before replacing existing dotfiles. Older backups are not deleted or migrated automatically.
 
 ## Status
 

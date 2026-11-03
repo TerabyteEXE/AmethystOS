@@ -1,4 +1,4 @@
-/* Kuhl OS web site · simple, documentation-first layout.
+/* AmethystOS web site · simple, documentation-first layout.
    Inspired by the straightforward structure of traditional Linux project sites.
    Original CSS; no Debian website source code is included. */
 :root {
@@ -34,7 +34,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 .nav-inner { min-height: 76px; display: flex; justify-content: space-between; align-items: center; column-gap: 30px; }
 .brand { display: inline-flex; gap: 8px; align-items: center; flex-shrink: 0; font-size: 22px; font-weight: 700; letter-spacing: -.035em; color: var(--text); text-decoration: none; }
 .brand:hover { color: var(--text); }
-.brand-mark { color: var(--accent); font-size: 24px; font-weight: 700; line-height: 1; }
+.brand-icon { display: block; width: 26px; height: 26px; flex: 0 0 26px; }
 .navlinks { display: flex; align-items: center; gap: 27px; }
 .navlinks a { font-size: 14px; color: var(--muted); text-decoration: none; }
 .navlinks a:hover, .navlinks a[aria-current="page"] { color: var(--accent); text-decoration: underline; text-underline-offset: 7px; }

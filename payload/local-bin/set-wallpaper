@@ -16,8 +16,8 @@ for f in "${files[@]}"; do
   if [[ "${f##*/}" == "$choice" ]]; then
     pkill -x swaybg 2>/dev/null || true
     nohup swaybg -i "$f" -m fill >/dev/null 2>&1 &
-    mkdir -p "$HOME/.local/state/kuhl-base-v1"
-    printf '%s\n' "$f" > "$HOME/.local/state/kuhl-base-v1/wallpaper"
+    mkdir -p "$HOME/.local/state/amethystos-base-v1"
+    printf '%s\n' "$f" > "$HOME/.local/state/amethystos-base-v1/wallpaper"
     exit 0
   fi
 done

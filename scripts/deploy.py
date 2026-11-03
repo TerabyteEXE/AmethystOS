@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Kuhl OS base: stage, validate, deploy, and restore the upstream dotfiles.
+"""AmethystOS base: stage, validate, deploy, and restore the upstream dotfiles.
 
 No commands are run as root. Existing files are never deleted without a backup.
 """
@@ -27,7 +27,7 @@ SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", 
 
 
 def log(*message: object) -> None:
-    print("[kuhl]", *message, flush=True)
+    print("[amethystos]", *message, flush=True)
 
 
 def expand_placeholders(base: Path, home: Path) -> None:
@@ -98,8 +98,8 @@ def validate(stage: Path, require_niri: bool) -> None:
 
 def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> None:
     home = home.resolve()
-    state_dir = home / ".local/state/kuhl-base-v1"
-    with tempfile.TemporaryDirectory(prefix="kuhl-stage-") as temp:
+    state_dir = home / ".local/state/amethystos-base-v1"
+    with tempfile.TemporaryDirectory(prefix="amethystos-stage-") as temp:
         stage = Path(temp)
         entries = stage_files(stage, home)
         validate(stage, require_niri)
@@ -112,7 +112,7 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
                 log("Dry run: would back up", len(collisions), "existing paths")
             return
         if state_dir.exists() and not replace:
-            raise RuntimeError("Existing Kuhl state found; use --replace to reinstall safely")
+            raise RuntimeError("Existing AmethystOS state found; use --replace to reinstall safely")
         runid = time.strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}"
         backup_dir = state_dir / "backups" / runid
         backup_dir.mkdir(parents=True, exist_ok=False)
@@ -152,9 +152,9 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
 
 
 def restore(home: Path, dry_run: bool) -> None:
-    state_file = home / ".local/state/kuhl-base-v1/state.json"
+    state_file = home / ".local/state/amethystos-base-v1/state.json"
     if not state_file.is_file():
-        raise RuntimeError("No managed Kuhl install was found")
+        raise RuntimeError("No managed AmethystOS install was found")
     state = json.loads(state_file.read_text(encoding="utf-8"))
     entries = state["entries"]
     modified = [e["path"] for e in entries if (home/e["path"]).exists() and digest_path(home/e["path"])!=e["sha256"]]
@@ -179,7 +179,7 @@ def restore(home: Path, dry_run: bool) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Deploy or restore the Kuhl desktop")
+    parser = argparse.ArgumentParser(description="Deploy or restore the AmethystOS desktop")
     parser.add_argument("action", choices=("install","restore"))
     parser.add_argument("--replace", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
@@ -192,7 +192,7 @@ def main():
         else:
             restore(args.home, args.dry_run)
     except Exception as exc:
-        print("[kuhl] ERROR:", exc, file=sys.stderr)
+        print("[amethystos] ERROR:", exc, file=sys.stderr)
         return 1
     return 0
 

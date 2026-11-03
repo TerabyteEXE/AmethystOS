@@ -1,4 +1,4 @@
-name: Validate Kuhl OS Niri Base
+name: Validate AmethystOS Niri Base
 on:
   push:
   pull_request:

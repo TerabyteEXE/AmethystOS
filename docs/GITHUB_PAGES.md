@@ -1,12 +1,12 @@
-# Publishing the Kuhl OS website
+# Publishing the AmethystOS website
 
-The site is ordinary static HTML/CSS/JS, served from the **root of the Kuhl-OS repository**. It needs no build system, package manager, CDN, or server.
+The site is ordinary static HTML/CSS/JS, served from the **root of the AmethystOS repository**. It needs no build system, package manager, CDN, or server.
 
 1. Commit `index.html`, `install.html`, `wiki/`, `assets/`, and `scripts/build_site.py` on the `main` branch.
 2. In the GitHub repository, open **Settings → Pages**.
 3. Under **Build and deployment**, select **Deploy from a branch**.
 4. Select `main`, folder `/ (root)`, then save.
-5. Once deployed, navigate to `https://terabyteexe.github.io/Kuhl-OS/`.
+5. Once deployed, navigate to `https://terabyteexe.github.io/AmethystOS/`.
 
 All internal links are relative so the site works from a GitHub Pages project subdirectory.
 

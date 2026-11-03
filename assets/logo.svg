@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AmethystOS gem mark">
+  <path fill="#94e2d5" d="M15 13h34l13 15-30 31L2 28z"/>
+  <path fill="#b8a7ea" d="M15 13 2 28h23l7 31 7-31h23L49 13z"/>
+  <path fill="#8e80c1" d="m15 13 10 15h14l10-15z"/>
+  <path fill="#635a9a" d="M25 28h14l-7 31z"/>
+  <path fill="#d5cff5" d="M15 13h34l-10 15H25z" opacity=".53"/>
+</svg>

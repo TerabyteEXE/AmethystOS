@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kuhl OS: upstream session components, with Fedora-safe integration.
+# AmethystOS: upstream session components, with Fedora-safe integration.
 set -u
 
 # Niri's session handles the desktop environment and portal environment.
@@ -7,7 +7,7 @@ set -u
 
 # Use the user's saved wallpaper if present; otherwise a dark solid background.
 WALLDIR="$HOME/Pictures/wallpapers"
-SELECTION="$HOME/.local/state/kuhl-base-v1/wallpaper"
+SELECTION="$HOME/.local/state/amethystos-base-v1/wallpaper"
 WALL=""
 if [[ -f "$SELECTION" ]]; then
   IFS= read -r WALL < "$SELECTION" || true

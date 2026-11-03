@@ -1,6 +1,6 @@
 # Security and risk notice
 
-Kuhl OS is experimental and AI-assisted. Its installer and scripts have **not** undergone an independent security audit. Do your own research; review source code and dependencies before running it, especially the remote bootstrap command.
+AmethystOS is experimental and AI-assisted. Its installer and scripts have **not** undergone an independent security audit. Do your own research; review source code and dependencies before running it, especially the remote bootstrap command.
 
 What the installer does: asks `sudo` for Fedora `dnf install`; downloads packages from Fedora's configured repositories; copies only the dotfiles in `payload/` into the current user's home; validates the Niri KDL before deployment; and backs up anything it replaces.
 

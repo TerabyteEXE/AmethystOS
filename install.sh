@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Kuhl OS — Fedora installation wrapper for the upstream Niri dotfiles.
+# AmethystOS — Fedora installation wrapper for the upstream Niri dotfiles.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DRY=0
@@ -11,7 +11,7 @@ for arg in "$@"; do
     --replace) REPLACE=1 ;;
     --no-packages) SKIP_PACKAGES=1 ;;
     --help|-h)
-      printf '%s\n' 'Kuhl OS Base v1 — Fedora + Niri' \
+      printf '%s\n' 'AmethystOS Base v1 — Fedora + Niri' \
        'Usage: bash install.sh [--dry-run] [--replace] [--no-packages]' \
        '  --replace       Back up and replace existing user dotfiles' \
        '  --no-packages   Skip Fedora package installation (advanced)' \
@@ -21,7 +21,7 @@ for arg in "$@"; do
 done
 
 if [[ ${EUID:-$(id -u)} -eq 0 && $DRY -eq 0 ]]; then
-  echo 'Do not run Kuhl OS installer as root (sudo is requested only for DNF).' >&2
+  echo 'Do not run AmethystOS installer as root (sudo is requested only for DNF).' >&2
   exit 2
 fi
 
@@ -29,7 +29,7 @@ if [[ $DRY -eq 0 ]]; then
   if [[ ! -r /etc/os-release ]]; then echo 'Cannot detect Fedora.' >&2; exit 2; fi
   # shellcheck disable=SC1091
   source /etc/os-release
-  if [[ ${ID:-} != fedora ]]; then echo 'Kuhl OS v1 supports Fedora Workstation only.' >&2; exit 2; fi
+  if [[ ${ID:-} != fedora ]]; then echo 'AmethystOS v1 supports Fedora Workstation only.' >&2; exit 2; fi
   if [[ ! $(command -v dnf) ]]; then echo 'DNF was not found.' >&2; exit 2; fi
 fi
 command -v python3 >/dev/null || { echo 'Python 3 is required' >&2; exit 2; }
@@ -44,7 +44,7 @@ step() {
   printf '\n%s [%d/5] %s\n %s[%s]%s\n' "$AQUA" "$i" "$label" "$RESET" "$bar" "$RESET"
 }
 
-printf '\n%sKUHL OS%s  /  BASE v1\n%sFedora + Niri  ·  one desktop, one installer%s\n' "$BOLD$AQUA" "$RESET" "$DIM" "$RESET"
+printf '\n%sAMETHYSTOS%s  /  BASE v1\n%sFedora + Niri  ·  one desktop, one installer%s\n' "$BOLD$AQUA" "$RESET" "$DIM" "$RESET"
 printf 'This installer adds a configured Niri desktop to Fedora Workstation.\n'
 printf 'GNOME, the login manager, and your personal files are not removed.\n'
 printf 'Code is MIT-licensed; please review the security notes before use.\n\n'
@@ -74,7 +74,7 @@ else
   # No global changes to GDM or the user's login shell.
   # shellcheck disable=SC1091
   source "$ROOT/scripts/packages.sh"
-  kuhl_install_fedora_packages
+  amethystos_install_fedora_packages
 
 fi
 
@@ -107,12 +107,12 @@ else
   mkdir -p "$HOME/Pictures/wallpapers" "$HOME/Pictures/Screenshots"
   # Offer one calm default image only on systems that do not already have a wallpaper.
   # Existing wallpaper folders and saved wallpaper selections are never replaced.
-  if [[ -f "$ROOT/assets/wallpapers/kuhl-still.png" ]]; then
+  if [[ -f "$ROOT/assets/wallpapers/amethyst-still.png" ]]; then
     existing_wallpaper=$(find "$HOME/Pictures/wallpapers" -maxdepth 1 -type f \
       \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit)
     if [[ -z "$existing_wallpaper" ]]; then
-      install -m 0644 "$ROOT/assets/wallpapers/kuhl-still.png" "$HOME/Pictures/wallpapers/kuhl-still.png"
-      echo 'Installed Kuhl Still wallpaper (your existing wallpaper settings were untouched).'
+      install -m 0644 "$ROOT/assets/wallpapers/amethyst-still.png" "$HOME/Pictures/wallpapers/amethyst-still.png"
+      echo 'Installed Amethyst Still wallpaper (your existing wallpaper settings were untouched).'
     fi
   fi
   echo 'Done. Log out and choose Niri from the Fedora login screen.'

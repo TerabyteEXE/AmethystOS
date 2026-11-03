@@ -15,7 +15,7 @@ test -s index.html
  test -s wiki/keybinds.html
  test -s assets/site.css
  test -s assets/site.js
- test -s assets/wallpapers/kuhl-still.png
+ test -s assets/wallpapers/amethyst-still.png
  python3 scripts/build_site.py --check
  python3 tests/test_site.py
 for script in install.sh uninstall.sh bootstrap.sh; do bash -n "$script"; done
@@ -59,7 +59,7 @@ if python3 scripts/deploy.py install --home "$HOMECASE" >"$TMP/err" 2>&1; then
   echo 'ERROR: installer replaced existing settings without opt-in' >&2; exit 1
 fi
 python3 scripts/deploy.py install --home "$HOMECASE" --replace
-[[ -f "$HOMECASE/.local/state/kuhl-base-v1/state.json" ]]
+[[ -f "$HOMECASE/.local/state/amethystos-base-v1/state.json" ]]
 [[ -f "$HOMECASE/.config/niri/autostart.sh" ]]
 [[ -f "$HOMECASE/.config/waybar/config.jsonc" ]]
 [[ -x "$HOMECASE/.local/bin/powermenu" ]]
@@ -83,4 +83,4 @@ else
   echo '  Skipped: Niri is not installed in this environment'
 fi
 
-echo 'All portable Kuhl OS base tests passed.'
+echo 'All portable AmethystOS base tests passed.'
