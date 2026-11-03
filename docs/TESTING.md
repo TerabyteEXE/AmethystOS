@@ -15,3 +15,11 @@ Manual Fedora GNOME/Niri login test (not verified in the development container):
 10. Reboot and verify GNOME remains available. Repeat after Fedora update.
 
 Known caveats: packaged Nerd font fallback differs slightly from upstream's exact Fira Code Nerd font; source wallpapers are excluded pending rights verification; GPU and portal behavior vary across hardware. Do not mark this stable solely on the CI green checkmark.
+
+## Fedora 44 missing-package regression
+
+The portable suite includes `tests/test_packages.sh`, which simulates a Fedora
+DNF installation where Starship is unavailable and verifies the required
+packages still install. On real Fedora 44, verify that the optional extras
+message does not abort installation, then log into Niri and confirm that Fish
+works with its normal prompt if Starship is missing.

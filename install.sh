@@ -67,27 +67,15 @@ if [[ $DRY -eq 1 ]]; then
 elif [[ $SKIP_PACKAGES -eq 1 ]]; then
   echo 'Skipping packages by request'
 else
-  # No COPR/AUR/custom system repositories. No global changes to GDM or shell.
-  required=(
-    niri xwayland-satellite waybar fuzzel mako swaybg
-    alacritty kitty gtklock polkit-kde
-    xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring
-    NetworkManager network-manager-applet nm-connection-editor
-    nautilus firefox pavucontrol playerctl brightnessctl
-    wl-clipboard cliphist pipewire wireplumber pipewire-pulseaudio
-    bluez libnotify jq gtk3 fish starship fastfetch papirus-icon-theme-dark adw-gtk3-theme
-    cascadia-code-nf-fonts
-  )
-  echo "Installing ${#required[@]} core Fedora packages (sudo required once)."
-  sudo dnf install -y "${required[@]}"
-  # Optional utilities enrich upstream extras but must not block a working desktop.
-  optional=(btop cava qt6ct nwg-look grim slurp zoxide)
-  echo 'Installing optional upstream desktop utilities where available.'
-  for pkg in "${optional[@]}"; do
-    if ! sudo dnf install -y "$pkg"; then
-      printf 'Optional package unavailable, continuing: %s\n' "$pkg"
-    fi
-  done
+  # DNF packages are separated into essential runtime pieces and optional polish.
+  # In particular Starship requires a non-default Fedora repository, so a missing
+  # package must never block the compositor/desktop installation.
+  # No COPR/AUR/custom repositories are enabled automatically.
+  # No global changes to GDM or the user's login shell.
+  # shellcheck disable=SC1091
+  source "$ROOT/scripts/packages.sh"
+  kuhl_install_fedora_packages
+
 fi
 
 step 3 'Checking existing configurations'

@@ -1,4 +1,4 @@
-# Kuhl OS — Base v1 (Niri)
+# Kuhl OS — Base v1 (Niri, RC1.1)
 
 **One desktop. One installer. No extras.**
 
@@ -14,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/Kuhl-OS/main/bootstrap.
 
 **Read scripts before running a remote command.** This command downloads and executes the latest source from GitHub; it is *not pinned to a commit*. For a safer manual installation, download the ZIP, inspect its scripts, then run `bash install.sh`.
 
-The installer uses **official Fedora packages**, checks free disk space, validates the Niri configuration with `niri validate` on Fedora, backs up existing dotfiles before replacing them, and **does not** remove GNOME or alter the default shell or login manager. An existing desktop prompts for backup-and-replace confirmation.
+The installer uses **Fedora packages from enabled repositories** (with Starship and visual extras optional), checks free disk space, validates the Niri configuration with `niri validate` on Fedora, backs up existing dotfiles before replacing them, and **does not** remove GNOME or alter the default shell or login manager. An existing desktop prompts for backup-and-replace confirmation.
 
 When installation finishes, **log out, select Niri at the login screen**, then log back in.
 
@@ -51,7 +51,7 @@ Config backups live at `~/.local/state/kuhl-base-v1/backups/`. Packages are not 
 
 ## Scope
 
-- Included: Niri, Waybar, Fuzzel, Mako, GTK/Qt appearance, terminal configuration, clipboard, power menu, wallpaper picker, screen lock, portals, and Fish/Starship terminal styling and optional btop/Cava styling.
+- Included: Niri, Waybar, Fuzzel, Mako, GTK/Qt appearance, terminal configuration, clipboard, power menu, wallpaper picker, screen lock, portals, and Fish configuration with optional Starship prompt styling, and optional btop/Cava styling.
 - Excluded: old Kuhl projects and website, Arch/AUR installer, bundled wallpapers of uncertain rights, personally customized dev/game apps, shell changes, SDDM replacement, and automatic third-party repositories.
 - Fedora-native adjustments: autostart and Polkit integration, session portals, paths and font fallback, GTK lock command, and removal of machine-specific/Arch-only launcher references.
 
@@ -64,3 +64,9 @@ The desktop configuration is adapted from **New Niri Minimal Dots** by **Aditya 
 ## Status
 
 **v1 base candidate, not a verified stable release.** Portable tests can run here; actual login, hardware support, and the Fedora-native Niri validation require a Fedora machine or the included Fedora CI workflow. See `docs/TESTING.md`.
+
+### Fedora package availability
+
+The core Niri stack is installed in a required DNF transaction. Already-installed packages are handled normally by DNF. Optional extras (including **Starship**) are attempted separately using `--skip-unavailable`. On Fedora 44, `starship` may not be offered by the enabled repositories; that **will not abort** a Kuhl OS installation. Fish already falls back to its normal prompt when Starship is not installed.
+
+Kuhl OS does not silently enable COPR repositories or pipe external installation scripts into a privileged shell. If you want Starship, review [Starship's official installation guide](https://starship.rs/guide/) and decide whether to trust the optional repository.
