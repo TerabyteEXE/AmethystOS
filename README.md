@@ -64,7 +64,7 @@ personal wallpapers or GNOME.
 | --- | --- |
 | Scrollable tiling compositor | Niri |
 | Status bar | Waybar |
-| App launcher | AmethystOS Search (GTK), Fuzzel fallback |
+| App launcher | AmethystOS Home (GTK, nested categories), Fuzzel fallback |
 | Terminal | Alacritty (Kitty also configured) |
 | Notifications | Mako |
 | Wallpaper | Swaybg and a wallpaper picker |
@@ -75,35 +75,38 @@ personal wallpapers or GNOME.
 
 **AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. Both are copied if missing on every installation, without replacing files of the same name. A fresh, empty wallpaper directory selects Amethyst Dark by default; existing wallpaper choices remain untouched. Change through Super+Shift+W, `set-wallpaper`, or Amethyst Settings.
 
-## Search, software and controls (RC2.6)
+## Amethyst Home and bar controls (RC2.7)
 
-**Super+Space** opens the larger, keyboard-first AmethystOS Search. Its categories
-are **All, Apps, Settings, Software, Wallpapers, System, and Power**. Type a
-query, use Up/Down to choose a result, Enter to open, Ctrl+1–7 to filter, and
-Esc or **Super+Space again** to close. The launcher uses GIO for desktop apps
-instead of manually running their desktop command strings. Fuzzel remains a
-fallback if the GTK launcher is unavailable.
+**Super+Space** opens **Amethyst Home**, a compact, dark translucent menu with
+**Apps, Learn, Style, Setup, Install, Remove, Update, About, System, and Power**.
+Use **Up/Down** to choose, **Enter or Right** to open, **Left/Backspace** to return
+from a category, and **type to search** either the current category or the full
+menu from Home. **Esc** or **Super+Space again** closes the launcher.
+**Super+D** opens the exact same Home menu; it is not a second menu anymore.
 
-**Super+D** opens the same launcher starting in **Settings**, instead of showing
-a second, inconsistent quick menu. Software transactions still show DNF or
-Flatpak confirmation; installing packages is never a silent search action.
+Installed apps launch through GIO desktop-file metadata; maintenance actions are
+fixed local commands and retain their existing confirmation steps. The menu has
+no telemetry, account requirement, or arbitrary shell command input. If GTK
+cannot start, Fuzzel remains a lightweight app-search fallback.
 
-Waybar keeps its existing look. Clicking its clock, audio, network, Bluetooth,
-or settings widget opens a compact Light/Dark GTK panel, anchored below the bar
-when the optional Fedora `gtk-layer-shell` package is available. These are
-separate layer-shell surfaces, not native popovers created by Waybar, so behavior
-may vary across monitor setups. Right-click functions remain available.
+Waybar keeps its original compact layout. Clock, audio, network, Bluetooth,
+and settings widgets open small matching Light/Dark panels. The calendar
+shows your local date and can return to today; the other panels show available
+local device state and link to real settings. Their shared style uses restrained
+translucency with native Niri background blur when available. They are
+**separate GTK surfaces**, not embedded Waybar widgets: precise anchoring can
+vary with output size, bar position, and GTK-layer-shell support.
 
-**AmethystDark.png** and **AmethystLight.png** remain unmodified. The current
-Niri rice and existing Waybar geometry are intentionally preserved. See
-[`docs/RELEASE_NOTES_RC26.md`](docs/RELEASE_NOTES_RC26.md) for scope and caveats.
+Your original **AmethystDark.png** and **AmethystLight.png** are unchanged.
+No mockup art, additional wallpaper, new boot splash, or new GTK-wide styling
+is forced on other apps. See [`docs/RELEASE_NOTES_RC27.md`](docs/RELEASE_NOTES_RC27.md).
 
 ## First shortcuts
 
 | Keys | Action |
 | --- | --- |
 | `Super + Enter` | Terminal |
-| `Super + Space` | Categorized app and action search |
+| `Super + Space` | Amethyst Home: categories, app search and actions |
 | `Super + W` | Close focused window |
 | `Super + Shift + Tab` | Toggle tabbed column display |
 | `Super + Shift + S` | Open Settings |
@@ -173,7 +176,7 @@ The interactive menu was fixed for the documented `curl | bash` installer. It no
 
 **Safety:** This is an AI-assisted experimental release candidate, not a security-audited operating system or ISO. Review scripts and test on Fedora with GNOME available for recovery.
 
-## RC2.5 — Settings and launcher cleanup
+## RC2.5 — Settings and launcher cleanup (historical)
 
 - **Super+Space** continues to search apps, and now also finds a single **Amethyst Menu** entry. Open that entry to access the same six categories as **Super+D**, without filling search with dozens of settings shortcuts.
 - Amethyst Settings now has light/dark styling drawn from the desktop’s existing palettes and uses the project crystal logo. Theme changes update Settings without dismissing the window.

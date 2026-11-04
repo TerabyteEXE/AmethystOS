@@ -204,3 +204,14 @@ window-rule {
     match title=r#"^AmethystOS( · .*)?$"#
     open-floating true
 }
+
+// Amethyst Home is a compact overlay, not a tiled desktop column.
+// The window stays centered and inherits Niri's native background blur.
+window-rule {
+    match title="^AmethystOS Home$"
+    open-floating true
+    opacity 0.98
+    background-effect {
+        blur true
+    }
+}

@@ -15,7 +15,7 @@ def test_one_search_ui():
  assert not matches('Power','appearance')
  keys=(ROOT/'payload/niri/keybinds.kdl').read_text()
  assert 'Mod+Space' in keys and 'Mod+D' in keys
- assert 'amethyst-launcher --category Settings' in keys
+ assert 'amethyst-launcher' in keys
  assert (ROOT/'payload/local-bin/amethyst-hub').read_text().count('amethyst-launcher')==1
  assert 'fuzzel' in (ROOT/'payload/local-bin/amethyst-launcher').read_text()
  assert 'launcher_gui.py' in (ROOT/'payload/local-bin/amethyst-launcher').read_text()

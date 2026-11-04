@@ -55,7 +55,7 @@ def test_shortcut_collision_free_and_search():
     matches=re.findall(r'^\s*((?:Mod|Ctrl|Alt|Shift|Super|XF86|Print)[^\s{]*)\s+(?:repeat=false\s+)?(?:hotkey-overlay-title="[^"]*"\s+)?\{',text,re.M)
     assert len(matches)==len(set(matches)), 'Duplicate active Niri shortcut'
     assert 'Mod+Space repeat=false' in text and 'amethyst-launcher' in text
-    assert 'Mod+D repeat=false' in text and 'amethyst-launcher --category Settings' in text
+    assert 'Mod+D repeat=false' in text and 'amethyst-launcher' in text
     assert 'Mod+Shift+D' in text
     assert 'amethyst-wallpapers' in text
 

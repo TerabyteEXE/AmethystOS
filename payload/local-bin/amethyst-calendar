@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
+# Share the same themed calendar as the Waybar clock.
 set -Eeuo pipefail
+if [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] && \
+  [[ -r "$HOME/.local/share/amethystos/bar_popup.py" ]] && \
+  python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' >/dev/null 2>&1; then
+  exec "$HOME/.local/bin/amethyst-popover" calendar
+fi
 helper="$HOME/.local/share/amethystos/calendar_gui.py"
 if [[ -r "$helper" ]] && python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' >/dev/null 2>&1; then
   exec python3 "$helper"

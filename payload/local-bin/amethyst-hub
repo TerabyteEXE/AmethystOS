@@ -5,4 +5,4 @@ if [[ "${1:-}" == --list ]]; then
   printf '%s\n' Applications Settings Software Wallpapers Calendar Power
   exit 0
 fi
-exec "$HOME/.local/bin/amethyst-launcher" --category Settings
+exec "$HOME/.local/bin/amethyst-launcher"

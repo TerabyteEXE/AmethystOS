@@ -213,8 +213,8 @@ def describe(action,combo):
     if main=='set-window-height':return ('Reduce' if '-' in action else 'Increase')+' window height by 10%'
     if main.startswith('spawn'):
         if 'alacritty' in action:return 'Open Alacritty terminal'
-        if 'amethyst-launcher' in action:return 'Search installed applications'
-        if 'amethyst-launcher --category Settings' in action:return 'Search AmethystOS settings'
+        if 'amethyst-launcher' in action:return 'Open Amethyst Home (Apps, Style, Setup, Install, and more)'
+        if 'amethyst-launcher --category Settings' in action:return 'Open Amethyst Home (Setup)'
         if 'amethyst-bar' in action:return 'Open Top Bar settings'
         if 'amethyst-wallpapers' in action:return 'Open wallpaper gallery'
         if 'fuzzel' in action:return 'Open application search (Fuzzel)'

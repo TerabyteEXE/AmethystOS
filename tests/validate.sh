@@ -36,6 +36,7 @@ python3 tests/test_usability.py
 python3 tests/test_settings_rc24.py
 python3 tests/test_rc25.py
 python3 tests/test_rc26.py
+python3 tests/test_rc27.py
 
 echo '[test] Direct upstream config and safety checks'
 python3 - <<'PY'
