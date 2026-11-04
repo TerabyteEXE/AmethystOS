@@ -18,7 +18,7 @@ def test_named_workspaces():
   assert f'Mod+{i} {{ focus-workspace "{name}"; }}' in keys
   assert f'Mod+Ctrl+{i} {{ move-column-to-workspace "{name}"; }}' in keys
  assert '"format": "{icon}"' in waybar
- assert 'duration-ms 150' in text
+ assert 'duration-ms 175' in text  # RC2.9 subtle Niri opening animation
 
 def test_bundled_appearance():
  for name in ['dark','light']:

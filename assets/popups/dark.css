@@ -1,12 +1,13 @@
-/* Small, restrained glass surfaces tied to the existing bar and wallpaper. */
-window#amethyst-bar-popup { background-color: rgba(22, 23, 36, 0.94); color: #e9e9f4;
-  border: 1px solid rgba(173,165,208,0.44); border-radius: 9px;
-  box-shadow: 0 10px 29px rgba(0,0,0,0.3); font-family: "Noto Sans", sans-serif; }
+/* Waybar's GTK panel and the other Amethyst surfaces share one palette. */
+window#amethyst-bar-popup { background-color: rgba(23, 23, 35, 0.91); color: #eeebf5;
+  border: 1px solid rgba(165, 151, 196, 0.43); border-radius: 9px;
+  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.26); font-family: "Noto Sans", sans-serif; }
 #amethyst-popup-content { background: transparent; }
-#amethyst-popup-title { font-size: 14px; font-weight: 700; color: #eee9fb; }
-#amethyst-popup-muted { color: #aaa8c0; font-size: 11px; }
-window#amethyst-bar-popup button { background: rgba(109,99,144,0.18); color: #f3f0fb;
-  border: 1px solid rgba(179,168,212,0.18); border-radius: 5px; padding: 8px 10px; }
-window#amethyst-bar-popup button:hover { background: rgba(142,122,197,0.32); }
-window#amethyst-bar-popup calendar { background: transparent; color: #f3f0fb; }
-window#amethyst-bar-popup calendar:selected { background: rgba(171,137,232,0.4); }
+#amethyst-popup-title { font-size: 14px; font-weight: 600; color: #eeebf5; }
+#amethyst-popup-muted { color: #b2adc8; font-size: 11px; }
+window#amethyst-bar-popup button { background: rgba(159, 143, 199, 0.14); color: #eeebf5;
+  border: 1px solid rgba(165, 151, 196, 0.43); border-radius: 6px; padding: 8px 10px; }
+window#amethyst-bar-popup button:hover { background: rgba(144, 123, 192, 0.27); }
+window#amethyst-bar-popup calendar { background: transparent; color: #eeebf5; }
+window#amethyst-bar-popup calendar:selected { background: rgba(144, 123, 192, 0.27); color: #eeebf5; }
+window#amethyst-bar-popup scale slider { background: #c6a9f2; border-radius: 99px; }

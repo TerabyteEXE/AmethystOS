@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# One entry point for Fedora, Flatpak and the AmethystOS desktop update.
+set -Eeuo pipefail
+script="$HOME/.local/share/amethystos/system_update.py"
+[[ -r "$script" ]] || { echo 'AmethystOS updater not installed. Reinstall this release.' >&2; exit 1; }
+exec python3 "$script" "$@"

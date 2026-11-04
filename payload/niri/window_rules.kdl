@@ -215,3 +215,12 @@ window-rule {
         blur true
     }
 }
+
+// AmethystOS widget popovers use the same subdued blur as the Waybar.
+layer-rule {
+    match namespace="^amethyst-popup$"
+    geometry-corner-radius 9
+    background-effect {
+        blur true
+    }
+}

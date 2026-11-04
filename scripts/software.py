@@ -63,12 +63,10 @@ def execute(action:str,key:str):
     return subprocess.call(command(action,key))
 
 def update():
-    print('AmethystOS — update the underlying Fedora system')
-    status=subprocess.call(['sudo','dnf','upgrade','--refresh'])
-    if shutil.which('flatpak'):
-        print('\nOptional user Flatpaks:')
-        subprocess.call(['flatpak','update','--user'])
-    return status
+    # The system updater is the single, reviewed path for Fedora, Flatpak
+    # and the AmethystOS desktop. It does not run unattended upgrades.
+    from system_update import main as update_main
+    return update_main(['all'])
 
 def pause():
     if sys.stdin.isatty():
@@ -93,7 +91,7 @@ def main():
         finally:pause()
         return ret
     if args.action=='update':
-        if args.dry_run:print('sudo dnf upgrade --refresh; flatpak update --user');return 0
+        if args.dry_run:print('Fedora + Flatpak + optional confirmed AmethystOS desktop refresh');return 0
         return spawn_terminal('update','')
     if args.key is not None and args.key not in APPS:
         print('Unknown application: '+args.key,file=sys.stderr);return 2

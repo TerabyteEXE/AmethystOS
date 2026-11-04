@@ -1,53 +1,24 @@
-/* Amethyst Home — compact Omarchy-style navigation.
- * Dark glass, one-level list, no hero, badges, footer or decorative glow.
- * This file changes only the launcher; the desktop and wallpapers are untouched.
- */
-window#amethyst-launcher {
-  background-color: rgba(25, 24, 38, 0.94);
-  color: #edeaf4;
-  border: 1px solid rgba(174, 169, 195, 0.72);
-  border-radius: 2px;
-  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.22);
-  font-family: "Noto Sans", sans-serif;
-  font-size: 12px;
-}
-#amethyst-home-content, #amethyst-home-scroll,
-#amethyst-launcher-results { background: transparent; color: #edeaf4; }
-#amethyst-home-nav {
-  background: rgba(255,255,255,0.025);
-  border-bottom: 1px solid rgba(174, 169, 195, 0.14);
-  padding: 2px 0;
-}
-#amethyst-home-title { color: #c9c4d8; font-size: 11px; font-weight: 500; }
-#amethyst-home-back {
-  border: 0; border-radius: 2px; background: transparent;
-  color: #b2acc5; padding: 0 8px; font-size: 17px; box-shadow: none;
-}
-#amethyst-home-back:hover { background: rgba(170, 157, 202, 0.12); }
-#amethyst-home-search {
-  color: #f1eef8;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(178, 173, 201, 0.13);
-  border-radius: 0;
-  box-shadow: none;
-  padding: 7px 8px;
-  font-size: 12px;
-  caret-color: #d8cafa;
-}
-#amethyst-home-search:focus { border-bottom-color: rgba(189, 171, 225, 0.35); box-shadow: none; }
-#amethyst-launcher-results row {
-  color: #e5e1ed;
-  background: transparent;
-  border: none;
-  border-radius: 2px;
-  margin: 1px 7px;
-}
-#amethyst-launcher-results row:hover { background: rgba(160, 149, 192, 0.10); }
-#amethyst-launcher-results row:selected {
-  background: rgba(127, 120, 157, 0.21);
-  color: #f8f6fb;
-}
+/* AmethystOS Home — one quiet, blur-ready surface.
+   The outer window is transparent; the EventBox draws the complete panel. */
+window#amethyst-launcher { background-color: transparent; color: #eeebf5;
+  font-family: "Noto Sans", sans-serif; font-size: 12px; }
+#amethyst-home-shell { background-color: rgba(23, 23, 35, 0.91); border: 1px solid rgba(165, 151, 196, 0.43);
+  border-radius: 9px; box-shadow: 0 9px 24px rgba(0, 0, 0, 0.26); }
+#amethyst-home-content, #amethyst-home-scroll, #amethyst-launcher-results {
+  background-color: transparent; color: #eeebf5; }
+#amethyst-home-nav { background: transparent; border-bottom: 1px solid rgba(165, 151, 196, 0.43); padding: 2px 0; }
+#amethyst-home-title { color: #b2adc8; font-size: 11px; font-weight: 600; }
+#amethyst-home-back { background: transparent; border: none; box-shadow: none;
+  color: #b2adc8; font-size: 16px; padding: 1px 8px; }
+#amethyst-home-back:hover { background: rgba(159, 143, 199, 0.14); }
+#amethyst-home-search { color: #eeebf5; background: transparent; border: none;
+  border-bottom: 1px solid rgba(165, 151, 196, 0.43); border-radius: 0; box-shadow: none;
+  padding: 9px 8px; font-size: 12px; caret-color: #c6a9f2; }
+#amethyst-home-search:focus { border-bottom-color: #c6a9f2; box-shadow: none; }
+#amethyst-launcher-results row { color: #eeebf5; background: transparent;
+  border: none; border-radius: 5px; margin: 1px 7px; }
+#amethyst-launcher-results row:hover { background: rgba(159, 143, 199, 0.14); }
+#amethyst-launcher-results row:selected { background: rgba(144, 123, 192, 0.27); color: #eeebf5; }
 #amethyst-home-item { padding: 8px 8px; }
 #amethyst-home-row-title { font-size: 12px; font-weight: 400; }
-#amethyst-home-chevron { font-size: 12px; color: rgba(202, 196, 222, 0.50); }
+#amethyst-home-chevron { color: #b2adc8; font-size: 12px; }

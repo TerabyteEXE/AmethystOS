@@ -27,7 +27,7 @@ tooltip {
     padding: 6px;
 }
 tooltip label {
-    color: #09e89d;
+    color: #c6a9f2;
     padding: 2px 6px;
 }
 
@@ -49,8 +49,8 @@ tooltip label {
 }
 
 #workspaces button {
-    color: #94e2d5; /* Keep as it is */
-    background: rgba(18, 19, 32, 0.92); /* workspace buttons */
+    color: #bca6e9; /* Keep as it is */
+    background: rgba(23, 23, 35, 0.91); /* workspace buttons */
     border-radius: 10px;
     padding: 2px 6px;
     margin: 1px 1px;
@@ -98,7 +98,7 @@ tooltip label {
     padding: 2px 8px;
     margin: 1px 1px;
     border-radius: 10px;
-    background: #000000;
+    background: rgba(23, 23, 35, 0.91);
     border: 1px solid rgba(69, 71, 90, 0.3);
     color: #bac2de;
     transition: all 0.2s ease;
@@ -110,7 +110,7 @@ tooltip label {
 
 /* ── Clock ── */
 #clock {
-    color: #94e2d5;
+    color: #bca6e9;
     font-weight: 600;
     font-size: 11px;
     letter-spacing: 0.3px;
@@ -119,14 +119,14 @@ tooltip label {
 
 /* ── Player ── */
 #custom-player {
-    color: #94e2d5;
+    color: #bca6e9;
     font-size: 10px;
     padding: 2px 10px;
 }
 
 /* ── CPU ── */
 #cpu {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #cpu.warning {
     color: #fab387;
@@ -137,7 +137,7 @@ tooltip label {
 
 /* ── Memory ── */
 #memory {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #memory.warning {
     color: #fab387;
@@ -148,7 +148,7 @@ tooltip label {
 
 /* ── Battery ── */
 #battery {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #battery.warning {
     color: #fab387;
@@ -162,7 +162,7 @@ tooltip label {
 
 /* ── Audio ── */
 #pulseaudio {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #pulseaudio.muted {
     color: #f38ba8;
@@ -170,7 +170,7 @@ tooltip label {
 
 /* ── Network ── */
 #network {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #network.disconnected,
 #network.disabled {
@@ -179,10 +179,10 @@ tooltip label {
 
 /* ── Bluetooth ── */
 #bluetooth {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #bluetooth.connected {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 #bluetooth.off,
 #bluetooth.disconnected {
@@ -191,12 +191,12 @@ tooltip label {
 
 /* ── Clipboard ── */
 #custom-clipboard {
-    color: #94e2d5;
+    color: #bca6e9;
 }
 
 /* ── Notifications ── */
 #custom-notifications {
-    color: #94e2d5;
+    color: #bca6e9;
     min-width: 24px;
 }
 #custom-notifications.dnd-none,
@@ -261,3 +261,8 @@ tooltip label {
 #workspaces button, #custom-settings, #custom-logo, #custom-power, #clock {
   transition: background-color 160ms ease, color 160ms ease;
 }
+
+/* AmethystOS unified surface: calibrated to Home, Settings and popovers. */
+#custom-settings, #tray { border-radius: 9px; }
+#custom-settings:hover { background: rgba(144, 123, 192, 0.27); }
+tooltip { border: 1px solid rgba(165, 151, 196, 0.43); background: rgba(23, 23, 35, 0.91); border-radius: 9px; }

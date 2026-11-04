@@ -183,3 +183,7 @@ The interactive menu was fixed for the documented `curl | bash` installer. It no
 - The experimental Plymouth/boot splash option has been removed; no boot files are changed during installation or upgrades.
 
 See [`docs/RELEASE_NOTES_RC25.md`](docs/RELEASE_NOTES_RC25.md) for compatibility and testing notes.
+
+### Updating AmethystOS
+
+Use `amethyst-update` (or **Settings → Software → System updates**). The terminal presents Fedora/Flatpak updates and an optional **AmethystOS desktop refresh** from the official GitHub project, shows the exact upstream commit, asks permission, and re-runs the installer with backed-up config replacement. Use `amethyst-update --dry-run` to preview without changes and review [`docs/RELEASE_NOTES_RC29.md`](docs/RELEASE_NOTES_RC29.md) before upgrading. This is AI-assisted, experimental software; review scripts and source commits before running them.

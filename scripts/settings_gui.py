@@ -352,7 +352,7 @@ class Settings(Gtk.Window):
         self.heading(box,'Software','Manage a curated selection of applications. Package changes still require your approval.')
         self.button(box,'Install applications','Fedora packages and optional user-scoped Flathub applications',lambda:self.run_bin('amethyst-software','install'))
         self.button(box,'Remove applications','Choose a supported program to uninstall',lambda:self.run_bin('amethyst-software','remove'))
-        self.button(box,'System updates','Update Fedora packages and your Flatpak applications',lambda:self.run_bin('amethyst-software','update'))
+        self.button(box,'System updates','Update Fedora, Flatpaks and optionally the AmethystOS desktop',lambda:self.run_bin('amethyst-software','update'))
 
     def build_system(self, box):
         self.heading(box,'System','Help, diagnostics, power and recovery tools.')

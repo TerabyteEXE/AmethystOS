@@ -2,7 +2,7 @@
 # AmethystOS: one installer, user-selectable Fedora apps, recoverable dotfiles.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0
+DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0 PRESERVE_APPEARANCE=0
 APP_GROUPS='' APPS_SET=0 START_THEME=dark
 for arg in "$@"; do
   case "$arg" in
@@ -11,6 +11,7 @@ for arg in "$@"; do
     --no-packages) SKIP_PACKAGES=1 ;;
     --non-interactive) NON_INTERACTIVE=1 ;;
     --no-theme) NO_THEME=1 ;;
+    --preserve-appearance) PRESERVE_APPEARANCE=1; NO_THEME=1 ;;
     --apps=*) APP_GROUPS=${arg#--apps=}; APPS_SET=1 ;;
     --theme=dark) START_THEME=dark ;;
     --theme=light) START_THEME=light ;;
@@ -26,6 +27,7 @@ Usage: bash install.sh [--dry-run] [--replace] [--no-packages]
   --theme=light     Set Amethyst Light on first login (default Dark)
   --no-packages     Don't run DNF (advanced)
   --no-theme        Do not change existing GNOME/GTK appearance preferences
+  --preserve-appearance  Preserve theme, scaling and selected wallpaper on upgrade
   --dry-run         Validate the plan without modifying the system
 The persistent removal command after install is: amethystos-uninstall
 HELP
@@ -145,7 +147,21 @@ else
       echo 'Note: GSettings appearance preference unavailable; GTK configs are still installed.' >&2
     fi
   fi
-  if ! "$HOME/.local/bin/amethyst-theme" "$START_THEME" --no-gtk; then
+  if (( PRESERVE_APPEARANCE )); then
+    # Theme and size are read from the existing appearance.json by the scale
+    # command, without asking for a new theme (which would reset wallpaper).
+    saved_scale=$(python3 - <<'PYINNER'
+import json
+from pathlib import Path
+p=Path.home()/'.local/state/amethystos-base-v1/appearance.json'
+try: print(int(json.loads(p.read_text()).get('scale',100)))
+except (OSError,ValueError,TypeError): print(100)
+PYINNER
+)
+    if ! "$HOME/.local/bin/amethyst-scale" "$saved_scale" --no-gtk; then
+      echo 'Appearance restoration incomplete; settings remain available.' >&2
+    fi
+  elif ! "$HOME/.local/bin/amethyst-theme" "$START_THEME" --no-gtk; then
     echo 'Theme colors could not be fully applied; desktop configs are still present.' >&2
   fi
   mkdir -p "$HOME/Pictures/Screenshots"

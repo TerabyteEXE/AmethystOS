@@ -1,5 +1,5 @@
 /* Scoped to the AmethystOS Settings window; does not alter other GTK apps. */
-window#amethyst-settings { background-color: #171925; color: #e9e9f4; font-family: "Noto Sans", sans-serif; font-size: 11pt; }
+window#amethyst-settings { background-color: rgba(23, 23, 35, 0.91); color: #e9e9f4; font-family: "Noto Sans", sans-serif; font-size: 11pt; }
 window#amethyst-settings headerbar { background: #222536; background-image: none; border: none; border-bottom: 1px solid #393c53; box-shadow: none; color: #e9e9f4; min-height: 48px; }
 window#amethyst-settings headerbar label { color: #e9e9f4; }
 window#amethyst-settings box#amethyst-sidebar { background-color: #1c1f2e; border-right: 1px solid #393c53; }

@@ -34,7 +34,7 @@ ACTIONS = (
     Action('Software', 'Software', 'Install, remove and update', (f'{BIN}/amethyst-settings', 'software'), 'system-software-install'),
     Action('Software', 'Install an application', 'Curated Fedora and Flatpak software', (f'{BIN}/amethyst-software', 'install'), 'list-add'),
     Action('Software', 'Remove an application', 'Review changes before removal', (f'{BIN}/amethyst-software', 'remove'), 'edit-delete'),
-    Action('Software', 'System updates', 'Fedora and Flatpak updates', (f'{BIN}/amethyst-software', 'update'), 'software-update-available'),
+    Action('Software', 'System updates', 'Fedora, Flatpaks and AmethystOS desktop updates', (f'{BIN}/amethyst-software', 'update'), 'software-update-available'),
     Action('Wallpapers', 'Wallpaper gallery', 'Choose from installed wallpapers', (f'{BIN}/amethyst-wallpapers',), 'preferences-desktop-wallpaper'),
     Action('System', 'Calendar', 'Today and monthly calendar', (f'{BIN}/amethyst-calendar',), 'x-office-calendar'),
     Action('System', 'System diagnostics', 'Check desktop components', (f'{BIN}/amethyst-settings', 'system'), 'utilities-system-monitor'),
@@ -170,6 +170,23 @@ def panel_size(section: str) -> tuple[int, int]:
     return 346, max(150, min(340, 99 + 38 * n))
 
 
+def scroll_target(value: float, page: float, upper: float, top: float,
+                  height: float, padding: float = 6) -> float:
+    """Return a vertical scrollbar position that keeps the highlighted row visible.
+
+    The ListBox selection is programmatic so GTK's usual keyboard-driven
+    ScrolledWindow movement does not always run. Keep this pure for testing.
+    """
+    if page <= 0:
+        return 0.0
+    target = value
+    if top - padding < value:
+        target = top - padding
+    elif top + height + padding > value + page:
+        target = top + height + padding - page
+    return max(0.0, min(target, max(0.0, upper - page)))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--category', choices=CATEGORIES, default='All', help='Open an existing menu section')
@@ -202,8 +219,14 @@ def main():
             super().__init__(title='AmethystOS Home')
             self.set_name('amethyst-launcher')
             self.set_decorated(False)
-            self.set_resizable(True)
+            self.set_resizable(False)
             self.set_size_request(258, 130)
+            self.set_app_paintable(True)
+            screen = self.get_screen()
+            if screen is not None and screen.is_composited():
+                rgba = screen.get_rgba_visual()
+                if rgba is not None:
+                    self.set_visual(rgba)
             self.set_default_size(*panel_size('Home'))
             self.set_position(Gtk.WindowPosition.CENTER)
             self.connect('destroy', Gtk.main_quit)
@@ -216,9 +239,16 @@ def main():
             self.provider = Gtk.CssProvider()
             self.load_style()
 
+            # Draw one clipped-looking, coherent glass surface. The window
+            # itself is transparent so the compositor can blur behind it.
+            shell = Gtk.EventBox()
+            shell.set_name('amethyst-home-shell')
+            for edge in ('start', 'end', 'top', 'bottom'):
+                getattr(shell, f'set_margin_{edge}')(4)
+            self.add(shell)
             frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             frame.set_name('amethyst-home-content')
-            self.add(frame)
+            shell.add(frame)
 
             self.navline = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=3)
             self.navline.set_name('amethyst-home-nav')
@@ -251,6 +281,7 @@ def main():
             scroll = Gtk.ScrolledWindow()
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scroll.set_name('amethyst-home-scroll')
+            scroll.set_overlay_scrolling(False)
             scroll.set_hexpand(True)
             scroll.set_vexpand(True)
             self.results = Gtk.ListBox()
@@ -259,6 +290,7 @@ def main():
             self.results.set_activate_on_single_click(False)
             self.results.connect('row-activated', self.activate)
             self.results.connect('key-press-event', self.on_key)
+            self.scroll = scroll
             scroll.add(self.results)
             frame.pack_start(scroll, True, True, 0)
 
@@ -331,8 +363,15 @@ def main():
                 row = Gtk.ListBoxRow()
                 line = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=9)
                 line.set_name('amethyst-home-item')
-                glyph = Gtk.Image.new_from_icon_name(item.icon, Gtk.IconSize.MENU)
-                glyph.set_pixel_size(15)
+                # Desktop files already supply the correct icon (including
+                # Flatpak and custom icons). Never replace them with one
+                # generic image; use a fallback only if Gio has none.
+                app = self.app_map.get(item.title) if item.description == 'Application' else None
+                gicon = app.get_icon() if app is not None else None
+                glyph = (Gtk.Image.new_from_gicon(gicon, Gtk.IconSize.MENU)
+                         if gicon is not None else
+                         Gtk.Image.new_from_icon_name(item.icon, Gtk.IconSize.MENU))
+                glyph.set_pixel_size(17)
                 line.pack_start(glyph, False, False, 0)
                 title = Gtk.Label(label=item.title)
                 title.set_name('amethyst-home-row-title')
@@ -350,6 +389,18 @@ def main():
             if first is not None:
                 self.results.select_row(first)
             # Selecting a ListBox row must never steal focus from the search.
+            GLib.idle_add(self._scroll_selected)
+
+        def _scroll_selected(self):
+            row = self.results.get_selected_row()
+            if row is None or row.get_parent() is not self.results:
+                return False
+            adjustment = self.scroll.get_vadjustment()
+            bounds = row.get_allocation()
+            value = scroll_target(adjustment.get_value(), adjustment.get_page_size(),
+                                  adjustment.get_upper(), bounds.y, bounds.height)
+            adjustment.set_value(value)
+            return False
 
         def launch_action(self, action):
             command = action.command
@@ -387,7 +438,10 @@ def main():
                 dialog.run()
                 dialog.destroy()
                 return
-            self.close()
+            # Hide immediately to avoid overlapping the Settings window or
+            # wallpaper gallery. Destroy on the next GTK loop iteration.
+            self.hide()
+            GLib.idle_add(self.destroy)
 
         def _edit_from_results(self, name):
             """Edit the search if a click placed keyboard focus on the list."""
@@ -451,6 +505,7 @@ def main():
                     row = self.results.get_row_at_index(index)
                     if row is not None:
                         self.results.select_row(row)
+                        self._scroll_selected()
                         self.entry.grab_focus()
                 return True
             if widget is self.results and event.string and event.string.isprintable():

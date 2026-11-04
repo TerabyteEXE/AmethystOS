@@ -25,6 +25,7 @@ def main():
     gi.require_version('Gtk','3.0')
     from gi.repository import Gtk,Gdk,GdkPixbuf
     win=Gtk.Window(title='AmethystOS · Wallpapers')
+    win.set_name('amethyst-wallpaper-gallery')
     win.set_default_size(860,570)
     win.set_border_width(14)
     win.connect('destroy',Gtk.main_quit)
@@ -70,9 +71,18 @@ def main():
     button.connect('clicked',apply)
     bottom.pack_end(button,False,False,0)
     # Arrow keys navigate thumbnails automatically in Gtk.IconView.
-    style=Gtk.CssProvider()
-    style.load_from_data(b'''window {background:#151923;color:#eeeaf6;} label{color:#e7e2f3;} button{border-radius:8px;} iconview{background:#171c29;}''')
-    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    theme='dark'
+    try:
+        import json
+        appearance=json.loads((Path.home()/'.local/state/amethystos-base-v1/appearance.json').read_text())
+        theme='light' if appearance.get('theme')=='light' else 'dark'
+    except (OSError,ValueError,TypeError):
+        pass
+    css=Path.home()/'.local/share/amethystos/gallery'/f'{theme}.css'
+    if css.exists():
+        style=Gtk.CssProvider()
+        style.load_from_path(str(css))
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     win.show_all()
     Gtk.main();return 0
 

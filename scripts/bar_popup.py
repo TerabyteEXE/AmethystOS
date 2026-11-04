@@ -107,6 +107,8 @@ def main():
     if GtkLayerShell is not None:
         try:
             GtkLayerShell.init_for_window(win)
+            if hasattr(GtkLayerShell, 'set_namespace'):
+                GtkLayerShell.set_namespace(win, 'amethyst-popup')
             GtkLayerShell.set_layer(win,GtkLayerShell.Layer.OVERLAY)
             GtkLayerShell.set_anchor(win,GtkLayerShell.Edge.TOP,True)
             GtkLayerShell.set_margin(win,GtkLayerShell.Edge.TOP,39)
@@ -157,7 +159,7 @@ def main():
         box.pack_start(field,False,False,0)
         return field
 
-    def button(text,*command,close=False):
+    def button(text,*command,close=True):
         item=Gtk.Button(label=text)
         item.set_relief(Gtk.ReliefStyle.NONE)
         def clicked(_):
@@ -206,7 +208,7 @@ def main():
         volume.connect('value-changed',changed)
         box.pack_start(volume,False,False,0)
         if shutil.which('wpctl'):
-            button('Toggle mute','wpctl','set-mute','@DEFAULT_AUDIO_SINK@','toggle')
+            button('Toggle mute','wpctl','set-mute','@DEFAULT_AUDIO_SINK@','toggle',close=False)
         button('Audio settings',str(local_bin/'amethyst-settings'),'devices')
     elif mode=='network':
         wifi=active_wifi()

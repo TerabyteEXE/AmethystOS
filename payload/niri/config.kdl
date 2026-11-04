@@ -339,17 +339,17 @@ animations {
   // Slow down all animations by this factor. Values below 1 speed them up instead.
   // Calm, short animations; no external shaders or GPU-heavy transitions.
   workspace-switch {
-    spring damping-ratio=1.0 stiffness=950 epsilon=0.001
+    spring damping-ratio=1.0 stiffness=820 epsilon=0.001
   }
   horizontal-view-movement {
-    spring damping-ratio=1.0 stiffness=850 epsilon=0.001
+    spring damping-ratio=1.0 stiffness=750 epsilon=0.001
   }
   window-open {
-    duration-ms 150
+    duration-ms 175
     curve "ease-out-cubic"
   }
   window-close {
-    duration-ms 130
+    duration-ms 145
     curve "ease-out-quad"
   }
 }
