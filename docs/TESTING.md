@@ -49,3 +49,7 @@ Manual release gates (must run in a REAL Fedora/Niri session):
    suspending, networking and locking on the actual target hardware.
 
 Never describe the release as "fully verified" until these tests pass.
+
+## RC2.1: terminal UI regression
+
+`tests/test_installer_tty.py` opens a real pseudo-terminal, runs the Python menu with stdin supplied by a pipe, exercises gaming/replace/appearance toggles, and confirms the written JSON plan. This catches the original non-seekable-terminal crash without running DNF.

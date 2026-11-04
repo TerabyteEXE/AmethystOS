@@ -30,3 +30,11 @@ The uninstaller leaves GNOME, DNF packages and personal wallpapers installed. It
 Portable installer, package, website, theme, wallpaper, config-protection and multi-upgrade restore tests passed. Native Niri config parsing and graphical Fedora tests **could not be run in the build environment**. Before marking this as stable v1, test a real Fedora/Niri login, portals/screen sharing, application launchers, Waybar click targets, audio/Bluetooth, display scaling, and restore on the target hardware.
 
 This project contains AI-assisted code and has not been independently security-audited. Review scripts, especially the one-line remote bootstrap, before executing them.
+
+## RC2.1: interactive setup correction
+
+- Fix the installer crashing with `io.UnsupportedOperation: File or stream is not seekable` when run using `curl ... | bash`. Read and write `/dev/tty` through separate streams instead of an `r+` text stream.
+- Resolve the duplicate `8` menu option: number 8 now selects gaming apps, number 9 selects backup-and-replace, and 10 controls GTK appearance.
+- Add a pseudo-terminal integration test that simulates piped stdin and verifies the saved install plan. No system packages are installed during the test.
+
+The fix changes only setup and tests; desktop configs, wallpapers, GNOME fallback, and recovery behavior are unchanged.

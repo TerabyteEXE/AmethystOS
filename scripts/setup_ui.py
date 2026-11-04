@@ -41,8 +41,8 @@ def draw(writer, selected, replace, appearance):
     for n, (key, title, info) in enumerate(GROUPS, 1):
         mark = f'{CYAN}✓{RESET}' if key in selected else ' '
         writer.write(f'  {n}. [{mark}] {title:<22} {DIM}{info}{RESET}\n')
-    writer.write(f'\n  8. [{CYAN if replace else ""}{"✓" if replace else " "}{RESET}] Back up and replace existing dotfiles\n')
-    writer.write(f'  9. [{CYAN if appearance else ""}{"✓" if appearance else " "}{RESET}] Coordinate GTK dark appearance (affects GNOME too)\n')
+    writer.write(f'\n  9. [{CYAN if replace else ""}{"✓" if replace else " "}{RESET}] Back up and replace existing dotfiles\n')
+    writer.write(f' 10. [{CYAN if appearance else ""}{"✓" if appearance else " "}{RESET}] Coordinate GTK dark appearance (affects GNOME too)\n')
     writer.write('\n  Enter a number to toggle, or press Enter to install.\n')
     writer.write(f'  {DIM}No existing desktop configuration will be replaced silently.{RESET}\n\n')
     writer.write(f'{PURPLE}amethystos › {RESET}')
@@ -53,10 +53,14 @@ def interactive_plan() -> dict:
     selected = set(DEFAULTS)
     replace = False
     appearance = True
-    with open('/dev/tty', 'r+', encoding='utf-8', buffering=1) as tty:
+    # Never open a terminal in 'r+' mode: Python's text I/O can seek between
+    # writes and reads, but terminal devices are not seekable. The installer
+    # runs with stdin owned by curl, so open /dev/tty for each direction.
+    with (open('/dev/tty', 'r', encoding='utf-8') as tty_in,
+          open('/dev/tty', 'w', encoding='utf-8', buffering=1) as tty_out):
         while True:
-            draw(tty, selected, replace, appearance)
-            answer = tty.readline()
+            draw(tty_out, selected, replace, appearance)
+            answer = tty_in.readline()
             if not answer:
                 raise RuntimeError('The setup terminal was closed')
             choice = answer.strip().lower()
@@ -64,22 +68,22 @@ def interactive_plan() -> dict:
                 break
             if choice in ('q', 'quit', 'cancel'):
                 raise KeyboardInterrupt
-            if choice == '8':
+            if choice == '9':
                 replace = not replace
-            elif choice == '9':
+            elif choice == '10':
                 appearance = not appearance
             elif choice.isdigit() and 1 <= int(choice) <= len(GROUPS):
                 key = GROUPS[int(choice) - 1][0]
                 if key in selected: selected.remove(key)
                 else: selected.add(key)
-        tty.write('\033[2J\033[H')
-        tty.write(f'{BOLD}{PURPLE}◆ AMETHYSTOS{RESET}  Your choices\n\n')
-        tty.write('  Optional apps: ' + (', '.join(sorted(selected)) or '(none)') + '\n')
-        tty.write('  Existing configs: ' + ('back up and replace' if replace else 'preserve') + '\n')
-        tty.write('  GTK appearance: ' + ('apply coordinated dark preference' if appearance else 'leave unchanged') + '\n\n')
-        tty.write('  Continue with Fedora package installation? [y/N] ')
-        tty.flush()
-        if tty.readline().strip().lower() not in ('y', 'yes'):
+        tty_out.write('\033[2J\033[H')
+        tty_out.write(f'{BOLD}{PURPLE}◆ AMETHYSTOS{RESET}  Your choices\n\n')
+        tty_out.write('  Optional apps: ' + (', '.join(sorted(selected)) or '(none)') + '\n')
+        tty_out.write('  Existing configs: ' + ('back up and replace' if replace else 'preserve') + '\n')
+        tty_out.write('  GTK appearance: ' + ('apply coordinated dark preference' if appearance else 'leave unchanged') + '\n\n')
+        tty_out.write('  Continue with Fedora package installation? [y/N] ')
+        tty_out.flush()
+        if tty_in.readline().strip().lower() not in ('y', 'yes'):
             raise KeyboardInterrupt
     return create_plan(list(selected), replace, appearance)
 
@@ -103,6 +107,10 @@ def main():
     except (KeyboardInterrupt, EOFError):
         print('\nSetup canceled. Nothing has been installed.', file=sys.stderr)
         return 130
+    except OSError as exc:
+        print(f'Unable to use the interactive terminal: {exc}\n'
+              'Run from a terminal window, or use --non-interactive.', file=sys.stderr)
+        return 2
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
     return 0
