@@ -214,7 +214,7 @@ def describe(action,combo):
     if main.startswith('spawn'):
         if 'alacritty' in action:return 'Open Alacritty terminal'
         if 'amethyst-launcher' in action:return 'Search installed applications'
-        if 'amethyst-hub' in action:return 'Open Amethyst quick menu'
+        if 'amethyst-launcher --category Settings' in action:return 'Search AmethystOS settings'
         if 'amethyst-bar' in action:return 'Open Top Bar settings'
         if 'amethyst-wallpapers' in action:return 'Open wallpaper gallery'
         if 'fuzzel' in action:return 'Open application search (Fuzzel)'

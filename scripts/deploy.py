@@ -27,7 +27,7 @@ EXTRA_FILES = (
     "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
     "amethyst-theme", "amethyst-scale",
     "amethyst-launcher", "amethyst-hub", "amethyst-bar", "amethyst-wallpapers",
-    "amethyst-software", "amethyst-calendar",
+    "amethyst-software", "amethyst-calendar", "amethyst-popover",
 )
 SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
 
@@ -62,10 +62,12 @@ def sources() -> list[tuple[Path, Path]]:
     mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
     mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
     mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
-    for script in ("bar_config.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "settings_gui.py", "settings_backend.py"):
+    for script in ("bar_config.py", "launcher_gui.py", "bar_popup.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "settings_gui.py", "settings_backend.py"):
         mapping.append((ROOT / "scripts" / script, Path(".local/share/amethystos") / script))
     mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
     mapping.append((ROOT / "assets/settings", Path(".local/share/amethystos/settings")))
+    mapping.append((ROOT / "assets/launcher", Path(".local/share/amethystos/launcher")))
+    mapping.append((ROOT / "assets/popups", Path(".local/share/amethystos/popups")))
     mapping.append((ROOT / "assets/branding/amethyst-logo.png", Path(".local/share/amethystos/assets/amethyst-logo.png")))
     mapping.extend((source,Path(".local/share/applications") / source.name)
                    for source in sorted((PAYLOAD / "applications").glob("*.desktop")))

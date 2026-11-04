@@ -1,0 +1,9 @@
+/* Match the existing AmethystOS Settings palette; no glow or wallpaper art. */
+window#amethyst-launcher { background: #171925; color: #e9e9f4; }
+#amethyst-launcher entry { background: #222536; color: #e9e9f4; border: 1px solid #393c53; border-radius: 7px; padding: 9px; font-size: 15px; }
+#amethyst-launcher-categories { background: #1c1f2e; }
+#amethyst-launcher-categories button { border-radius: 6px; background: transparent; color: #aeb0c7; padding: 7px; }
+#amethyst-launcher-categories button.selected-category { background: #30334a; color: #b4befe; }
+#amethyst-launcher-results row { background: transparent; border-radius: 5px; margin: 2px 8px; }
+#amethyst-launcher-results row:selected { background: #30334a; color: #e9e9f4; }
+#amethyst-launcher-hint { color: #aeb0c7; font-size: 11px; }

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Toggle a single AmethystOS Fuzzel instance with Super+Space.
-# Only signals the PID we launched, never every Fuzzel process on the desktop.
+# Super+Space toggles Amethyst's unified, category-filtered launcher.
+# Native GTK is preferred; Fuzzel remains the safe fallback if GTK is unavailable.
 set -Eeuo pipefail
 umask 077
 runtime="${XDG_RUNTIME_DIR:-$HOME/.cache}"
@@ -10,18 +10,24 @@ if [[ -f "$state" ]]; then
   read -r pid < "$state" || pid=''
   if [[ "$pid" =~ ^[0-9]+$ ]] && [[ -r "/proc/$pid/cmdline" ]]; then
     args=$(tr '\0' ' ' < "/proc/$pid/cmdline")
-    if [[ "$args" == *fuzzel* ]]; then
+    if [[ "$args" == *launcher_gui.py* || "$args" == *fuzzel* ]]; then
       kill -TERM "$pid" 2>/dev/null || true
       exit 0
     fi
   fi
   rm -f -- "$state"
 fi
-if ! command -v fuzzel >/dev/null 2>&1; then
-  echo 'AmethystOS: Fuzzel is not installed' >&2; exit 1
+GUI="$HOME/.local/share/amethystos/launcher_gui.py"
+if [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" && -r "$GUI" ]] && \
+    python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk, Gio' >/dev/null 2>&1; then
+  python3 "$GUI" "$@" &
+else
+  if ! command -v fuzzel >/dev/null 2>&1; then
+    echo 'AmethystOS: GTK launcher and Fuzzel are unavailable.' >&2; exit 1
+  fi
+  # Fallback: clean Apps / Amethyst Menu search, existing desktop entry actions.
+  fuzzel --prompt 'Apps / Amethyst Menu: ' --lines 10 --width 54 &
 fi
-# Only actual apps and the single Amethyst Settings entry appear in search.
-fuzzel --prompt 'Apps / Amethyst Menu: ' --lines 10 --width 46 &
 pid=$!
 printf '%s\n' "$pid" > "$state"
 wait "$pid" || true

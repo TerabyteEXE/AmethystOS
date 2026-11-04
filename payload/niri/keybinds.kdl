@@ -18,7 +18,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
     Mod+Space repeat=false hotkey-overlay-title="Search apps / Amethyst Menu (toggle)" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-launcher"; }
-    Mod+D repeat=false hotkey-overlay-title="AmethystOS quick actions" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-hub"; }
+    Mod+D repeat=false hotkey-overlay-title="AmethystOS search (settings category)" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-launcher --category Settings"; }
     Mod+Shift+S { spawn "sh" "-c" "$HOME/.local/bin/amethyst-settings"; }
     Mod+Shift+W { spawn "sh" "-c" "$HOME/.local/bin/amethyst-wallpapers"; }
     Mod+Shift+T { spawn "sh" "-c" "$HOME/.local/bin/amethyst-settings appearance"; }

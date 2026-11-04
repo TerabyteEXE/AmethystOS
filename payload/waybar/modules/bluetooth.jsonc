@@ -10,7 +10,7 @@
     "format-no-controller": "󰂲",
     "tooltip": true,
     "tooltip-format": "{controller_alias}  {controller_address}",
-    "on-click": "~/.local/bin/amethyst-settings bluetooth",
+    "on-click": "~/.local/bin/amethyst-popover bluetooth",
     "on-click-right": "rfkill toggle bluetooth",
   },
 }

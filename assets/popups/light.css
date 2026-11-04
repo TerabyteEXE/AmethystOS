@@ -1,0 +1,4 @@
+window#amethyst-bar-popup { background: #f7f7fc; color: #272338; border: 1px solid #d8d6e4; border-radius: 8px; }
+#amethyst-bar-popup button { background: #ffffff; color: #272338; border: 1px solid #d8d6e4; border-radius: 5px; padding: 8px; }
+#amethyst-bar-popup button:hover { background: #e8e5f4; }
+#amethyst-popup-title { font-weight: bold; font-size: 14px; }

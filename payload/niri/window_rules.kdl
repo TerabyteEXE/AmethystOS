@@ -197,3 +197,10 @@ window-rule {
     geometry-corner-radius 20
     clip-to-geometry true
 }
+
+// AmethystOS small utility surfaces should float, never consume a tile.
+// The layer-shell version of the bar popup anchors itself above normal windows.
+window-rule {
+    match title=r#"^AmethystOS( · .*)?$"#
+    open-floating true
+}

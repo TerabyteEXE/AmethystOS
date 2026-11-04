@@ -17,7 +17,7 @@
       "car": "󰄋"
     },
     "scroll-step": 5,
-    "on-click": "~/.local/bin/amethyst-settings audio",
+    "on-click": "~/.local/bin/amethyst-popover audio",
     "on-click-right": "pavucontrol",
     "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
     "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-",

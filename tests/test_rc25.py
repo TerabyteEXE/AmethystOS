@@ -32,8 +32,9 @@ def test_menu_access_via_search():
     launcher=(ROOT/'payload/local-bin/amethyst-launcher').read_text()
     assert 'Apps / Amethyst Menu:' in launcher
     hub=(ROOT/'payload/local-bin/amethyst-hub').read_text()
-    for category in ('Applications','Settings','Software','Wallpapers','Calendar','Power'):
-        assert category in hub
+    assert 'amethyst-launcher' in hub
+    from launcher_gui import CATEGORIES
+    assert set(('Apps','Settings','Software','Wallpapers','System','Power')).issubset(CATEGORIES)
     keys=(ROOT/'payload/niri/keybinds.kdl').read_text()
     assert 'Mod+Space repeat=false' in keys and 'Mod+D repeat=false' in keys
 

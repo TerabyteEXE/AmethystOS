@@ -1,0 +1,8 @@
+window#amethyst-launcher { background: #f7f7fc; color: #272338; }
+#amethyst-launcher entry { background: #ffffff; color: #272338; border: 1px solid #d8d6e4; border-radius: 7px; padding: 9px; font-size: 15px; }
+#amethyst-launcher-categories { background: #f0eff8; }
+#amethyst-launcher-categories button { border-radius: 6px; background: transparent; color: #69657b; padding: 7px; }
+#amethyst-launcher-categories button.selected-category { background: #e5e0f5; color: #675b9e; }
+#amethyst-launcher-results row { background: transparent; border-radius: 5px; margin: 2px 8px; }
+#amethyst-launcher-results row:selected { background: #e5e0f5; color: #272338; }
+#amethyst-launcher-hint { color: #69657b; font-size: 11px; }

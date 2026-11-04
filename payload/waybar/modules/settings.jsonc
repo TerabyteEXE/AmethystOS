@@ -3,7 +3,7 @@
     "format": "⚙",
     "tooltip": true,
     "tooltip-format": "Amethyst Settings",
-    "on-click": "~/.local/bin/amethyst-settings",
+    "on-click": "~/.local/bin/amethyst-popover settings",
     "on-click-right": "~/.local/bin/amethyst-bar menu"
   }
 }

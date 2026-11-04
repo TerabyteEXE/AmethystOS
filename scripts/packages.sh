@@ -12,7 +12,7 @@ AMETHYSTOS_REQUIRED=(
   cascadia-mono-nf-fonts google-noto-sans-fonts
 )
 # These are cosmetic tools. Missing ones do NOT block the graphical desktop.
-AMETHYSTOS_OPTIONAL=(starship fastfetch btop cava nwg-look gammastep grim slurp zoxide chafa)
+AMETHYSTOS_OPTIONAL=(gtk-layer-shell starship fastfetch btop cava nwg-look gammastep grim slurp zoxide chafa)
 
 # Software chosen in the terminal UI; packages are from configured Fedora repos.
 # This is intentionally not a general-purpose package-name input field.

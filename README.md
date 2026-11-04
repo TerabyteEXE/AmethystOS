@@ -64,7 +64,7 @@ personal wallpapers or GNOME.
 | --- | --- |
 | Scrollable tiling compositor | Niri |
 | Status bar | Waybar |
-| App launcher | Fuzzel |
+| App launcher | AmethystOS Search (GTK), Fuzzel fallback |
 | Terminal | Alacritty (Kitty also configured) |
 | Notifications | Mako |
 | Wallpaper | Swaybg and a wallpaper picker |
@@ -75,30 +75,35 @@ personal wallpapers or GNOME.
 
 **AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. Both are copied if missing on every installation, without replacing files of the same name. A fresh, empty wallpaper directory selects Amethyst Dark by default; existing wallpaper choices remain untouched. Change through Super+Shift+W, `set-wallpaper`, or Amethyst Settings.
 
-## Search, software and controls (RC2.4)
+## Search, software and controls (RC2.6)
 
-**Super+Space** searches installed applications. AmethystOS controls are grouped
-inside the single **Amethyst Settings** app (Super+Shift+S or Waybar gear). Press **Super+Space again** to close the same launcher (or Esc).
-The **Super+D** menu has six concise categories: Applications, Settings,
-Software, Wallpapers, Calendar, and Power. Software installation, removal and
-updates are grouped under **Settings → Software**. Nothing in this menu bypasses your confirmation for system
-package changes.
+**Super+Space** opens the larger, keyboard-first AmethystOS Search. Its categories
+are **All, Apps, Settings, Software, Wallpapers, System, and Power**. Type a
+query, use Up/Down to choose a result, Enter to open, Ctrl+1–7 to filter, and
+Esc or **Super+Space again** to close. The launcher uses GIO for desktop apps
+instead of manually running their desktop command strings. Fuzzel remains a
+fallback if the GTK launcher is unavailable.
 
-**Click the clock** for a calendar; hover for the month view. **Super+Shift+W**
-opens the new scrollable wallpaper thumbnail browser; select an image and click
-Apply or double-click it. It falls back to the older Fuzzel keyboard picker
-if GTK bindings are unavailable.
+**Super+D** opens the same launcher starting in **Settings**, instead of showing
+a second, inconsistent quick menu. Software transactions still show DNF or
+Flatpak confirmation; installing packages is never a silent search action.
 
-Use **Super+Alt+B** or right-click the bar's gear icon to open the persistent
-**Top bar** page inside Settings. This graphical window stays open when you change
-position, density or visible modules. These preferences survive Light/Dark switching and scale changes. See [`docs/USABILITY.md`](docs/USABILITY.md).
+Waybar keeps its existing look. Clicking its clock, audio, network, Bluetooth,
+or settings widget opens a compact Light/Dark GTK panel, anchored below the bar
+when the optional Fedora `gtk-layer-shell` package is available. These are
+separate layer-shell surfaces, not native popovers created by Waybar, so behavior
+may vary across monitor setups. Right-click functions remain available.
+
+**AmethystDark.png** and **AmethystLight.png** remain unmodified. The current
+Niri rice and existing Waybar geometry are intentionally preserved. See
+[`docs/RELEASE_NOTES_RC26.md`](docs/RELEASE_NOTES_RC26.md) for scope and caveats.
 
 ## First shortcuts
 
 | Keys | Action |
 | --- | --- |
 | `Super + Enter` | Terminal |
-| `Super + Space` | App launcher |
+| `Super + Space` | Categorized app and action search |
 | `Super + W` | Close focused window |
 | `Super + Shift + Tab` | Toggle tabbed column display |
 | `Super + Shift + S` | Open Settings |
