@@ -14,7 +14,7 @@ from bar_config import load as bar_load, render as bar_render
 THEME_FILES=(
  'waybar/style.css','waybar/config.jsonc','kitty/kitty.conf','alacritty/alacritty.toml',
  'fuzzel/fuzzel.ini','mako/config','gtk-3.0/settings.ini',
- 'gtk-4.0/settings.ini','qt6ct/qt6ct.conf',
+ 'gtk-4.0/settings.ini','gtk-4.0/gtk.css','gtk-4.0/gtk-dark.css','qt6ct/qt6ct.conf',
 )
 VALID_SIZES=(100,115,125,150,175)
 
@@ -114,7 +114,7 @@ def apply(home,theme=None,scale=None,gtk=True,reload=True):
  waybar_cfg=home/'.config/waybar/config.jsonc'
  waybar_css=home/'.config/waybar/style.css'
  replacements[waybar_cfg],replacements[waybar_css]=bar_render(
-    replacements[waybar_cfg],replacements[waybar_css],bar_load(home))
+    replacements[waybar_cfg],replacements[waybar_css],bar_load(home), scale=scale)
  # Store originals before committing. All tracked files are guaranteed unchanged.
  originals={p:p.read_bytes() for p in replacements}
  try:

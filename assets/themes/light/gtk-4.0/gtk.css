@@ -1,0 +1,6 @@
+/* AmethystOS GTK4 Light: minimal overrides, no forced dark widgets. */
+@define-color accent_color #73529d;
+@define-color accent_bg_color #7754a0;
+@define-color accent_fg_color #ffffff;
+@define-color selected_bg_color #7754a0;
+@define-color selected_fg_color #ffffff;

@@ -62,7 +62,7 @@ def sources() -> list[tuple[Path, Path]]:
     mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
     mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
     mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
-    for script in ("bar_config.py", "launcher_gui.py", "bar_popup.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "system_update.py", "settings_gui.py", "settings_backend.py"):
+    for script in ("bar_config.py", "launcher_gui.py", "bar_popup.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "system_update.py", "settings_gui.py", "settings_backend.py", "ui_style.py"):
         mapping.append((ROOT / "scripts" / script, Path(".local/share/amethystos") / script))
     mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
     mapping.append((ROOT / "assets/settings", Path(".local/share/amethystos/settings")))

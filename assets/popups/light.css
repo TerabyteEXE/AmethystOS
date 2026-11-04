@@ -11,3 +11,6 @@ window#amethyst-bar-popup button:hover { background: rgba(143, 113, 195, 0.22); 
 window#amethyst-bar-popup calendar { background: transparent; color: #2e293d; }
 window#amethyst-bar-popup calendar:selected { background: rgba(143, 113, 195, 0.22); color: #2e293d; }
 window#amethyst-bar-popup scale slider { background: #71539c; border-radius: 99px; }
+
+/* Bar panels use the same accent as Home and Settings. */
+#amethyst-popup-title { border-bottom: 1px solid #7753ad; padding-bottom: 5px; }

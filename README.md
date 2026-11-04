@@ -101,6 +101,23 @@ Your original **AmethystDark.png** and **AmethystLight.png** are unchanged.
 No mockup art, additional wallpaper, new boot splash, or new GTK-wide styling
 is forced on other apps. See [`docs/RELEASE_NOTES_RC27.md`](docs/RELEASE_NOTES_RC27.md).
 
+## Readability and scale (RC2.10)
+
+Use **Amethyst Settings → Appearance → Text and UI** or choose a known scale
+from the terminal:
+
+```bash
+amethyst-scale 125  # 100, 115, 125, 150 or 175
+amethyst-scale 100  # return to standard text sizing
+```
+
+The same preference now sizes **Amethyst Home, Settings, calendar/bar panels,
+wallpaper gallery, Waybar and the configured terminals**, while respecting
+Niri's per-monitor Wayland scale. On small monitors, windows stay within the
+usable screen and scroll their content. External GTK/Qt/Flatpak/Electron apps
+can have their own display settings and are not guaranteed to match perfectly.
+See [RC2.10 testing and rollback](docs/RELEASE_NOTES_RC210.md).
+
 ## First shortcuts
 
 | Keys | Action |

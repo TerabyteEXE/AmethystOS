@@ -26,3 +26,7 @@ window#amethyst-settings scrolledwindow { background-color: #f7f7fc; }
 window#amethyst-settings separator { background-color: #d8d6e4; min-width: 1px; min-height: 1px; }
 window#amethyst-settings spinner { color: #675b9e; }
 window#amethyst-settings label.error { color: #e67d91; }
+
+/* A consistent, restrained Amethyst accent in Settings. */
+window#amethyst-settings stacksidebar row:selected { border-left: 2px solid #7753ad; }
+window#amethyst-settings button:focus { border-color: #7753ad; }

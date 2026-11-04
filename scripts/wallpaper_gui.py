@@ -9,6 +9,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from ui_style import appearance as ui_appearance, install_override, window_size, workarea_size, px
 
 WALLDIR=Path.home()/'Pictures/wallpapers'
 EXTS={'.png','.jpeg','.jpg','.webp'}
@@ -26,10 +27,11 @@ def main():
     from gi.repository import Gtk,Gdk,GdkPixbuf
     win=Gtk.Window(title='AmethystOS · Wallpapers')
     win.set_name('amethyst-wallpaper-gallery')
-    win.set_default_size(860,570)
-    win.set_border_width(14)
+    theme, ui_scale = ui_appearance()
+    win.set_default_size(*window_size(860,570,ui_scale,*workarea_size(Gdk)))
+    win.set_border_width(px(14, ui_scale))
     win.connect('destroy',Gtk.main_quit)
-    vbox=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=12)
+    vbox=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=px(12, ui_scale))
     win.add(vbox)
     title=Gtk.Label(label='Wallpapers · double-click to apply, or select and press Apply')
     title.set_xalign(0)
@@ -40,7 +42,7 @@ def main():
     model=Gtk.ListStore(GdkPixbuf.Pixbuf,str,str)
     for item in wallpapers():
         try:
-            pixbuf=GdkPixbuf.Pixbuf.new_from_file_at_scale(str(item),180,110,True)
+            pixbuf=GdkPixbuf.Pixbuf.new_from_file_at_scale(str(item),px(180,ui_scale),px(110,ui_scale),True)
             model.append([pixbuf,item.name,str(item)])
         except Exception as exc:
             print('Skipping invalid image:',item,exc,file=sys.stderr)
@@ -48,11 +50,11 @@ def main():
     view.set_model(model)
     view.set_pixbuf_column(0)
     view.set_text_column(1)
-    view.set_item_width(195)
+    view.set_item_width(px(195,ui_scale))
     view.set_selection_mode(Gtk.SelectionMode.SINGLE)
-    view.set_margin(10)
-    view.set_row_spacing(14)
-    view.set_column_spacing(14)
+    view.set_margin(px(10,ui_scale))
+    view.set_row_spacing(px(14,ui_scale))
+    view.set_column_spacing(px(14,ui_scale))
     scroller.add(view)
     bottom=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=10)
     vbox.pack_start(bottom,False,False,0)
@@ -71,18 +73,12 @@ def main():
     button.connect('clicked',apply)
     bottom.pack_end(button,False,False,0)
     # Arrow keys navigate thumbnails automatically in Gtk.IconView.
-    theme='dark'
-    try:
-        import json
-        appearance=json.loads((Path.home()/'.local/state/amethystos-base-v1/appearance.json').read_text())
-        theme='light' if appearance.get('theme')=='light' else 'dark'
-    except (OSError,ValueError,TypeError):
-        pass
     css=Path.home()/'.local/share/amethystos/gallery'/f'{theme}.css'
     if css.exists():
         style=Gtk.CssProvider()
         style.load_from_path(str(css))
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(),style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    sizing_provider=install_override(Gtk,Gdk,'gallery',ui_scale)
     win.show_all()
     Gtk.main();return 0
 

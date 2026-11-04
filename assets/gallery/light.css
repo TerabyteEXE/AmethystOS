@@ -7,3 +7,6 @@ window#amethyst-wallpaper-gallery iconview:selected { background: rgba(143, 113,
 window#amethyst-wallpaper-gallery button { background: rgba(147, 120, 195, 0.13); color: #2e293d;
   border: 1px solid rgba(125, 105, 157, 0.35); border-radius: 7px; padding: 6px 12px; }
 window#amethyst-wallpaper-gallery button:hover { background: rgba(143, 113, 195, 0.22); }
+
+/* Selection treatment matches Amethyst Home. */
+window#amethyst-wallpaper-gallery iconview:selected { border: 1px solid #7753ad; }

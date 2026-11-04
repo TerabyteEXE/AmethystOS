@@ -13,6 +13,7 @@ import re
 import shutil
 import subprocess
 import sys
+from ui_style import appearance as ui_appearance, install_override, window_size, workarea_size, px
 
 MODES = ('calendar', 'audio', 'network', 'bluetooth', 'settings')
 
@@ -90,13 +91,14 @@ def main():
     GLib.set_prgname('amethyst-bar-popup')
     home=Path.home()
     preferences=appearance_state(home)
-    theme='light' if preferences.get('theme')=='light' else 'dark'
+    theme, ui_scale = ui_appearance(home)
     mode=args.mode
     win=Gtk.Window(title=f'AmethystOS · {mode.title()}')
     win.set_name('amethyst-bar-popup')
-    win.set_default_size(324,-1)
+    width, _ = window_size(324, 375, ui_scale, *workarea_size(Gdk))
+    win.set_default_size(width,-1)
     win.set_resizable(False)
-    win.set_border_width(16)
+    win.set_border_width(px(16, ui_scale))
     win.connect('destroy',Gtk.main_quit)
     def escape(_widget,event):
         if Gdk.keyval_name(event.keyval)=='Escape':
@@ -137,7 +139,8 @@ def main():
         except GLib.Error as exc:
             print('AmethystOS popup CSS:',exc,file=sys.stderr)
 
-    box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=10)
+    sizing_provider = install_override(Gtk, Gdk, 'popup', ui_scale)
+    box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=px(10, ui_scale))
     box.set_name('amethyst-popup-content')
     win.add(box)
     row=Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,spacing=8)

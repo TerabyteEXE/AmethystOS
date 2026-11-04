@@ -13,10 +13,11 @@ import shutil
 import subprocess
 import sys
 from threading import Thread
+from ui_style import appearance as ui_appearance, install_override, window_size, workarea_size, px
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib, GdkPixbuf
+from gi.repository import Gtk, GLib, GdkPixbuf, Gdk
 from settings_backend import PAGES, MODULES, DENSITIES, POSITIONS, SCALES, page_for, bar_action, appearance_action
 
 HOME = Path.home()
@@ -29,8 +30,10 @@ class Settings(Gtk.Window):
     def __init__(self, requested='home'):
         super().__init__(title='AmethystOS Settings')
         self.set_name("amethyst-settings")
-        self.set_default_size(870, 610)
-        self.set_size_request(650, 470)
+        self._theme, self.ui_scale = ui_appearance()
+        self._workarea = workarea_size(Gdk)
+        self.set_default_size(*window_size(870, 610, self.ui_scale, *self._workarea))
+        self.set_size_request(0, 0)
         self.set_border_width(0)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('destroy', Gtk.main_quit)
@@ -56,7 +59,7 @@ class Settings(Gtk.Window):
         self.stack.set_transition_duration(160)
         side_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         side_panel.set_name('amethyst-sidebar')
-        side_panel.set_size_request(204, -1)
+        side_panel.set_size_request(px(204,self.ui_scale), -1)
         brand = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         brand.set_border_width(17)
         logo = SHARE / 'assets/amethyst-logo.png'
@@ -109,7 +112,9 @@ class Settings(Gtk.Window):
         outer.pack_end(footer, False, False, 0)
         self.theme_in_use = None
         self._style_provider = None
+        self._sizing_provider = None
         self._apply_style(self.appearance_prefs.get('theme', 'dark'))
+        self._styled_scale = self.ui_scale
 
     def _apply_style(self, theme):
         """Load scoped CSS for Settings, tracking the active desktop theme."""
@@ -128,6 +133,9 @@ class Settings(Gtk.Window):
             Gtk.StyleContext.add_provider_for_screen(
                 screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
             self._style_provider = provider
+            if self._sizing_provider is not None:
+                Gtk.StyleContext.remove_provider_for_screen(screen, self._sizing_provider)
+            self._sizing_provider = install_override(Gtk, Gdk, 'settings', self.ui_scale)
             self.theme_in_use = theme
         except GLib.Error as exc:
             print('AmethystOS Settings: CSS could not be loaded:', exc, file=sys.stderr)
@@ -205,8 +213,14 @@ class Settings(Gtk.Window):
         self._result(('Applied: ' if ok else 'Could not apply: ') + result, ok)
         self.bar_prefs = self._read_json(STATE/'bar.json', self.bar_prefs)
         self.appearance_prefs = self._read_json(STATE/'appearance.json', self.appearance_prefs)
-        if self.appearance_prefs.get('theme','dark') != self.theme_in_use:
+        new_scale = self.appearance_prefs.get('scale',100)
+        if new_scale != self.ui_scale:
+            self.ui_scale = new_scale
+            self.resize(*window_size(870,610,self.ui_scale,*self._workarea))
+        if (self.appearance_prefs.get('theme','dark') != self.theme_in_use
+                or self._sizing_provider is None or new_scale != getattr(self,'_styled_scale',None)):
             self._apply_style(self.appearance_prefs.get('theme','dark'))
+            self._styled_scale = new_scale
         self.sync_bar_widgets()
         return False
 

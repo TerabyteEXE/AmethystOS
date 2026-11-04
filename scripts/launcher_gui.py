@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+from ui_style import appearance as ui_appearance, install_override, window_size, workarea_size, px
 import subprocess
 import sys
 
@@ -160,14 +161,16 @@ def input_edit_intent(key: str, text: str, focused: bool, section: str) -> str:
     return 'other'
 
 
-def panel_size(section: str) -> tuple[int, int]:
+def panel_size(section: str, scale: int = 100, work_width: int = 1920, work_height: int = 1080) -> tuple[int, int]:
     """Home stays narrow like the reference; installed apps get more room."""
     if section == 'Home':
-        return 286, 425
-    if section == 'Apps':
-        return 402, 425
-    n = len(SECTIONS.get(section, ()))
-    return 346, max(150, min(340, 99 + 38 * n))
+        size = (306, 440)
+    elif section == 'Apps':
+        size = (420, 440)
+    else:
+        n = len(SECTIONS.get(section, ()))
+        size = (358, max(165, min(370, 118 + 42 * n)))
+    return window_size(*size, scale, work_width, work_height)
 
 
 def scroll_target(value: float, page: float, upper: float, top: float,
@@ -227,10 +230,11 @@ def main():
                 rgba = screen.get_rgba_visual()
                 if rgba is not None:
                     self.set_visual(rgba)
-            self.set_default_size(*panel_size('Home'))
+            self.theme, self.ui_scale = ui_appearance()
+            self.work_width, self.work_height = workarea_size(Gdk)
+            self.set_default_size(*panel_size('Home', self.ui_scale, self.work_width, self.work_height))
             self.set_position(Gtk.WindowPosition.CENTER)
             self.connect('destroy', Gtk.main_quit)
-            # Important: do NOT bind the parent window to key-press-event.
             # GTK must get the first and only chance to edit a focused Entry.
             self.section = LEGACY_MAP[args.category]
             self.apps = self.load_apps()
@@ -238,6 +242,7 @@ def main():
             self.entries: list[MenuItem] = []
             self.provider = Gtk.CssProvider()
             self.load_style()
+            self.sizing_provider = install_override(Gtk, Gdk, 'launcher', self.ui_scale)
 
             # Draw one clipped-looking, coherent glass surface. The window
             # itself is transparent so the compositor can blur behind it.
@@ -336,7 +341,7 @@ def main():
             self.navline.set_visible(self.section != 'Home')
             self.heading_label.set_text(self.section)
             self.entry.set_placeholder_text('Go...' if self.section == 'Home' else 'Search...')
-            self.resize(*panel_size(self.section))
+            self.resize(*panel_size(self.section, self.ui_scale, self.work_width, self.work_height))
 
         def navigate(self, section):
             if section not in SECTIONS and section != 'Apps':
@@ -371,7 +376,7 @@ def main():
                 glyph = (Gtk.Image.new_from_gicon(gicon, Gtk.IconSize.MENU)
                          if gicon is not None else
                          Gtk.Image.new_from_icon_name(item.icon, Gtk.IconSize.MENU))
-                glyph.set_pixel_size(17)
+                glyph.set_pixel_size(px(19, self.ui_scale))
                 line.pack_start(glyph, False, False, 0)
                 title = Gtk.Label(label=item.title)
                 title.set_name('amethyst-home-row-title')

@@ -22,3 +22,7 @@ window#amethyst-launcher { background-color: transparent; color: #2e293d;
 #amethyst-home-item { padding: 8px 8px; }
 #amethyst-home-row-title { font-size: 12px; font-weight: 400; }
 #amethyst-home-chevron { color: #706781; font-size: 12px; }
+
+/* Quiet AmethystOS signature on the current compact Home menu. */
+#amethyst-home-shell { border-left: 2px solid #7753ad; }
+#amethyst-launcher-results row:selected { border-left: 2px solid #7753ad; }

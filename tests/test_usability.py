@@ -30,15 +30,15 @@ def test_bar_customization_and_rollback():
         prefs=load(h)
         assert prefs['position']=='bottom' and prefs['density']=='compact'
         assert prefs['modules']['cpu'] is False
-        def check():
+        def check(expected_font):
             cfg=(h/'.config/waybar/config.jsonc').read_text()
             css=(h/'.config/waybar/style.css').read_text()
             assert '"position": "bottom"' in cfg
             assert '"cpu"' not in re.search(r'"modules-right"\s*:\s*\[([^]]+)\]',cfg).group(1)
-            assert 'font-size: 11px;' in css
-        check()
+            assert f'window#waybar {{ font-size: {expected_font}px; }}' in css
+        check(11)
         apply(h,theme='light',scale=125,gtk=False,reload=False)
-        check()
+        check(14)
         # Correctly refuses to reset manual Waybar user changes.
         p=h/'.config/waybar/style.css';p.write_text(p.read_text()+'\n/* external edit */\n')
         try:change(h,density='roomy',reload=False)

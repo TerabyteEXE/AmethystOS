@@ -30,7 +30,7 @@ def load(home: Path) -> dict:
     return {'position':pos,'density':density,'modules':modules}
 
 
-def render(config: str, style: str, prefs: dict) -> tuple[str,str]:
+def render(config: str, style: str, prefs: dict, scale: int = 100) -> tuple[str,str]:
     position=prefs['position']
     density=prefs['density']
     enabled=prefs['modules']
@@ -47,6 +47,12 @@ def render(config: str, style: str, prefs: dict) -> tuple[str,str]:
     if count!=1:raise ValueError('Waybar center module list not found')
     sizes={'compact':('11px','1px 5px','3px'),'normal':('13px','2px 8px','6px'),'roomy':('15px','4px 11px','8px')}
     font,padding,gap=sizes[density]
+    if scale not in (100,115,125,150,175):
+        raise ValueError('Invalid AmethystOS UI scaling preference')
+    factor=scale/100
+    font=f'{round(int(font[:-2])*factor)}px'
+    padding=' '.join(f'{round(int(chunk[:-2])*factor)}px' for chunk in padding.split())
+    gap=f'{round(int(gap[:-2])*factor)}px'
     style += ('\n/* AmethystOS bar preferences: generated, do not edit here. */\n'
               f'window#waybar {{ font-size: {font}; }}\n'
               f'window#waybar #clock, window#waybar #custom-settings, window#waybar #custom-logo, '
