@@ -75,7 +75,7 @@ personal wallpapers or GNOME.
 
 **AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. Both are copied if missing on every installation, without replacing files of the same name. A fresh, empty wallpaper directory selects Amethyst Dark by default; existing wallpaper choices remain untouched. Change through Super+Shift+W, `set-wallpaper`, or Amethyst Settings.
 
-## Amethyst Home and bar controls (RC2.7)
+## Amethyst Home and bar controls (RC2.8)
 
 **Super+Space** opens **Amethyst Home**, a compact, dark translucent menu with
 **Apps, Learn, Style, Setup, Install, Remove, Update, About, System, and Power**.

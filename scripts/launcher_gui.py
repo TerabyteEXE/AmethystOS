@@ -8,8 +8,6 @@ can be tested without installing GTK.
 from __future__ import annotations
 import argparse
 from dataclasses import dataclass
-from datetime import datetime
-import getpass
 from pathlib import Path
 import subprocess
 import sys
@@ -145,6 +143,33 @@ def search_menu(query: str, section: str = 'Home', applications=()):
             q in f'{item.title} {item.description} {section}'.casefold()]
 
 
+def input_edit_intent(key: str, text: str, focused: bool, section: str) -> str:
+    """Keep text editing ahead of category navigation.
+
+    GTK Entry must process BackSpace/Delete itself while focused; a pressed
+    BackSpace means "back one category" only with an *empty* search field.
+    For the (rare) case where a result row has focus, editing is forwarded to
+    the entry instead of being treated as a menu navigation shortcut.
+    """
+    if key == 'BackSpace':
+        if text:
+            return 'native' if focused else 'delete-left'
+        return 'back' if section != 'Home' else 'ignore'
+    if key == 'Delete':
+        return 'native' if focused else ('delete-right' if text else 'ignore')
+    return 'other'
+
+
+def panel_size(section: str) -> tuple[int, int]:
+    """Home stays narrow like the reference; installed apps get more room."""
+    if section == 'Home':
+        return 286, 425
+    if section == 'Apps':
+        return 402, 425
+    n = len(SECTIONS.get(section, ()))
+    return 346, max(150, min(340, 99 + 38 * n))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--category', choices=CATEGORIES, default='All', help='Open an existing menu section')
@@ -171,78 +196,63 @@ def main():
     GLib.set_application_name('AmethystOS Home')
 
     class Home(Gtk.Window):
+        """Compact, search-first GTK menu with conventional text editing."""
+
         def __init__(self):
             super().__init__(title='AmethystOS Home')
             self.set_name('amethyst-launcher')
             self.set_decorated(False)
-            self.set_default_size(460, 535)
-            self.set_size_request(405, 400)
+            self.set_resizable(True)
+            self.set_size_request(258, 130)
+            self.set_default_size(*panel_size('Home'))
             self.set_position(Gtk.WindowPosition.CENTER)
             self.connect('destroy', Gtk.main_quit)
-            self.connect('key-press-event', self.on_key)
+            # Important: do NOT bind the parent window to key-press-event.
+            # GTK must get the first and only chance to edit a focused Entry.
             self.section = LEGACY_MAP[args.category]
             self.apps = self.load_apps()
             self.app_map = {name: app for name, app in self.apps}
-            self.entries = []
+            self.entries: list[MenuItem] = []
             self.provider = Gtk.CssProvider()
             self.load_style()
 
             frame = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             frame.set_name('amethyst-home-content')
             self.add(frame)
-            header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            header.set_name('amethyst-home-header')
-            header.set_border_width(14)
-            logo = Path.home()/'.local/share/amethystos/assets/amethyst-logo.png'
-            if logo.is_file():
-                try:
-                    pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(logo), 26, 26, True)
-                    header.pack_start(Gtk.Image.new_from_pixbuf(pb), False, False, 0)
-                except (GLib.Error, OSError):
-                    pass
-            brand = Gtk.Label(label='AMETHYSTOS')
-            brand.set_name('amethyst-home-brand')
-            brand.set_xalign(0)
-            header.pack_start(brand, True, True, 0)
-            self.clock = Gtk.Label(label=datetime.now().strftime('%a %b %-d'))
-            self.clock.set_name('amethyst-home-time')
-            header.pack_end(self.clock, False, False, 0)
-            frame.pack_start(header, False, False, 0)
 
-            heading = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-            heading.set_margin_start(16)
-            heading.set_margin_end(16)
-            heading.set_margin_top(2)
-            heading.set_margin_bottom(9)
+            self.navline = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=3)
+            self.navline.set_name('amethyst-home-nav')
+            self.navline.set_margin_start(6)
+            self.navline.set_margin_end(6)
             self.back_btn = Gtk.Button(label='‹')
             self.back_btn.set_name('amethyst-home-back')
             self.back_btn.set_relief(Gtk.ReliefStyle.NONE)
+            self.back_btn.set_tooltip_text('Back to the main menu (Left or Backspace)')
             self.back_btn.connect('clicked', lambda *_: self.go_back())
-            heading.pack_start(self.back_btn, False, False, 0)
-            self.heading_label = Gtk.Label(label='Home')
+            self.navline.pack_start(self.back_btn, False, False, 0)
+            self.heading_label = Gtk.Label(label='Apps')
             self.heading_label.set_name('amethyst-home-title')
             self.heading_label.set_xalign(0)
-            heading.pack_start(self.heading_label, True, True, 0)
-            self.welcome = Gtk.Label(label=f'Hi, {getpass.getuser()}')
-            self.welcome.set_name('amethyst-home-welcome')
-            heading.pack_end(self.welcome, False, False, 0)
-            frame.pack_start(heading, False, False, 0)
+            self.navline.pack_start(self.heading_label, True, True, 0)
+            frame.pack_start(self.navline, False, False, 0)
 
-            self.entry = Gtk.SearchEntry()
+            self.entry = Gtk.Entry()
             self.entry.set_name('amethyst-home-search')
-            self.entry.set_placeholder_text('Search apps, settings, actions…')
-            self.entry.set_margin_start(14)
-            self.entry.set_margin_end(14)
-            self.entry.set_margin_bottom(11)
-            self.entry.connect('search-changed', lambda *_: self.populate())
+            self.entry.set_placeholder_text('Go...')
+            self.entry.set_tooltip_text('Type to search; Up/Down to select, Enter to open')
+            self.entry.set_margin_start(8)
+            self.entry.set_margin_end(8)
+            self.entry.set_margin_top(6)
+            self.entry.set_margin_bottom(5)
+            self.entry.connect('changed', lambda *_: self.populate())
             self.entry.connect('key-press-event', self.on_key)
             frame.pack_start(self.entry, False, False, 0)
 
             scroll = Gtk.ScrolledWindow()
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            scroll.set_name('amethyst-home-scroll')
             scroll.set_hexpand(True)
             scroll.set_vexpand(True)
-            scroll.set_name('amethyst-home-scroll')
             self.results = Gtk.ListBox()
             self.results.set_name('amethyst-launcher-results')
             self.results.set_selection_mode(Gtk.SelectionMode.SINGLE)
@@ -251,15 +261,11 @@ def main():
             self.results.connect('key-press-event', self.on_key)
             scroll.add(self.results)
             frame.pack_start(scroll, True, True, 0)
-            hint = Gtk.Label(label='↑ ↓ Select      Enter Open      ← Back      Esc Close')
-            hint.set_name('amethyst-launcher-hint')
-            hint.set_xalign(0)
-            hint.set_margin_start(17)
-            hint.set_margin_top(11)
-            hint.set_margin_bottom(12)
-            frame.pack_end(hint, False, False, 0)
+
+            self._sync_section()
             self.populate()
             self.show_all()
+            self.navline.set_visible(self.section != 'Home')
             self.entry.grab_focus()
 
         def load_style(self):
@@ -294,12 +300,18 @@ def main():
                     continue
             return sorted(found.items(), key=lambda item: item[0].casefold())
 
+        def _sync_section(self):
+            self.navline.set_visible(self.section != 'Home')
+            self.heading_label.set_text(self.section)
+            self.entry.set_placeholder_text('Go...' if self.section == 'Home' else 'Search...')
+            self.resize(*panel_size(self.section))
+
         def navigate(self, section):
             if section not in SECTIONS and section != 'Apps':
                 return
             self.section = section
             self.entry.set_text('')
-            self.heading_label.set_text(section)
+            self._sync_section()
             self.populate()
             self.entry.grab_focus()
 
@@ -307,32 +319,26 @@ def main():
             if self.section != 'Home':
                 self.section = 'Home'
                 self.entry.set_text('')
-                self.heading_label.set_text('Home')
+                self._sync_section()
                 self.populate()
                 self.entry.grab_focus()
 
         def populate(self):
             for row in self.results.get_children():
                 self.results.remove(row)
-            self.entries = search_menu(self.entry.get_text(), self.section, self.apps)
-            for item in self.entries[:120]:
+            self.entries = search_menu(self.entry.get_text(), self.section, self.apps)[:120]
+            for item in self.entries:
                 row = Gtk.ListBoxRow()
-                line = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=11)
-                line.set_border_width(9)
+                line = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=9)
+                line.set_name('amethyst-home-item')
                 glyph = Gtk.Image.new_from_icon_name(item.icon, Gtk.IconSize.MENU)
-                glyph.set_pixel_size(18)
+                glyph.set_pixel_size(15)
                 line.pack_start(glyph, False, False, 0)
-                labels = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
                 title = Gtk.Label(label=item.title)
+                title.set_name('amethyst-home-row-title')
                 title.set_xalign(0)
                 title.set_ellipsize(Pango.EllipsizeMode.END)
-                labels.pack_start(title, False, False, 0)
-                sub = Gtk.Label(label=item.description)
-                sub.set_name('amethyst-home-detail')
-                sub.set_xalign(0)
-                sub.set_ellipsize(Pango.EllipsizeMode.END)
-                labels.pack_start(sub, False, False, 0)
-                line.pack_start(labels, True, True, 0)
+                line.pack_start(title, True, True, 0)
                 if item.section:
                     chevron = Gtk.Label(label='›')
                     chevron.set_name('amethyst-home-chevron')
@@ -340,10 +346,10 @@ def main():
                 row.add(line)
                 self.results.add(row)
             self.results.show_all()
-            self.back_btn.set_sensitive(self.section!='Home')
             first = self.results.get_row_at_index(0)
             if first is not None:
                 self.results.select_row(first)
+            # Selecting a ListBox row must never steal focus from the search.
 
         def launch_action(self, action):
             command = action.command
@@ -383,33 +389,73 @@ def main():
                 return
             self.close()
 
+        def _edit_from_results(self, name):
+            """Edit the search if a click placed keyboard focus on the list."""
+            bounds = self.entry.get_selection_bounds()
+            if bounds and len(bounds) == 3:
+                selected, start, end = bool(bounds[0]), bounds[1], bounds[2]
+            elif bounds and len(bounds) == 2:
+                start, end = bounds
+                selected = (start != end)
+            else:
+                selected, start, end = False, 0, 0
+            if selected:
+                self.entry.delete_text(start, end)
+                self.entry.set_position(start)
+            else:
+                pos = self.entry.get_position()
+                if name == 'BackSpace' and pos > 0:
+                    self.entry.delete_text(pos-1, pos)
+                    self.entry.set_position(pos-1)
+                elif name == 'Delete' and pos < len(self.entry.get_text()):
+                    self.entry.delete_text(pos, pos+1)
+                    self.entry.set_position(pos)
+            self.entry.grab_focus()
+
         def on_key(self, widget, event):
             name = Gdk.keyval_name(event.keyval) or ''
             if name == 'Escape':
                 self.close()
                 return True
-            if name in ('Left','BackSpace') and (widget != self.entry or not self.entry.get_text()):
+            # Let GTK Entry handle all native text-editing keys, including
+            # BackSpace, Delete, Ctrl+Backspace, Ctrl+A and cursor movement.
+            # The old parent-window handler interpreted BackSpace as "Back".
+            focused = widget is self.entry
+            if name in ('BackSpace', 'Delete'):
+                intent = input_edit_intent(name, self.entry.get_text(), focused, self.section)
+                if intent == 'native':
+                    return False
+                if intent == 'back':
+                    self.go_back()
+                elif intent in ('delete-left', 'delete-right'):
+                    self._edit_from_results(name)
+                return True
+            if event.state & (Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.MOD1_MASK):
+                return False
+            if name == 'Left':
+                if focused and self.entry.get_text():
+                    return False  # text cursor movement, not category navigation
                 self.go_back()
                 return True
-            if name in ('Return','KP_Enter','Right'):
-                if name == 'Right' and widget == self.entry and self.entry.get_text():
-                    return False   # allow search cursor movement
+            if name in ('Return', 'KP_Enter', 'Right'):
+                if name == 'Right' and focused and self.entry.get_text():
+                    return False
                 self.activate(None, self.results.get_selected_row())
                 return True
-            if name in ('Down','Up'):
+            if name in ('Down', 'Up'):
                 selected = self.results.get_selected_row()
-                index = selected.get_index() if selected else (-1 if name=='Down' else 1)
-                index += 1 if name=='Down' else -1
-                index = max(0,min(index,len(self.results.get_children())-1))
-                row = self.results.get_row_at_index(index)
-                if row:
-                    self.results.select_row(row)
-                    # Keep focus in search for typing after arrow navigation.
-                    self.entry.grab_focus()
+                count = len(self.entries)
+                if count:
+                    index = selected.get_index() if selected is not None else (-1 if name=='Down' else 0)
+                    index = (index + (1 if name == 'Down' else -1)) % count
+                    row = self.results.get_row_at_index(index)
+                    if row is not None:
+                        self.results.select_row(row)
+                        self.entry.grab_focus()
                 return True
-            if widget == self.results and len(name)==1 and not (event.state & (Gdk.ModifierType.CONTROL_MASK|Gdk.ModifierType.MOD1_MASK)):
+            if widget is self.results and event.string and event.string.isprintable():
                 self.entry.grab_focus()
-                self.entry.insert_text(name, -1)
+                self.entry.insert_text(event.string, -1)
                 return True
             return False
 

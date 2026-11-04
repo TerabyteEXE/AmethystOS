@@ -23,7 +23,7 @@ def test_home_categories_and_keyboard_contract():
     assert all(item.title in SECTIONS or item.title=='Apps' for item in HOME_SECTIONS)
     assert LEGACY_MAP['Settings']=='Setup'
     code=(ROOT/'scripts/launcher_gui.py').read_text()
-    for name in ('Down','Up','Return','KP_Enter','Right','Left','Escape','search-changed'):
+    for name in ('Down','Up','Return','KP_Enter','Right','Left','Escape','changed'):
         assert name in code,name
     assert 'shell=True' not in code
 

@@ -1,13 +1,17 @@
-# AmethystOS — daily use (RC2.7)
+# AmethystOS — daily use (RC2.8)
 
 ## The Home menu
 
 - **Super+Space** or **Super+D**: open the same Amethyst Home panel.
 - Start at **Home**, with Apps, Learn, Style, Setup, Install, Remove, Update,
   About, System and Power. Use **Up/Down** then **Enter/Right** to drill in.
-- **Left** or **Backspace** (when search is empty): return to Home.
+- **Left** or **Backspace** with an *empty* search: return to Home.
+- **Backspace/Delete with text in the search field:** edit the text normally.
+  Ctrl+A, word deletion, selection and the text cursor remain handled by GTK.
 - **Type to search**. At Home, search combines installed apps and built-in
   actions. Inside Apps or another category, search stays inside that category.
+- The **Home panel stays narrow and minimal**, with no greeting, branding header,
+  descriptions or footer. Choosing Apps opens a wider single-column app list.
 - **Esc** or pressing **Super+Space** again closes the panel.
 - **Super+Shift+S** still opens Amethyst Settings directly.
 
