@@ -44,7 +44,7 @@ When the installer is complete, **log out, choose Niri at the Fedora login scree
 | Lock screen | GTKLock |
 | Audio and network integration | Fedora packages and supporting desktop tools |
 
-**Amethyst Still**, an original minimal wallpaper, is included under `assets/wallpapers/`. On first installation only, it is copied if `~/Pictures/wallpapers/` does not contain any image. Your current wallpaper and selection are not replaced.
+**AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. On first installation only, both are copied if `~/Pictures/wallpapers/` contains no images. Your current wallpaper and selection are not replaced.
 
 ## First shortcuts
 
@@ -58,7 +58,7 @@ When the installer is complete, **log out, choose Niri at the Fedora login scree
 | `Super + O` | Overview |
 | `Super + Shift + /` | Niri built-in keybinding overlay |
 
-The [complete 125-shortcut reference](wiki/keybinds.html) is **generated directly from** [`payload/niri/keybinds.kdl`](payload/niri/keybinds.kdl). Refresh it after editing shortcuts with `python3 scripts/build_site.py`.
+The [keybinding reference](wiki/keybinds.html) is **generated directly from** [`payload/niri/keybinds.kdl`](payload/niri/keybinds.kdl). Refresh it after editing shortcuts with `python3 scripts/build_site.py`. Other pages, including `about.html`, are maintained as HTML and are not overwritten by this command.
 
 ## Local commands
 
@@ -77,8 +77,8 @@ Backups live at `~/.local/state/amethystos-base-v1/backups/`. Restore deliberate
 The website is a **simple, documentation-first static site** using dependency-free HTML, CSS and JavaScript, ready for GitHub Pages. Its routes are `index.html`, `install.html`, `wiki/index.html`, `wiki/keybinds.html`, `wiki/customization.html`, and `wiki/troubleshooting.html`.
 
 ```bash
-python3 scripts/build_site.py         # regenerate the pages and keybinding reference
-python3 scripts/build_site.py --check # ensure generated pages aren't stale
+python3 scripts/build_site.py         # regenerate only the keybinding reference
+python3 scripts/build_site.py --check # ensure keybinding reference isn't stale
 ```
 
 The homepage source lives in `site_templates/home.html`; edit that template rather than editing generated `index.html`.

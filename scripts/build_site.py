@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Generate the static AmethystOS website and keymap from the shipped Niri config.
-Run: python3 scripts/build_site.py (or --check to detect stale pages).
+"""Generate the keybinding reference from the Niri config.
+Other HTML pages are maintained directly and are not overwritten by this tool.
+Run: python3 scripts/build_site.py (or --check to detect a stale keybinding page).
 No external packages or internet access are required.
 """
 from __future__ import annotations
@@ -54,9 +55,9 @@ def doc_page(title,sub,active,body):
     return page(title,sub,'../','keys' if active=='keys' else 'wiki',f'''<div class="wrap"><div class="page-title"><p class="eyebrow">AmethystOS / Documentation</p><h1>{escape(title)}</h1><p class="lead">{escape(sub)}</p></div>
 <div class="doc-shell">{sidebar(active)}<article class="doc-content">{body}</article></div></div>''')
 
-# The landing-page content is maintained as ordinary HTML so the plain site
-# cannot be overwritten with an outdated mockup when docs are regenerated.
-home=(ROOT/'site_templates/home.html').read_text()
+# Website pages are hand-maintained. The old landing page template is archival only.
+# Deprecated home template is preserved as site_templates/home.legacy.html.
+home=''  # The homepage is now directly maintained in index.html.
 
 install_body=f'''<div class="wrap"><div class="page-title"><p class="eyebrow">AmethystOS / Setup</p><h1>Install AmethystOS.</h1><p class="lead">Start with Fedora Workstation. Add AmethystOS as a separate Niri session. Keep GNOME available if you need it.</p></div><div class="doc-shell">
 <aside class="side-nav"><p class="side-label">On this page</p><a href="#requirements">Requirements</a><a href="#command">One-command setup</a><a href="#manual">Manual install</a><a href="#after">After installation</a><a href="#restore">Restore or remove</a><a href="wiki/index.html">Open wiki ↗</a></aside>
@@ -262,17 +263,14 @@ def generate_keys():
 <div class="note"><strong>Source of truth:</strong> The bindings above were generated from the included <span class="inline-code">payload/niri/keybinds.kdl</span>. Your own local changes won't be reflected until this documentation is regenerated. Use <span class="kbd">Super + Shift + /</span> for Niri's in-session hotkey overlay.</div>'''
     return doc_page('Keybindings','Search the shortcuts that actually ship with AmethystOS.', 'keys', body)
 
+# Hand-edited pages (including About) are the source of truth. Rebuilding docs
+# must never discard the maintainer's website edits. Only this page is generated.
 files={
- 'index.html':page('Fedora + Niri','AmethystOS is a Fedora Workstation desktop setup based on Niri with a simple installer and documentation.','', 'home',home),
- 'install.html':page('Installation','Install AmethystOS on Fedora Workstation with one command.','', 'install',install_body),
- 'wiki/index.html':doc_page('The AmethystOS wiki','A straightforward guide to your Fedora + Niri desktop.','home',wiki_home),
  'wiki/keybinds.html':generate_keys(),
- 'wiki/customization.html':doc_page('Customization','Make the desktop yours, one config at a time.','custom',custom),
- 'wiki/troubleshooting.html':doc_page('Troubleshooting','A few grounded ways to recover when something goes wrong.','trouble',trouble),
 }
 
 p=argparse.ArgumentParser()
-p.add_argument('--check',action='store_true',help='Check generated pages match the Niri source without modifying files')
+p.add_argument('--check',action='store_true',help='Check keybinding reference matches the Niri source without modifying files')
 args=p.parse_args()
 for rel,content in files.items():
     destination=ROOT/rel
@@ -282,4 +280,4 @@ for rel,content in files.items():
     else:
         destination.parent.mkdir(parents=True,exist_ok=True)
         destination.write_text(content)
-print(f'Website OK: {len(files)} pages; {len(keys())} Niri shortcuts')
+print(f'Keybinding reference OK: {len(keys())} Niri shortcuts')

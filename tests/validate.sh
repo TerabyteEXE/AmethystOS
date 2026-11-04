@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+trap 'code=$?; printf "[test] FAILED on line %s (exit %s): %s\n" "$LINENO" "$code" "$BASH_COMMAND" >&2' ERR
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
@@ -15,7 +16,8 @@ test -s index.html
  test -s wiki/keybinds.html
  test -s assets/site.css
  test -s assets/site.js
- test -s assets/wallpapers/amethyst-still.png
+test -s assets/wallpapers/AmethystDark.png
+test -s assets/wallpapers/AmethystLight.png
  python3 scripts/build_site.py --check
  python3 tests/test_site.py
 for script in install.sh uninstall.sh bootstrap.sh; do bash -n "$script"; done

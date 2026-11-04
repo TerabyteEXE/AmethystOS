@@ -19,7 +19,7 @@ python3 scripts/build_site.py
 bash tests/validate.sh
 ```
 
-`--check` is used by CI to catch stale generated pages. Don't manually edit the generated HTML pages; edit `site_templates/home.html` for homepage content or `scripts/build_site.py` for the remaining pages.
+`--check` is used by CI to catch stale generated keybinding docs. The homepage, About page, installation guide, and other wiki pages are maintained directly as HTML, so your edits won't be overwritten; edit `scripts/build_site.py` to change the generated keybinding reference.
 
 ## Website philosophy
 

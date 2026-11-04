@@ -105,14 +105,15 @@ if [[ $DRY -eq 1 ]]; then
   echo 'Dry-run complete. No changes made.'
 else
   mkdir -p "$HOME/Pictures/wallpapers" "$HOME/Pictures/Screenshots"
-  # Offer one calm default image only on systems that do not already have a wallpaper.
-  # Existing wallpaper folders and saved wallpaper selections are never replaced.
-  if [[ -f "$ROOT/assets/wallpapers/amethyst-still.png" ]]; then
-    existing_wallpaper=$(find "$HOME/Pictures/wallpapers" -maxdepth 1 -type f \
-      \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit)
-    if [[ -z "$existing_wallpaper" ]]; then
-      install -m 0644 "$ROOT/assets/wallpapers/amethyst-still.png" "$HOME/Pictures/wallpapers/amethyst-still.png"
-      echo 'Installed Amethyst Still wallpaper (your existing wallpaper settings were untouched).'
+  # Copy official wallpapers only if the user has no images in their wallpaper folder.
+  # Existing artwork and selected wallpapers always take precedence.
+  existing_wallpaper=$(find "$HOME/Pictures/wallpapers" -maxdepth 1 -type f \
+    \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit)
+  if [[ -z "$existing_wallpaper" ]]; then
+    if [[ -f "$ROOT/assets/wallpapers/AmethystDark.png" && -f "$ROOT/assets/wallpapers/AmethystLight.png" ]]; then
+      install -m 0644 "$ROOT/assets/wallpapers/AmethystDark.png" "$HOME/Pictures/wallpapers/AmethystDark.png"
+      install -m 0644 "$ROOT/assets/wallpapers/AmethystLight.png" "$HOME/Pictures/wallpapers/AmethystLight.png"
+      echo 'Installed AmethystOS dark and light wallpapers (existing selections untouched).'
     fi
   fi
   echo 'Done. Log out and choose Niri from the Fedora login screen.'

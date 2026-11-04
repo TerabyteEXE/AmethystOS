@@ -12,14 +12,23 @@ class Links(HTMLParser):
         for attribute in ('href','src'):
             if attribute in values:self.links.append(values[attribute])
 files=list(ROOT.glob('*.html'))+list((ROOT/'wiki').glob('*.html'))
-assert len(files)==6,f'Expected six site pages, found {len(files)}'
+required={
+    'index.html', 'about.html', 'install.html', 'wiki/index.html',
+    'wiki/keybinds.html', 'wiki/customization.html', 'wiki/troubleshooting.html'
+}
+actual={str(f.relative_to(ROOT)) for f in files}
+missing=required-actual
+assert not missing, f'Missing required site pages: {sorted(missing)}'
+assert len(actual)==len(files), 'Duplicated site page in discovery'
+
 for source in files:
     scanner=Links(); scanner.feed(source.read_text())
     for link in scanner.links:
         if link.startswith(('#','http://','https://','mailto:','tel:')):continue
         location=(source.parent/link.split('#',1)[0]).resolve()
         assert location.is_relative_to(ROOT) and location.is_file(),f'{source.name}: missing or unsafe link {link}'
-assert (ROOT/'assets/wallpapers/amethyst-still.png').is_file()
+assert (ROOT/'assets/wallpapers/AmethystDark.png').is_file()
+assert (ROOT/'assets/wallpapers/AmethystLight.png').is_file()
 assert (ROOT/'assets/branding/amethyst-logo.png').is_file()
 assert (ROOT/'assets/branding/amethyst-logo-original.png').is_file()
 assert (ROOT/'assets/favicon.png').is_file()

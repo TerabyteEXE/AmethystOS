@@ -7,6 +7,6 @@ The project uses the original geometric purple amethyst crystal image supplied b
 - `assets/favicon.png`: small raster favicon derived from the supplied image.
 - `assets/apple-touch-icon.png`: small browser/home-screen icon derived from the supplied image.
 
-The website references this logo from `scripts/build_site.py` and `site_templates/home.html`; do not edit the generated HTML directly. The repository's MIT license covers the software where applicable; do not assume original brand artwork is MIT-licensed without separate permission from the artwork owner.
+The static website HTML references this logo directly; the generated keybinding reference also references it through `scripts/build_site.py`. The repository's MIT license covers the software where applicable; do not assume original brand artwork is MIT-licensed without separate permission from the artwork owner.
 
 To regenerate the site: `python3 scripts/build_site.py`.
