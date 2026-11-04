@@ -16,7 +16,7 @@ set_wall() {
   mkdir -p "$(dirname -- "$SELECTION")"
   printf '%s\n' "$file" > "$SELECTION"
   # Don't try to start the wallpaper daemon from a text console.
-  if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v swaybg >/dev/null 2>&1; then
+  if [[ -n "${WAYLAND_DISPLAY:-}" && -n "${NIRI_SOCKET:-}" ]] && command -v swaybg >/dev/null 2>&1; then
     pkill -x swaybg 2>/dev/null || true
     nohup swaybg -i "$file" -m fill >/dev/null 2>&1 </dev/null &
     disown || true

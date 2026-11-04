@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=AmethystOS
+Description=Minimal AmethystOS crystal logo
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/amethystos
+ScriptFile=/usr/share/plymouth/themes/amethystos/amethystos.script

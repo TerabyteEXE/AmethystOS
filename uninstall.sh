@@ -20,5 +20,6 @@ if (( ! YES )); then
 fi
 python3 "$ROOT/scripts/deploy.py" restore --dry-run >/dev/null
 python3 "$ROOT/scripts/desktop_prefs.py" restore || true
+python3 "$ROOT/scripts/appearance.py" restore-scale || true
 python3 "$ROOT/scripts/deploy.py" restore
 printf 'Dotfiles restored. Fedora applications and user wallpapers are left in place.\n'

@@ -1,9 +1,10 @@
 {
   // ───────── Workspaces ─────────
-  // Four compact numbered buttons inside the left glass panel.
+  // Five persistent workspace buttons inside the left glass panel.
   // Workspace 1 is focused -> brighter translucent pill (.active/.focused in css).
   "niri/workspaces": {
-    "format": "{index}",
+    "format": "{icon}",
+    "format-icons": { "one":"1", "two":"2", "three":"3", "four":"4", "five":"5", "default":"•" },
     "on-click": "activate",
     "all-outputs": false,
     "disable-markup": true

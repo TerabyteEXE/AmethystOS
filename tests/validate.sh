@@ -25,10 +25,11 @@ find payload -name '*.sh' -type f -print0 | while IFS= read -r -d '' shfile; do
   if head -n1 "$shfile" | grep -q python; then python3 -m py_compile "$shfile"; else bash -n "$shfile"; fi
 done
 find payload/local-bin -type f -print0 | while IFS= read -r -d '' shfile; do bash -n "$shfile"; done
-python3 -m py_compile scripts/deploy.py scripts/setup_ui.py scripts/wallpapers.py scripts/desktop_prefs.py tests/test_polish.py tests/test_installer_tty.py
-bash -n scripts/packages.sh tests/test_packages.sh
+python3 -m py_compile scripts/deploy.py scripts/setup_ui.py scripts/wallpapers.py scripts/desktop_prefs.py scripts/appearance.py tests/test_rc22.py tests/test_polish.py tests/test_installer_tty.py
+bash -n scripts/packages.sh scripts/boot_theme.sh tests/test_packages.sh
 bash tests/test_packages.sh
 python3 tests/test_polish.py
+python3 tests/test_rc22.py
 python3 tests/test_installer_tty.py
 
 echo '[test] Direct upstream config and safety checks'
@@ -42,7 +43,8 @@ assert 'close-window' in (p/'niri/keybinds.kdl').read_text()
 assert not (p/'gtk-4.0/assets').exists()
 assert 'pkill -f xdg-desktop-portal-gnome' not in (p/'niri/autostart.sh').read_text()
 assert 'gtklock' in (p/'niri-lock/lock.sh').read_text()
-assert not list(p.glob('**/*.jpg')) and not list(p.glob('**/*.png'))
+assert not list(p.glob('**/*.jpg'))
+assert [str(x.relative_to(p)) for x in p.glob('**/*.png')] == ['fastfetch/amethyst-logo.png']
 for path in ['waybar/scripts/powermenu.sh','local-bin/powermenu']:
     assert 'niri-lock\n' not in (p/path).read_text()
 print('  Upstream visuals retained, dangerous startup removed')

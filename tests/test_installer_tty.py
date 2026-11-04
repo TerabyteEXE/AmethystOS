@@ -14,6 +14,9 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
+import sys
+sys.path.insert(0,str(ROOT/"scripts"))
+from setup_ui import GROUPS
 
 
 def test_piped_stdin_terminal_menu():
@@ -27,7 +30,7 @@ def test_piped_stdin_terminal_menu():
             os.execv('/bin/bash', ['bash', '-c',
                 f"printf 'piped input' | python3 scripts/setup_ui.py --output '{output}'"])
 
-        commands = [b'8\n', b'9\n', b'10\n', b'\n', b'y\n']
+        commands = [b'8\n', f'{len(GROUPS)+1}\n'.encode(), f'{len(GROUPS)+2}\n'.encode(), b'\n', b'y\n']
         menu_prompts = 0
         transcript = bytearray()
         previous_len = 0
@@ -81,4 +84,4 @@ def test_piped_stdin_terminal_menu():
 
 if __name__ == '__main__':
     test_piped_stdin_terminal_menu()
-    print('[test] Real TTY menu with piped stdin, all 8 app groups and preferences: OK')
+    print('[test] Real TTY menu with piped stdin, optional app choices and preferences: OK')

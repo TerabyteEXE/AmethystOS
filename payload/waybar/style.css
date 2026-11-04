@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: "Cascadia Mono NF", "DejaVu Sans", sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     min-height: 0;
     box-shadow: none;
@@ -23,7 +23,7 @@ tooltip {
     background: rgba(17, 17, 27, 0.92);
     border: 1px solid rgba(180, 190, 254, 0.12);
     border-radius: 10px;
-    color: #000000;
+    color: #f3efff;
     padding: 6px;
 }
 tooltip label {
@@ -50,7 +50,7 @@ tooltip label {
 
 #workspaces button {
     color: #94e2d5; /* Keep as it is */
-    background: rgba(0, 0, 0, 1); /* Worskspace buttons */
+    background: rgba(18, 19, 32, 0.92); /* workspace buttons */
     border-radius: 10px;
     padding: 2px 6px;
     margin: 1px 1px;
@@ -252,7 +252,12 @@ tooltip label {
 
 /* AmethystOS settings and tray affordances. */
 #custom-settings, #tray {
-    background: #000000; color: #cba6f7;
+    background: rgba(22, 20, 38, 0.95); color: #cba6f7;
     border-radius: 10px; margin: 1px; padding: 2px 9px;
 }
 #custom-settings:hover { background: #313244; }
+
+/* AmethystOS: consistent small hover transitions, without expensive effects. */
+#workspaces button, #custom-settings, #custom-logo, #custom-power, #clock {
+  transition: background-color 160ms ease, color 160ms ease;
+}

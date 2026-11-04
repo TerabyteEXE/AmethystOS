@@ -51,13 +51,16 @@ appearance() {
 item=${1:-menu}
 case "$item" in
   menu)
-    choice=$(choose 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Display information' 'Wallpapers' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
+    choice=$(choose 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Interface scaling' 'Workspaces' 'Display information' 'Boot splash' 'Wallpapers' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
     case "$choice" in
       'Network') exec "$0" network ;;
       'Audio') exec "$0" audio ;;
       'Bluetooth') exec "$0" bluetooth ;;
       'Appearance') exec "$0" appearance ;;
       'Display information') exec "$0" display ;;
+      'Interface scaling') exec "$0" scaling ;;
+      'Workspaces') exec "$0" workspaces ;;
+      'Boot splash') exec "$0" boot ;;
       'Wallpapers') exec "$0" wallpaper ;;
       'Keyboard shortcuts') exec "$0" keys ;;
       'Software updates') exec "$0" updates ;;
@@ -69,15 +72,40 @@ case "$item" in
     if command -v blueman-manager >/dev/null; then launch blueman-manager
     else terminal 'bluetoothctl devices; bluetoothctl show'; fi ;;
   appearance)
-    choice=$(choose 'Dark GTK appearance' 'Light GTK appearance' 'GTK settings' 'Qt settings' 'Choose wallpaper') || exit 0
+    choice=$(choose 'Amethyst Dark' 'Amethyst Light' 'GTK settings' 'Qt settings' 'Choose wallpaper') || exit 0
     case "$choice" in
-      'Dark GTK appearance') appearance dark;;
-      'Light GTK appearance') appearance light;;
+      'Amethyst Dark') exec "$HOME/.local/bin/amethyst-theme" dark;;
+      'Amethyst Light') exec "$HOME/.local/bin/amethyst-theme" light;;
       'GTK settings') launch nwg-look;;
       'Qt settings') launch qt6ct;;
       'Choose wallpaper') exec "$0" wallpaper;;
     esac ;;
-  dark|light) appearance "$item" ;;
+  dark|light) exec "$HOME/.local/bin/amethyst-theme" "$item" ;;
+  scaling)
+    choice=$(choose 'Automatic (Wayland per-monitor)' '100%' '115%' '125%' '150%' '175%') || exit 0
+    case "$choice" in
+      'Automatic (Wayland per-monitor)') "$HOME/.local/bin/amethyst-scale" auto ;;
+      '100%') "$HOME/.local/bin/amethyst-scale" 100 ;;
+      '115%') "$HOME/.local/bin/amethyst-scale" 115 ;;
+      '125%') "$HOME/.local/bin/amethyst-scale" 125 ;;
+      '150%') "$HOME/.local/bin/amethyst-scale" 150 ;;
+      '175%') "$HOME/.local/bin/amethyst-scale" 175 ;;
+    esac ;;
+  workspaces)
+    choice=$(choose 'Workspace 1' 'Workspace 2' 'Workspace 3' 'Workspace 4' 'Workspace 5') || exit 0
+    case "$choice" in
+      'Workspace '[1-5]) case "${choice##* }" in
+        1) name=one;; 2) name=two;; 3) name=three;; 4) name=four;; 5) name=five;;
+      esac
+      niri msg action focus-workspace "$name" ;;
+    esac ;;
+  boot)
+    choice=$(choose 'Show Plymouth status' 'Install Amethyst boot splash (sudo)' 'Restore previous boot splash (sudo)') || exit 0
+    case "$choice" in
+      'Show Plymouth status') terminal '$HOME/.local/bin/amethyst-boot --status' ;;
+      'Install Amethyst boot splash (sudo)') terminal '$HOME/.local/bin/amethyst-boot --apply' ;;
+      'Restore previous boot splash (sudo)') terminal '$HOME/.local/bin/amethyst-boot --restore' ;;
+    esac ;;
   display)
     # Niri does not expose GNOME's monitor-control DBus API; GNOME Settings
     # can exit immediately in a Niri session. Use Niri's own output API.

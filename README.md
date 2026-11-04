@@ -130,3 +130,20 @@ If you are switching from an earlier installation, read [the upgrade notes](docs
 ## Status
 
 **v1 polish release candidate.** The desktop has been tested by its maintainer, but specific Fedora versions, other GPUs, display configurations, and third-party components still need wider testing. Local automated checks do not prove all hardware and graphical integrations work on every computer. See [`docs/TESTING.md`](docs/TESTING.md) and [`docs/SECURITY.md`](docs/SECURITY.md).
+
+## RC2.1 installer hotfix
+
+The interactive menu was fixed for the documented `curl | bash` installer. It now opens the controlling terminal separately for input/output; choosing optional app group 8 (Gaming) no longer toggles configuration replacement. The portable validation suite includes a pseudo-terminal regression test. No changes were made to the existing Niri rice.
+
+
+## AmethystOS RC2.2: desktop controls
+
+- **Super+1–5** opens five permanent named Niri workspaces; **Super+Ctrl+1–5** moves the focused column there. Niri still has its own dynamic workspace behavior for additional workspaces.
+- **Super+Shift+S** opens Amethyst Settings. **Super+Shift+T** opens the appearance picker.
+- **Amethyst Dark / Light** recolor Waybar, launcher, notification and terminal files, coordinate GTK where available, and use the corresponding wallpaper.
+- **Interface scaling:** `amethyst-scale auto` leaves Niri's automatic per-monitor Wayland scaling alone. `amethyst-scale 125` adjusts bar and application font sizes; advanced users can choose 100, 115, 125, 150 or 175.
+- **Fastfetch** uses the official AmethystOS crystal PNG; terminal rendering support varies.
+- **Boot splash:** optional, system-wide and **not silently installed**. Run `amethyst-boot --apply` to add a minimal Plymouth crystal splash and rebuild initramfs, or `amethyst-boot --restore` to restore the previous Plymouth theme. Review `docs/RC22.md` before enabling this feature.
+- **Optional apps** can be selected individually. Steam, OBS Studio, Discord and Flatseal are installed from Flathub only after explicit opt-in. They are not required for the desktop.
+
+**Safety:** This is an AI-assisted experimental release candidate, not a security-audited operating system or ISO. Review scripts and test on Fedora with GNOME available for recovery.

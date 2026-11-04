@@ -17,7 +17,20 @@ GROUPS = [
     ('creative', 'Creative tools', 'GIMP, Inkscape and Krita'),
     ('dev', 'Development', 'Git, Micro, Neovim and Python tooling'),
     ('media', 'Music & video', 'Celluloid and Rhythmbox'),
-    ('gaming', 'Gaming tools', 'Lutris, GameMode and MangoHud (if available)'),
+    ('gaming', 'Gaming tools', 'Lutris, GameMode and MangoHud'),
+    ('steam', 'Steam (Flatpak)', 'Flathub — third-party source, opt-in'),
+    ('obs', 'OBS Studio (Flatpak)', 'Flathub — streaming and recording'),
+    ('discord', 'Discord (Flatpak)', 'Flathub — voice and chat'),
+    ('flatseal', 'Flatseal (Flatpak)', 'Flathub permission manager'),
+    ('libreoffice', 'LibreOffice', 'Writer and Calc'),
+    ('thunderbird', 'Thunderbird', 'Email'),
+    ('gimp', 'GIMP', 'Image editor'),
+    ('krita', 'Krita', 'Digital painting'),
+    ('inkscape', 'Inkscape', 'Vector graphics'),
+    ('kdenlive', 'Kdenlive', 'Video editor'),
+    ('audacity', 'Audacity', 'Audio editor'),
+    ('neovim', 'Neovim', 'Editor'),
+    ('lutris', 'Lutris', 'Linux gaming launcher'),
 ]
 DEFAULTS = {'firefox', 'essentials'}
 PURPLE='\033[38;5;141m'; CYAN='\033[38;5;116m'; DIM='\033[2m'; RESET='\033[0m'; BOLD='\033[1m'
@@ -31,20 +44,25 @@ def create_plan(selected: list[str], replace: bool = False, appearance: bool = T
     return {'groups': sorted(set(selected)), 'replace': bool(replace), 'apply_dark': bool(appearance), 'schema': 1}
 
 
-def draw(writer, selected, replace, appearance):
+def draw(writer, selected, replace, appearance, theme, boot, page=0):
     writer.write('\033[2J\033[H')
-    writer.write(f'{PURPLE}╭────────────────────────────────────────────────────────╮{RESET}\n')
-    writer.write(f'{PURPLE}│{RESET} {BOLD}◆  AMETHYSTOS{RESET}    SETUP / FEDORA + NIRI                   {PURPLE}│{RESET}\n')
-    writer.write(f'{PURPLE}╰────────────────────────────────────────────────────────╯{RESET}\n\n')
-    writer.write(f'{DIM}Niri, its system controls and required fonts are included.{RESET}\n')
-    writer.write('Choose optional software (a missing extra will be skipped).\n\n')
-    for n, (key, title, info) in enumerate(GROUPS, 1):
+    writer.write(f'{PURPLE}◆ AMETHYSTOS{RESET}  ·  FEDORA / NIRI  ·  SETUP\n')
+    writer.write(f'{DIM}Select optional apps by number; Enter proceeds. GTK/desktop are included.\n')
+    writer.write(f'Steam, OBS, Discord, and Flatseal use Flathub only when chosen.{RESET}\n\n')
+    page_size=10
+    start=page*page_size
+    writer.write(f'  Software page {page+1}/{(len(GROUPS)+page_size-1)//page_size} — use n/p to navigate\n')
+    for n in range(start,min(start+page_size,len(GROUPS))):
+        key, title, info = GROUPS[n]
+        n=n+1
         mark = f'{CYAN}✓{RESET}' if key in selected else ' '
-        writer.write(f'  {n}. [{mark}] {title:<22} {DIM}{info}{RESET}\n')
-    writer.write(f'\n  9. [{CYAN if replace else ""}{"✓" if replace else " "}{RESET}] Back up and replace existing dotfiles\n')
-    writer.write(f' 10. [{CYAN if appearance else ""}{"✓" if appearance else " "}{RESET}] Coordinate GTK dark appearance (affects GNOME too)\n')
-    writer.write('\n  Enter a number to toggle, or press Enter to install.\n')
-    writer.write(f'  {DIM}No existing desktop configuration will be replaced silently.{RESET}\n\n')
+        writer.write(f'{n:>2}. [{mark}] {title:<25} {DIM}{info}{RESET}\n')
+    base = len(GROUPS)
+    writer.write(f'\n {base+1:>2}. [{"✓" if replace else " "}] Back up and replace existing configs\n')
+    writer.write(f' {base+2:>2}. [{"✓" if appearance else " "}] Coordinate GTK appearance with desktop\n')
+    writer.write(f' {base+3:>2}. [{"✓" if theme == "light" else " "}] Start with Amethyst Light (otherwise Dark)\n')
+    writer.write(f' {base+4:>2}. [{"✓" if boot else " "}] Install Amethyst boot splash (system change, opt-in)\n')
+    writer.write(f'\n{DIM}n = next page, p = previous page, Enter = continue{RESET}\n')
     writer.write(f'{PURPLE}amethystos › {RESET}')
     writer.flush()
 
@@ -53,13 +71,16 @@ def interactive_plan() -> dict:
     selected = set(DEFAULTS)
     replace = False
     appearance = True
+    theme = "dark"
+    boot = False
+    page=0
     # Never open a terminal in 'r+' mode: Python's text I/O can seek between
     # writes and reads, but terminal devices are not seekable. The installer
     # runs with stdin owned by curl, so open /dev/tty for each direction.
     with (open('/dev/tty', 'r', encoding='utf-8') as tty_in,
           open('/dev/tty', 'w', encoding='utf-8', buffering=1) as tty_out):
         while True:
-            draw(tty_out, selected, replace, appearance)
+            draw(tty_out, selected, replace, appearance, theme, boot, page)
             answer = tty_in.readline()
             if not answer:
                 raise RuntimeError('The setup terminal was closed')
@@ -68,24 +89,38 @@ def interactive_plan() -> dict:
                 break
             if choice in ('q', 'quit', 'cancel'):
                 raise KeyboardInterrupt
-            if choice == '9':
+            if choice == 'n':
+                page=min(page+1,(len(GROUPS)-1)//10)
+                continue
+            if choice == 'p':
+                page=max(0,page-1)
+                continue
+            if choice == str(len(GROUPS) + 1):
                 replace = not replace
-            elif choice == '10':
+            elif choice == str(len(GROUPS) + 2):
                 appearance = not appearance
+            elif choice == str(len(GROUPS) + 3):
+                theme = 'light' if theme == 'dark' else 'dark'
+            elif choice == str(len(GROUPS) + 4):
+                boot = not boot
             elif choice.isdigit() and 1 <= int(choice) <= len(GROUPS):
                 key = GROUPS[int(choice) - 1][0]
+                page=(int(choice)-1)//10
                 if key in selected: selected.remove(key)
                 else: selected.add(key)
         tty_out.write('\033[2J\033[H')
         tty_out.write(f'{BOLD}{PURPLE}◆ AMETHYSTOS{RESET}  Your choices\n\n')
         tty_out.write('  Optional apps: ' + (', '.join(sorted(selected)) or '(none)') + '\n')
         tty_out.write('  Existing configs: ' + ('back up and replace' if replace else 'preserve') + '\n')
-        tty_out.write('  GTK appearance: ' + ('apply coordinated dark preference' if appearance else 'leave unchanged') + '\n\n')
+        tty_out.write('  Appearance: ' + (theme if appearance else 'do not change GNOME') + '\n')
+        tty_out.write('  Boot splash: ' + ('optional install enabled' if boot else 'unchanged') + '\n\n')
         tty_out.write('  Continue with Fedora package installation? [y/N] ')
         tty_out.flush()
         if tty_in.readline().strip().lower() not in ('y', 'yes'):
             raise KeyboardInterrupt
-    return create_plan(list(selected), replace, appearance)
+    plan=create_plan(list(selected), replace, appearance)
+    plan.update(theme=theme, boot=boot)
+    return plan
 
 
 def main():
@@ -94,12 +129,15 @@ def main():
     parser.add_argument('--non-interactive', action='store_true')
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--no-theme', action='store_true')
+    parser.add_argument('--theme', choices=('dark','light'), default='dark')
+    parser.add_argument('--boot-splash', action='store_true')
     parser.add_argument('--groups', default=None, help='comma-separated selection')
     args = parser.parse_args()
     try:
         if args.non_interactive or args.groups is not None:
             chosen = (args.groups.split(',') if args.groups else []) if args.groups is not None else sorted(DEFAULTS)
             plan = create_plan(chosen, args.replace, not args.no_theme)
+            plan.update(theme=args.theme, boot=args.boot_splash)
         else:
             plan = interactive_plan()
             if args.replace: plan['replace'] = True

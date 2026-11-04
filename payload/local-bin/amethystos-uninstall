@@ -27,5 +27,7 @@ fi
 python3 "$SCRIPT" restore --dry-run >/dev/null
 PREF="$HOME/.local/share/amethystos/desktop_prefs.py"
 if [[ -r "$PREF" ]]; then python3 "$PREF" restore || true; fi
+APP="$HOME/.local/share/amethystos/appearance.py"
+if [[ -r "$APP" ]]; then python3 "$APP" restore-scale || true; fi
 python3 "$SCRIPT" restore
 printf 'Your original configurations have been restored. Log out and return to GNOME if needed.\n'

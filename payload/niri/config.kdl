@@ -1,3 +1,10 @@
+// Five named workspaces remain available even when empty.
+workspace "one"
+workspace "two"
+workspace "three"
+workspace "four"
+workspace "five"
+
 // This config is in the KDL format: https://kdl.dev
 // "/-" comments out the following node.
 // Check the wiki for a full description of the configuration:
@@ -330,7 +337,21 @@ animations {
   // off
 
   // Slow down all animations by this factor. Values below 1 speed them up instead.
-  slowdown 1.4
+  // Calm, short animations; no external shaders or GPU-heavy transitions.
+  workspace-switch {
+    spring damping-ratio=1.0 stiffness=950 epsilon=0.001
+  }
+  horizontal-view-movement {
+    spring damping-ratio=1.0 stiffness=850 epsilon=0.001
+  }
+  window-open {
+    duration-ms 150
+    curve "ease-out-cubic"
+  }
+  window-close {
+    duration-ms 130
+    curve "ease-out-quad"
+  }
 }
 include "window_rules.kdl" // Made by me
 include "basicsettings.kdl" // Added by niri-settings

@@ -25,6 +25,7 @@ CONFIG_DIRS = (
 EXTRA_FILES = (
     "powermenu", "set-wallpaper", "clipboard-history", "mako-history",
     "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
+    "amethyst-theme", "amethyst-scale", "amethyst-boot",
 )
 SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
 
@@ -50,6 +51,10 @@ def sources() -> list[tuple[Path, Path]]:
     # Keep a self-contained uninstaller after the one-command bootstrap archive is removed.
     mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
     mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
+    mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
+    mapping.append((ROOT / "scripts/boot_theme.sh", Path(".local/share/amethystos/boot_theme.sh")))
+    mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
+    mapping.append((ROOT / "assets/plymouth", Path(".local/share/amethystos/assets/plymouth")))
     mapping.extend((PAYLOAD / "applications" / name, Path(".local/share/applications") / name)
                    for name in ("amethyst-settings.desktop", "qt6ct.desktop", "nwg-look.desktop"))
     mapping.extend((PAYLOAD / "local-bin" / name, Path(".local/bin") / name) for name in EXTRA_FILES)

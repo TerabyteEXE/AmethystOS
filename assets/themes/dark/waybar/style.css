@@ -1,0 +1,263 @@
+/* ═══════════════════════════════════════════════════════════════════
+ * Waybar — Frosted Glass · Neon Accents · Modern
+ * ═══════════════════════════════════════════════════════════════════ */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Cascadia Mono NF", "DejaVu Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 0;
+    box-shadow: none;
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+}
+
+window#waybar {
+    background: transparent;
+    color: #cdd6f4;
+}
+
+tooltip {
+    background: rgba(17, 17, 27, 0.92);
+    border: 1px solid rgba(180, 190, 254, 0.12);
+    border-radius: 10px;
+    color: #f3efff;
+    padding: 6px;
+}
+tooltip label {
+    color: #09e89d;
+    padding: 2px 6px;
+}
+
+/* ═══ LEFT / CENTER / RIGHT ═══ */
+.modules-left,
+.modules-center,
+.modules-right {
+    background: transparent;
+    padding: 2px 0;
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * WORKSPACES — minimal dot/pill style
+ * ═══════════════════════════════════════════════════════════════════ */
+#workspaces {
+    padding: 0 2px;
+    margin: 0 2px;
+}
+
+#workspaces button {
+    color: #94e2d5; /* Keep as it is */
+    background: rgba(18, 19, 32, 0.92); /* workspace buttons */
+    border-radius: 10px;
+    padding: 2px 6px;
+    margin: 1px 1px;
+    min-width: 14px;
+    border: 1px solid rgba(69, 71, 90, 0);
+    font-size: 11px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+#workspaces button:hover {
+    color: #cba6f7;
+    border-radius: 10px;
+    background: rgba(69, 71, 90, 1);
+}
+
+#workspaces button.active {
+    color: #1e1e2e;
+    background: rgba(180, 190, 254, 0.9);
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+#workspaces button.urgent {
+    color: #1e1e2e;
+    background: rgba(243, 139, 168, 0.9);
+    border-radius: 7px;
+    font-weight: 800;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * PILL BASE — shared glassmorphism style
+ * ═══════════════════════════════════════════════════════════════════ */
+#clock,
+#custom-player,
+#pulseaudio,
+#network,
+#bluetooth,
+#custom-clipboard,
+#custom-notifications,
+#cpu,
+#memory,
+#battery,
+#custom-power {
+    padding: 2px 8px;
+    margin: 1px 1px;
+    border-radius: 10px;
+    background: #000000;
+    border: 1px solid rgba(69, 71, 90, 0.3);
+    color: #bac2de;
+    transition: all 0.2s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * INDIVIDUAL MODULE STYLES
+ * ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Clock ── */
+#clock {
+    color: #94e2d5;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    padding: 2px 10px;
+}
+
+/* ── Player ── */
+#custom-player {
+    color: #94e2d5;
+    font-size: 10px;
+    padding: 2px 10px;
+}
+
+/* ── CPU ── */
+#cpu {
+    color: #94e2d5;
+}
+#cpu.warning {
+    color: #fab387;
+}
+#cpu.critical {
+    color: #f38ba8;
+}
+
+/* ── Memory ── */
+#memory {
+    color: #94e2d5;
+}
+#memory.warning {
+    color: #fab387;
+}
+#memory.critical {
+    color: #f38ba8;
+}
+
+/* ── Battery ── */
+#battery {
+    color: #94e2d5;
+}
+#battery.warning {
+    color: #fab387;
+}
+#battery.critical {
+    color: #f38ba8;
+}
+#battery.charging {
+    color: #a6e3a1;
+}
+
+/* ── Audio ── */
+#pulseaudio {
+    color: #94e2d5;
+}
+#pulseaudio.muted {
+    color: #f38ba8;
+}
+
+/* ── Network ── */
+#network {
+    color: #94e2d5;
+}
+#network.disconnected,
+#network.disabled {
+    color: #f38ba8;
+}
+
+/* ── Bluetooth ── */
+#bluetooth {
+    color: #94e2d5;
+}
+#bluetooth.connected {
+    color: #94e2d5;
+}
+#bluetooth.off,
+#bluetooth.disconnected {
+    color: #45475a;
+}
+
+/* ── Clipboard ── */
+#custom-clipboard {
+    color: #94e2d5;
+}
+
+/* ── Notifications ── */
+#custom-notifications {
+    color: #94e2d5;
+    min-width: 24px;
+}
+#custom-notifications.dnd-none,
+#custom-notifications.dnd-notification,
+#custom-notifications.dnd-inhibited-none,
+#custom-notifications.dnd-inhibited-notification {
+    color: #f38ba8;
+}
+
+/* ── Power ── */
+#custom-power {
+    min-width: 26px;
+    padding: 2px 8px;
+    color: #f38ba8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+ * HOVER — each module gets its own accent glow
+ * ═══════════════════════════════════════════════════════════════════ */
+#cpu:hover {
+    color: #cba6f7;
+}
+#memory:hover {
+    color: #cba6f7;
+}
+#battery:hover {
+    color: #cba6f7;
+}
+#pulseaudio:hover {
+    color: #cba6f7;
+}
+#network:hover {
+    color: #cba6f7;
+}
+#bluetooth:hover {
+    color: #cba6f7;
+}
+#custom-clipboard:hover {
+    color: #cba6f7;
+}
+#custom-notifications:hover {
+    color: #cba6f7;
+}
+#custom-power:hover {
+    color: #ff0000;
+}
+#clock:hover {
+    color: #cba6f7;
+}
+#custom-player:hover {
+    color: #cba6f7;
+}
+
+/* AmethystOS settings and tray affordances. */
+#custom-settings, #tray {
+    background: rgba(22, 20, 38, 0.95); color: #cba6f7;
+    border-radius: 10px; margin: 1px; padding: 2px 9px;
+}
+#custom-settings:hover { background: #313244; }
+
+/* AmethystOS: consistent small hover transitions, without expensive effects. */
+#workspaces button, #custom-settings, #custom-logo, #custom-power, #clock {
+  transition: background-color 160ms ease, color 160ms ease;
+}

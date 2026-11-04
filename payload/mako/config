@@ -25,7 +25,7 @@ max-icon-size=44
 icon-path=/usr/share/icons/Papirus-Dark
 
 # Text
-font=JetBrainsMono Nerd Font 9
+font=Cascadia Mono NF 11
 markup=1
 actions=1
 format=<b>%s</b>\n%b
