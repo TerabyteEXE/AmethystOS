@@ -1,125 +1,44 @@
 #!/usr/bin/env bash
-# A small desktop control menu with guaranteed fallbacks and readable errors.
-set -u
-notify() { command -v notify-send >/dev/null && notify-send 'AmethystOS' "$*" || printf '%s\n' "$*" >&2; }
-launch() {
-  local cmd=$1; shift
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    notify "$cmd is not installed. Install it using Fedora DNF."; return 1
-  fi
-  local logdir="$HOME/.cache/amethystos"
-  mkdir -p "$logdir"
-  "$cmd" "$@" >>"$logdir/launch.log" 2>&1 &
-}
-terminal() {
-  if command -v alacritty >/dev/null; then
-    alacritty -e bash -lc "$*; echo; read -r -p 'Press Enter to close...'" &
-  elif command -v kitty >/dev/null; then
-    kitty bash -lc "$*; echo; read -r -p 'Press Enter to close...'" &
-  else
-    notify 'No terminal emulator available'; return 1
-  fi
-}
-choose() {
-  if [[ -n ${WAYLAND_DISPLAY:-} ]] && command -v fuzzel >/dev/null; then
-    printf '%s\n' "$@" | fuzzel --dmenu --prompt 'Amethyst Settings: ' --width 36
-  elif [[ -e /dev/tty ]]; then
-    printf '%s\n' "$@" | nl -w2 -s'. ' >&2
-    printf 'Selection: ' >&2
-    local n
-    read -r n </dev/tty || return 1
-    [[ "$n" =~ ^[0-9]+$ ]] || return 1
-    printf '%s\n' "$@" | sed -n "${n}p"
-  else
-    echo 'Open this command in a Wayland session, or provide a category.' >&2; return 1
-  fi
-}
-appearance() {
-  local mode=$1
-  local helper="$HOME/.local/share/amethystos/desktop_prefs.py"
-  if [[ ! -r "$helper" ]]; then notify 'Appearance helper missing'; return 1; fi
-  if ! python3 "$helper" "$mode"; then
-    notify 'Could not update GTK appearance. Use GNOME Settings to change it.'
-    return 1
-  fi
-  # Use the matching official wallpaper if it was installed; this does not
-  # prevent manually picking another wallpaper afterward.
-  local wall="$HOME/Pictures/wallpapers/Amethyst${mode^}.png"
-  if [[ -f "$wall" ]]; then "$HOME/.local/bin/set-wallpaper" --file "$wall"; fi
-  notify "AmethystOS $mode appearance applied. Some applications require a restart."
-}
-item=${1:-menu}
-case "$item" in
-  menu)
-    choice=$(choose 'Search applications' 'Install application' 'Remove application' 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Interface scaling' 'Top bar settings' 'Workspaces' 'Display information' 'Boot splash' 'Wallpapers' 'Calendar' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
-    case "$choice" in
-      'Search applications') exec "$HOME/.local/bin/amethyst-launcher" ;;
-      'Install application') exec "$HOME/.local/bin/amethyst-software" install ;;
-      'Remove application') exec "$HOME/.local/bin/amethyst-software" remove ;;
-      'Top bar settings') exec "$HOME/.local/bin/amethyst-bar" menu ;;
-      'Calendar') exec "$HOME/.local/bin/amethyst-calendar" ;;
-      'Network') exec "$0" network ;;
-      'Audio') exec "$0" audio ;;
-      'Bluetooth') exec "$0" bluetooth ;;
-      'Appearance') exec "$0" appearance ;;
-      'Display information') exec "$0" display ;;
-      'Interface scaling') exec "$0" scaling ;;
-      'Workspaces') exec "$0" workspaces ;;
-      'Boot splash') exec "$0" boot ;;
-      'Wallpapers') exec "$0" wallpaper ;;
-      'Keyboard shortcuts') exec "$0" keys ;;
-      'Software updates') exec "$0" updates ;;
-      'Diagnostics') exec "$0" diagnostics ;;
-    esac ;;
-  network) launch nm-connection-editor ;;
-  audio) launch pavucontrol ;;
-  bluetooth)
-    if command -v blueman-manager >/dev/null; then launch blueman-manager
-    else terminal 'bluetoothctl devices; bluetoothctl show'; fi ;;
-  appearance)
-    choice=$(choose 'Amethyst Dark' 'Amethyst Light' 'GTK settings' 'Qt settings' 'Choose wallpaper') || exit 0
-    case "$choice" in
-      'Amethyst Dark') exec "$HOME/.local/bin/amethyst-theme" dark;;
-      'Amethyst Light') exec "$HOME/.local/bin/amethyst-theme" light;;
-      'GTK settings') launch nwg-look;;
-      'Qt settings') launch qt6ct;;
-      'Choose wallpaper') exec "$0" wallpaper;;
-    esac ;;
-  dark|light) exec "$HOME/.local/bin/amethyst-theme" "$item" ;;
-  scaling)
-    choice=$(choose 'Automatic (Wayland per-monitor)' '100%' '115%' '125%' '150%' '175%') || exit 0
-    case "$choice" in
-      'Automatic (Wayland per-monitor)') "$HOME/.local/bin/amethyst-scale" auto ;;
-      '100%') "$HOME/.local/bin/amethyst-scale" 100 ;;
-      '115%') "$HOME/.local/bin/amethyst-scale" 115 ;;
-      '125%') "$HOME/.local/bin/amethyst-scale" 125 ;;
-      '150%') "$HOME/.local/bin/amethyst-scale" 150 ;;
-      '175%') "$HOME/.local/bin/amethyst-scale" 175 ;;
-    esac ;;
-  workspaces)
-    choice=$(choose 'Workspace 1' 'Workspace 2' 'Workspace 3' 'Workspace 4' 'Workspace 5') || exit 0
-    case "$choice" in
-      'Workspace '[1-5]) case "${choice##* }" in
-        1) name=one;; 2) name=two;; 3) name=three;; 4) name=four;; 5) name=five;;
-      esac
-      niri msg action focus-workspace "$name" ;;
-    esac ;;
-  boot)
-    choice=$(choose 'Show Plymouth status' 'Install Amethyst boot splash (sudo)' 'Restore previous boot splash (sudo)') || exit 0
-    case "$choice" in
-      'Show Plymouth status') terminal '$HOME/.local/bin/amethyst-boot --status' ;;
-      'Install Amethyst boot splash (sudo)') terminal '$HOME/.local/bin/amethyst-boot --apply' ;;
-      'Restore previous boot splash (sudo)') terminal '$HOME/.local/bin/amethyst-boot --restore' ;;
-    esac ;;
-  display)
-    # Niri does not expose GNOME's monitor-control DBus API; GNOME Settings
-    # can exit immediately in a Niri session. Use Niri's own output API.
-    terminal 'niri msg outputs' ;;
-  wallpaper) exec "$HOME/.local/bin/amethyst-wallpapers" ;;
-  bar) exec "$HOME/.local/bin/amethyst-bar" menu ;;
-  calendar) exec "$HOME/.local/bin/amethyst-calendar" ;;
-  keys) niri msg action show-hotkey-overlay || notify 'Use Super+Shift+/ for the Niri shortcut overlay' ;;
+# Single, category-based AmethystOS Settings entry point.
+# On Fedora/Niri it runs the persistent GTK interface; the simple keyboard menu
+# is retained for recovery when GTK bindings are unavailable.
+set -Eeuo pipefail
+page="${1:-home}"
+case "$page" in
+  dark|light) exec "$HOME/.local/bin/amethyst-theme" "$page" ;;
+  keys) exec niri msg action show-hotkey-overlay ;;
   updates) exec "$HOME/.local/bin/amethyst-software" update ;;
-  diagnostics) terminal '$HOME/.local/bin/amethyst-doctor' ;;
-  *) echo 'Usage: amethyst-settings [network|audio|bluetooth|appearance|dark|light|display|wallpaper|bar|calendar|keys|updates|diagnostics]' >&2; exit 2;;
+  diagnostics) exec alacritty -e "$HOME/.local/bin/amethyst-doctor" ;;
 esac
+GUI="$HOME/.local/share/amethystos/settings_gui.py"
+if [[ -r "$GUI" ]] && [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] && \
+   python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' >/dev/null 2>&1; then
+  exec python3 "$GUI" "$page"
+fi
+# Fallback: menu remains usable in a terminal, without needing GTK bindings.
+if ! command -v fuzzel >/dev/null 2>&1 && [[ ! -r /dev/tty ]]; then
+  printf 'AmethystOS Settings: install python3-gobject and GTK3, or run in a graphical session.\n' >&2
+  exit 1
+fi
+items=( 'Appearance' 'Top bar' 'Devices' 'Workspaces' 'Software' 'System' 'Wallpapers' 'Exit' )
+while true; do
+  if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v fuzzel >/dev/null 2>&1; then
+    choice=$(printf '%s\n' "${items[@]}" | fuzzel --dmenu --prompt 'Amethyst Settings › ') || exit 0
+  else
+    printf '%s\n' "${items[@]}" | nl -ba -w2 -s'. ' >&2
+    printf 'Choose (1–8): ' >&2
+    read -r n </dev/tty || exit 0
+    [[ "$n" =~ ^[1-8]$ ]] || continue
+    choice="${items[n-1]}"
+  fi
+  case "$choice" in
+    Appearance) "$HOME/.local/bin/amethyst-theme" dark || true ;;
+    'Top bar') "$HOME/.local/bin/amethyst-bar" menu || true ;;
+    Devices) command -v nm-connection-editor >/dev/null && nm-connection-editor >/dev/null 2>&1 & ;;
+    Workspaces) command -v niri >/dev/null && niri msg action focus-workspace one || true ;;
+    Software) "$HOME/.local/bin/amethyst-software" install || true ;;
+    System) "$HOME/.local/bin/amethyst-doctor" || true ;;
+    Wallpapers) "$HOME/.local/bin/amethyst-wallpapers" || true ;;
+    Exit|'') exit 0 ;;
+  esac
+done

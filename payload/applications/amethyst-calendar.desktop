@@ -7,3 +7,4 @@ Icon=x-office-calendar
 Categories=Office;Calendar;
 Terminal=false
 StartupNotify=false
+NoDisplay=true

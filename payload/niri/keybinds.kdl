@@ -17,7 +17,7 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Mod+Space repeat=false hotkey-overlay-title="Search apps and AmethystOS actions (toggle)" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-launcher"; }
+    Mod+Space repeat=false hotkey-overlay-title="Search applications (toggle)" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-launcher"; }
     Mod+D repeat=false hotkey-overlay-title="AmethystOS quick actions" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-hub"; }
     Mod+Shift+S { spawn "sh" "-c" "$HOME/.local/bin/amethyst-settings"; }
     Mod+Shift+W { spawn "sh" "-c" "$HOME/.local/bin/amethyst-wallpapers"; }
@@ -62,7 +62,7 @@ binds {
     // or do a four-finger swipe up on a touchpad.
     Mod+O repeat=false { toggle-overview; }
 
-    Mod+Q repeat=false { close-window; }
+    Mod+W repeat=false { close-window; }
 
     Mod+Left  { focus-column-left; }
     Mod+Down  { focus-workspace-down; }
@@ -248,7 +248,7 @@ binds {
     // Toggle tabbed column display mode.
     // Windows in this column will appear as vertical tabs,
     // rather than stacked on top of each other.
-    Mod+W { toggle-column-tabbed-display; }
+    Mod+Shift+Tab { toggle-column-tabbed-display; }
 
     // Actions to switch layouts.
     // Note: if you uncomment these, make sure you do NOT have

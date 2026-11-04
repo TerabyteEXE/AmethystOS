@@ -7,3 +7,4 @@ Icon=software-update-available
 Categories=System;
 Terminal=false
 StartupNotify=false
+NoDisplay=true

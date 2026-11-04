@@ -7,3 +7,4 @@ Icon=preferences-system-windows
 Categories=Settings;DesktopSettings;
 Terminal=false
 StartupNotify=false
+NoDisplay=true

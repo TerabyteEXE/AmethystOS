@@ -7,3 +7,4 @@ Icon=preferences-desktop-wallpaper
 Categories=Settings;DesktopSettings;
 Terminal=false
 StartupNotify=false
+NoDisplay=true

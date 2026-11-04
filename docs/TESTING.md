@@ -5,7 +5,7 @@ Automated: `bash tests/validate.sh`. On Fedora with `niri` installed, the native
 Manual Fedora GNOME/Niri login test (not verified in the development container):
 1. On Fedora Workstation, log in to GNOME and install AmethystOS from the extracted ZIP. Confirm desktop session **Niri** appears in GDM.
 2. Log in to Niri. Check Waybar, Mako, Fuzzel (`Super+Space`) and terminal (`Super+Enter`).
-3. Create two terminal windows, scroll between columns, close using `Super+Q`; test workspaces and Niri help overlay.
+3. Create two terminal windows, scroll between columns, close using `Super+W`; test workspaces and Niri help overlay.
 4. Open `Super+P` power menu and use *Lock* to verify GTKLock.
 5. Click Waybar network/audio/Bluetooth/notifications/clipboard controls, including the menu scripts.
 6. Add a wallpaper to `~/Pictures/wallpapers/` and use `set-wallpaper`. Log out and back in.

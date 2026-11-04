@@ -1,57 +1,70 @@
-# AmethystOS RC2.3 — Everyday desktop controls
+# AmethystOS — everyday controls (RC2.4)
 
-This release retains the original Fedora/Niri window layout, styles and key
-bindings except for two changes: Super+D is the new quick-actions menu, and
-toggle-floating moves to Super+Shift+D to avoid a duplicate Niri binding.
+The default Niri layout is unchanged. The interface is now organized around
+**one Settings application** and a short quick-action menu.
 
-## Search and commands
+## Launcher and menus
 
-- **Super+Space**: open/close Fuzzel. Its normal desktop application search now
-  includes searchable AmethystOS entries for Settings, install/remove software,
-  updates, wallpapers, calendar and the top bar. **Esc** closes it as usual.
-- **Super+D**: Amethyst quick-actions menu. Type to filter; use arrow keys and
-  Enter to choose. No typing of arbitrary package names or commands.
-- **Super+Shift+S**: Settings; **Super+Alt+B**: Waybar settings.
-- **Super+Shift+W**: thumbnail wallpaper browser. Double-click or press Apply.
+- **Super+Space** opens or closes the Fuzzel application search. It lists
+  installed applications and a single **Amethyst Settings** entry, not a long
+  series of maintenance launchers.
+- **Super+D** opens a six-item keyboard-friendly quick menu: Applications,
+  Settings, Software, Wallpapers, Calendar, and Power. Navigate with the arrow
+  keys, filter by typing, and press Enter to choose.
+- **Super+Shift+S** opens the categorized graphical Settings window.
+- **Super+Alt+B** opens its **Top bar** page directly. Right-clicking the
+  Waybar gear opens the same page; left-click opens the Settings overview.
 
-## Calendar and top bar
+## Settings categories
 
-Hover the Waybar clock for the calendar tooltip and click it for a separate
-calendar window. Right-click the Waybar gear icon for the bar settings menu;
-choose top/bottom, compact/normal/roomy, or hide/show optional modules.
+**Overview:** common tasks, wallpapers, calendar.
 
-Preferences are stored at `~/.local/state/amethystos-base-v1/bar.json` and
-reapplied after the Light/Dark theme changes. If you manually edit Waybar
-files, AmethystOS will refuse to overwrite them until you reconcile your edits.
-Use `amethyst-bar status` to inspect, or run `amethyst-bar menu`.
+**Appearance:** light/dark theme, font and UI scaling, wallpaper browser,
+GTK and Qt tools.
 
-## Software manager
+**Top bar:** change position, density, and visible modules. These controls
+apply immediately **without closing the window**. Preferences persist through
+Light/Dark theme changes. If a managed Waybar config was manually edited,
+AmethystOS refuses to overwrite it and shows an error.
 
-`amethyst-software install` and `amethyst-software remove` show a curated list
-of Fedora packages and a few Flathub apps. DNF transactions are interactive
-and show the actual package changes. External Flathub sources are explicitly
-opt-in. The software menu does not remove AmethystOS system components.
+**Devices:** network connections, volume, Bluetooth. An unavailable tool is
+reported as missing rather than silently failing.
 
-`amethyst-software update` opens a terminal and runs Fedora updates (then
-user Flatpak updates if Flatpak is installed). The commands work on Fedora,
-not on every Linux distribution.
+**Desktop:** switch between the five named workspaces, open the calendar and
+inspect Niri display information.
 
-## Wallpaper browser
+**Software:** launch the curated installer, uninstaller, or Fedora/Flatpak update
+workflow. Transactions still require normal package-manager approval.
 
-The GTK3 browser displays local PNG/JPEG/WebP pictures from
-`~/Pictures/wallpapers/`, with a scrollable grid and thumbnail previews. It
-reuses the existing `set-wallpaper --file` operation. If GTK or PyGObject is
-missing, it falls back to Fuzzel's keyboard-only list. Default Amethyst Dark
-and Light wallpapers stay intact, and personal wallpapers are never deleted.
+**System:** Niri shortcut overlay, diagnostics, optional boot splash and power.
 
-## Limitations and testing
+The GTK3 Settings app requires Fedora `python3-gobject` and `gtk3`, already
+included in the essential package list. Without GTK, a smaller Fuzzel/text
+fallback remains available. System apps such as Qt, GTK4/libadwaita,
+Flatpak and games can still have their own appearance preferences.
 
-Automatic GUI styling is not universal: Qt, GTK4/libadwaita, Flatpak, Electron,
-and individual games may retain independent settings. A live Fedora Niri login
-and end-to-end app launches must be tested on your hardware before a stable v1.
-The Super+Space toggle relies on Niri processing the keybinding while Fuzzel
-has keyboard focus. If a particular session inhibits shortcuts, use Esc.
+## Shortcuts
 
-`bash tests/validate.sh` covers configuration, rollback, shortcuts and new
-controller logic without a graphical session. Fedora CI installs Niri and
-additionally checks the real compositor parser.
+| Keys | Purpose |
+| --- | --- |
+| `Super+Space` | Search installed applications (toggle) |
+| `Super+D` | Quick menu |
+| `Super+Shift+S` | Amethyst Settings |
+| `Super+Alt+B` | Top bar settings |
+| `Super+Shift+W` | Wallpaper gallery |
+| `Super+W` | Close focused window |
+| `Super+Shift+Tab` | Toggle tabbed columns (moved from Super+W) |
+| `Super+1–5` | Switch named workspaces |
+
+The complete source-derived list is at `wiki/keybinds.html`.
+
+## Troubleshooting
+
+Use `amethyst-settings` from a terminal if the launcher entry appears broken;
+look for GTK error messages. Run `amethyst-bar status` to inspect the saved
+Waybar settings. If the GUI won't open, check that Fedora has `python3-gobject`
+and `gtk3`, and use `amethyst-settings` in a terminal as a fallback.
+
+`bash tests/validate.sh` tests the source files, CLI commands and deployment
+safety. A real Fedora/Niri graphical session is still needed to verify GTK
+rendering, popup focus, and Waybar interactions before a stable release.

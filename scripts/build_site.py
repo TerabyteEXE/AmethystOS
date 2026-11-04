@@ -91,8 +91,8 @@ wiki_home=f'''<h2>Welcome to the wiki</h2>
 <h2>Get started in a minute</h2><p>After logging into the Niri session, these shortcuts will get you moving:</p>
 <table class="key-table"><tbody>
 <tr><td><span class="kbd">Super + Enter</span></td><td>Open Alacritty terminal</td></tr>
-<tr><td><span class="kbd">Super + Space</span></td><td>Open Fuzzel application launcher</td></tr>
-<tr><td><span class="kbd">Super + Q</span></td><td>Close the focused window</td></tr>
+<tr><td><span class="kbd">Super + Space</span></td><td>Search installed applications</td></tr>
+<tr><td><span class="kbd">Super + W</span></td><td>Close the focused window</td></tr>
 <tr><td><span class="kbd">Super + H / L</span></td><td>Move between columns</td></tr>
 <tr><td><span class="kbd">Super + O</span></td><td>Show workspace overview</td></tr>
 <tr><td><span class="kbd">Super + Shift + /</span></td><td>Open built-in hotkey overlay</td></tr>
@@ -213,11 +213,15 @@ def describe(action,combo):
     if main=='set-window-height':return ('Reduce' if '-' in action else 'Increase')+' window height by 10%'
     if main.startswith('spawn'):
         if 'alacritty' in action:return 'Open Alacritty terminal'
+        if 'amethyst-launcher' in action:return 'Search installed applications'
+        if 'amethyst-hub' in action:return 'Open Amethyst quick menu'
+        if 'amethyst-bar' in action:return 'Open Top Bar settings'
+        if 'amethyst-wallpapers' in action:return 'Open wallpaper gallery'
         if 'fuzzel' in action:return 'Open application search (Fuzzel)'
         if 'nautilus' in action:return 'Open file manager'
         if 'amethyst-browser' in action or 'firefox' in action:return 'Open selected browser'
         if 'kitty' in action:return 'Open Kitty terminal'
-        if 'amethyst-settings' in action:return 'Open Amethyst Settings'
+        if 'amethyst-settings' in action:return 'Open Amethyst Settings (categorized)'
         if 'set-wallpaper' in action:return 'Choose a wallpaper'
         if 'powermenu' in action:return 'Open power menu'
         if 'orca' in action:return 'Toggle screen reader'

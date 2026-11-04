@@ -7,3 +7,4 @@ Icon=system-software-install
 Categories=System;PackageManager;
 Terminal=false
 StartupNotify=false
+NoDisplay=true
