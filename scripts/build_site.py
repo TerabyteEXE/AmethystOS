@@ -20,7 +20,7 @@ def nav(rel,active):
     menu=[('Home',rel+'index.html','home'),('Install',rel+'install.html','install'),('Documentation',rel+'wiki/index.html','wiki'),('Keybindings',rel+'wiki/keybinds.html','keys')]
     links=''.join(f'<a href="{u}"'+(' aria-current="page"' if id==active else '')+f'>{t}</a>' for t,u,id in menu)
     return f'''<header class="topbar"><div class="wrap nav-inner">
-<a href="{rel}index.html" class="brand" aria-label="AmethystOS home"><img class="brand-icon" src="{rel}assets/logo.svg" alt="" width="26" height="26">AmethystOS</a>
+<a href="{rel}index.html" class="brand" aria-label="AmethystOS home"><img class="brand-icon" src="{rel}assets/branding/amethyst-logo.png" alt="" width="36" height="36">AmethystOS</a>
 <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
 <nav id="site-nav" class="navlinks" data-navlinks aria-label="Main navigation">{links}<a class="nav-github" href="{GITHUB}" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 </div></header>'''
@@ -29,7 +29,8 @@ def page(title,description,rel,active,body):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c1014"><meta name="description" content="{escape(description)}">
-<title>{escape(title)} — AmethystOS</title><link rel="icon" href="{rel}assets/favicon.svg" type="image/svg+xml">
+<title>{escape(title)} — AmethystOS</title><link rel="icon" href="{rel}assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="{rel}assets/apple-touch-icon.png">
 <link rel="stylesheet" href="{rel}assets/site.css"><script src="{rel}assets/site.js" defer></script></head>
 <body><a class="skip-link" href="#content">Skip to content</a>
 {nav(rel,active)}<main id="content">{body}</main>

@@ -1,4 +1,4 @@
-<img src="assets/logo.svg" alt="AmethystOS gem logo" width="42" height="42">
+<img src="assets/branding/amethyst-logo.png" alt="AmethystOS purple crystal logo" width="92">
 
 # AmethystOS
 
@@ -84,6 +84,10 @@ python3 scripts/build_site.py --check # ensure generated pages aren't stale
 The homepage source lives in `site_templates/home.html`; edit that template rather than editing generated `index.html`.
 
 To publish it, go to **Settings → Pages → Build and deployment**, choose **Deploy from a branch**, select `main` and `/ (root)`. See [`docs/GITHUB_PAGES.md`](docs/GITHUB_PAGES.md).
+
+## Official logo
+
+The purple crystal is the official AmethystOS project logo supplied by the project creator. The repository contains the [original image](assets/branding/amethyst-logo-original.png), a [transparent web-ready PNG](assets/branding/amethyst-logo.png), and PNG browser icons. The website uses the image directly; it is **not** a replacement illustration.
 
 ## Source and credit
 

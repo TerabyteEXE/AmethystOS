@@ -34,7 +34,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid 
 .nav-inner { min-height: 76px; display: flex; justify-content: space-between; align-items: center; column-gap: 30px; }
 .brand { display: inline-flex; gap: 8px; align-items: center; flex-shrink: 0; font-size: 22px; font-weight: 700; letter-spacing: -.035em; color: var(--text); text-decoration: none; }
 .brand:hover { color: var(--text); }
-.brand-icon { display: block; width: 26px; height: 26px; flex: 0 0 26px; }
+.brand-icon { display: block; width: 36px; height: 36px; flex: 0 0 36px; object-fit: contain; }
 .navlinks { display: flex; align-items: center; gap: 27px; }
 .navlinks a { font-size: 14px; color: var(--muted); text-decoration: none; }
 .navlinks a:hover, .navlinks a[aria-current="page"] { color: var(--accent); text-decoration: underline; text-underline-offset: 7px; }
@@ -55,6 +55,11 @@ p { margin: 0 0 15px; }
 /* Homepage: plain information, plain links, and a single install command */
 .home-intro { padding: 52px 0 35px; border-bottom: 1px solid var(--line); }
 .home-intro .lead { margin-bottom: 20px; }
+/* Official crystal logo, supplied by the project creator. Simple presentation,
+   with no generated illustration or redesigned mark. */
+.home-heading { display: flex; align-items: center; gap: 22px; margin-bottom: 16px; }
+.home-mark { display: block; width: 94px; height: 98px; object-fit: contain; flex: 0 0 94px; }
+.home-heading h1 { margin-bottom: 0; }
 .project-meta { font-size: 13px; color: var(--soft); margin: 0; }
 .home-section { padding: 32px 0 34px; border-bottom: 1px solid var(--line); }
 .home-section h2 { margin-bottom: 13px; }
@@ -149,6 +154,9 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 24px 0; }
   .navlinks.open { display: flex; }
   .navlinks a { display: block; padding: 7px 0; }
   .home-intro { padding-top: 35px; }
+  .home-heading { gap: 12px; align-items: center; }
+  .home-mark { width: 66px; height: 69px; flex-basis: 66px; }
+  .home-heading h1 { font-size: clamp(26px, 7vw, 34px); }
   .home-section { padding: 27px 0; }
   .home-columns, .doc-card-grid { grid-template-columns: 1fr; }
   .home-columns > div + div { margin-top: 24px; }

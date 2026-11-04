@@ -20,9 +20,12 @@ for source in files:
         location=(source.parent/link.split('#',1)[0]).resolve()
         assert location.is_relative_to(ROOT) and location.is_file(),f'{source.name}: missing or unsafe link {link}'
 assert (ROOT/'assets/wallpapers/amethyst-still.png').is_file()
-assert (ROOT/'assets/logo.svg').is_file()
-assert (ROOT/'assets/favicon.svg').is_file()
+assert (ROOT/'assets/branding/amethyst-logo.png').is_file()
+assert (ROOT/'assets/branding/amethyst-logo-original.png').is_file()
+assert (ROOT/'assets/favicon.png').is_file()
+assert (ROOT/'assets/apple-touch-icon.png').is_file()
 for f in files:
     assert 'AmethystOS' in f.read_text(), f'{f.name}: brand missing'
+    assert 'assets/branding/amethyst-logo.png' in f.read_text(), f'{f.name}: official logo missing'
 assert 'TerabyteEXE/AmethystOS' in (ROOT/'bootstrap.sh').read_text()
 print(f'[test] {len(files)} website pages and all local links: OK')
