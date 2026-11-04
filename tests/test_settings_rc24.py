@@ -26,9 +26,9 @@ def test_single_settings_entry():
         if section.get('NoDisplay','false').lower()!='true':
             visible.append(source.name)
         assert section.get('Exec'), source.name
-    assert visible==['amethyst-settings.desktop'],visible
+    assert visible==['amethyst-control.desktop','amethyst-settings.desktop'],visible
     launcher=(ROOT/'payload/local-bin/amethyst-launcher').read_text()
-    assert "Search applications: " in launcher
+    assert "Apps / Amethyst Menu: " in launcher
     hub=ROOT/'payload/local-bin/amethyst-hub'
     p=subprocess.run(['bash',str(hub),'--list'],capture_output=True,text=True,check=True)
     labels=p.stdout.splitlines()

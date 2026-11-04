@@ -27,13 +27,14 @@ done
 find payload/local-bin -type f -print0 | while IFS= read -r -d '' shfile; do bash -n "$shfile"; done
 python3 -m py_compile scripts/settings_gui.py scripts/settings_backend.py tests/test_settings_rc24.py
 python3 -m py_compile scripts/deploy.py scripts/setup_ui.py scripts/wallpapers.py scripts/desktop_prefs.py scripts/appearance.py tests/test_rc22.py tests/test_polish.py tests/test_installer_tty.py
-bash -n scripts/packages.sh scripts/boot_theme.sh tests/test_packages.sh
+bash -n scripts/packages.sh tests/test_packages.sh
 bash tests/test_packages.sh
 python3 tests/test_polish.py
 python3 tests/test_rc22.py
 python3 tests/test_installer_tty.py
 python3 tests/test_usability.py
 python3 tests/test_settings_rc24.py
+python3 tests/test_rc25.py
 
 echo '[test] Direct upstream config and safety checks'
 python3 - <<'PY'

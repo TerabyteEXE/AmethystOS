@@ -21,7 +21,7 @@ if ! command -v fuzzel >/dev/null 2>&1; then
   echo 'AmethystOS: Fuzzel is not installed' >&2; exit 1
 fi
 # Only actual apps and the single Amethyst Settings entry appear in search.
-fuzzel --prompt 'Search applications: ' --lines 10 --width 46 &
+fuzzel --prompt 'Apps / Amethyst Menu: ' --lines 10 --width 46 &
 pid=$!
 printf '%s\n' "$pid" > "$state"
 wait "$pid" || true

@@ -6,8 +6,9 @@ The default Niri layout is unchanged. The interface is now organized around
 ## Launcher and menus
 
 - **Super+Space** opens or closes the Fuzzel application search. It lists
-  installed applications and a single **Amethyst Settings** entry, not a long
-  series of maintenance launchers.
+  installed applications plus **Amethyst Settings** and **Amethyst Menu**.
+  Search for **Amethyst Menu** to open the same six-category menu as Super+D,
+  with arrow-key navigation. The launcher remains free of individual maintenance actions.
 - **Super+D** opens a six-item keyboard-friendly quick menu: Applications,
   Settings, Software, Wallpapers, Calendar, and Power. Navigate with the arrow
   keys, filter by typing, and press Enter to choose.
@@ -36,7 +37,7 @@ inspect Niri display information.
 **Software:** launch the curated installer, uninstaller, or Fedora/Flatpak update
 workflow. Transactions still require normal package-manager approval.
 
-**System:** Niri shortcut overlay, diagnostics, optional boot splash and power.
+**System:** Niri shortcut overlay, diagnostics, and power (no boot-theme controls).
 
 The GTK3 Settings app requires Fedora `python3-gobject` and `gtk3`, already
 included in the essential package list. Without GTK, a smaller Fuzzel/text
@@ -47,7 +48,7 @@ Flatpak and games can still have their own appearance preferences.
 
 | Keys | Purpose |
 | --- | --- |
-| `Super+Space` | Search installed applications (toggle) |
+| `Super+Space` | Search apps, Amethyst Menu (toggle) |
 | `Super+D` | Quick menu |
 | `Super+Shift+S` | Amethyst Settings |
 | `Super+Alt+B` | Top bar settings |

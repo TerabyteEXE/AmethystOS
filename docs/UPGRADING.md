@@ -25,3 +25,22 @@ and coordinates optional GTK appearance preferences with reversible backups.
 The two official wallpapers are copied when missing; existing image files and
 selection are preserved. The menu launcher settings are available from the
 Waybar gear or Super+Shift+S.
+
+## Upgrading from an RC2.2–RC2.4 boot splash
+
+RC2.5 removes the optional Plymouth boot splash installer, GUI control and associated user scripts. During an upgrade, unmodified user-level copies managed by AmethystOS are retired safely; modified copies are preserved. **AmethystOS does not change the active system Plymouth theme, bootloader, or initramfs automatically.**
+
+If you previously enabled the experimental splash and want to restore the old Fedora theme, first inspect the saved choice:
+
+```bash
+sudo cat /var/lib/amethystos/previous-plymouth-theme
+```
+
+Only if it is the expected theme and you understand the implications of rebuilding your initramfs, restore it manually:
+
+```bash
+previous=$(sudo cat /var/lib/amethystos/previous-plymouth-theme)
+sudo plymouth-set-default-theme "$previous" -R
+```
+
+Rebuilding initramfs requires adequate free space and can affect boot reliability if interrupted. The new installer itself never performs either of these commands.

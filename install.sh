@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0
-APP_GROUPS='' APPS_SET=0 START_THEME=dark BOOT_SPLASH=0
+APP_GROUPS='' APPS_SET=0 START_THEME=dark
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY=1 ;;
@@ -14,7 +14,6 @@ for arg in "$@"; do
     --apps=*) APP_GROUPS=${arg#--apps=}; APPS_SET=1 ;;
     --theme=dark) START_THEME=dark ;;
     --theme=light) START_THEME=light ;;
-    --boot-splash) BOOT_SPLASH=1 ;;
     --help|-h)
       cat <<'HELP'
 AmethystOS — Fedora + Niri
@@ -25,7 +24,6 @@ Usage: bash install.sh [--dry-run] [--replace] [--no-packages]
   --non-interactive Use default app selections, no terminal prompts
   --apps=...        Comma-separated app groups; empty value installs no extras
   --theme=light     Set Amethyst Light on first login (default Dark)
-  --boot-splash     Opt in to system-level Plymouth boot splash
   --no-packages     Don't run DNF (advanced)
   --no-theme        Do not change existing GNOME/GTK appearance preferences
   --dry-run         Validate the plan without modifying the system
@@ -83,7 +81,6 @@ if (( APPS_SET )); then uiargs+=(--groups "$APP_GROUPS"); fi
 if (( REPLACE )); then uiargs+=(--replace); fi
 if (( NO_THEME )); then uiargs+=(--no-theme); fi
 uiargs+=(--theme "$START_THEME")
-if (( BOOT_SPLASH )); then uiargs+=(--boot-splash); fi
 python3 "$ROOT/scripts/setup_ui.py" "${uiargs[@]}"
 readarray -t selection < <(python3 - "$TMPPLAN" <<'PY'
 import json,sys
@@ -92,14 +89,12 @@ print(','.join(p['groups']))
 print('1' if p['replace'] else '0')
 print('1' if p.get('apply_dark') else '0')
 print(p.get('theme','dark'))
-print('1' if p.get('boot') else '0')
 PY
 )
 APP_GROUPS=${selection[0]}
 REPLACE=${selection[1]}
 APPLY_DARK=${selection[2]}
 START_THEME=${selection[3]}
-BOOT_SPLASH=${selection[4]}
 printf 'Optional apps: %s\n' "${APP_GROUPS:-none}"
 
 stage 3 'Checking existing desktop settings (before DNF changes)'
@@ -154,12 +149,6 @@ else
     echo 'Theme colors could not be fully applied; desktop configs are still present.' >&2
   fi
   mkdir -p "$HOME/Pictures/Screenshots"
-  if (( BOOT_SPLASH )); then
-    echo 'Installing the optional AmethystOS Plymouth theme (initramfs rebuild required).'
-    if ! bash "$ROOT/scripts/boot_theme.sh" --apply; then
-      echo 'Boot splash installation failed; your desktop is still installed.' >&2
-    fi
-  fi
 fi
 
 stage 7 'Finished'

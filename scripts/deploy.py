@@ -25,11 +25,19 @@ CONFIG_DIRS = (
 EXTRA_FILES = (
     "powermenu", "set-wallpaper", "clipboard-history", "mako-history",
     "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
-    "amethyst-theme", "amethyst-scale", "amethyst-boot",
+    "amethyst-theme", "amethyst-scale",
     "amethyst-launcher", "amethyst-hub", "amethyst-bar", "amethyst-wallpapers",
     "amethyst-software", "amethyst-calendar",
 )
 SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
+
+# User-owned files from older releases, not Plymouth system files. A migration
+# may retire them only when their hashes still match our deployment record.
+RETIRED_PATHS = (
+    ".local/bin/amethyst-boot",
+    ".local/share/amethystos/boot_theme.sh",
+    ".local/share/amethystos/assets/plymouth",
+)
 
 
 def log(*message: object) -> None:
@@ -56,9 +64,9 @@ def sources() -> list[tuple[Path, Path]]:
     mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
     for script in ("bar_config.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "settings_gui.py", "settings_backend.py"):
         mapping.append((ROOT / "scripts" / script, Path(".local/share/amethystos") / script))
-    mapping.append((ROOT / "scripts/boot_theme.sh", Path(".local/share/amethystos/boot_theme.sh")))
     mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
-    mapping.append((ROOT / "assets/plymouth", Path(".local/share/amethystos/assets/plymouth")))
+    mapping.append((ROOT / "assets/settings", Path(".local/share/amethystos/settings")))
+    mapping.append((ROOT / "assets/branding/amethyst-logo.png", Path(".local/share/amethystos/assets/amethyst-logo.png")))
     mapping.extend((source,Path(".local/share/applications") / source.name)
                    for source in sorted((PAYLOAD / "applications").glob("*.desktop")))
     mapping.extend((PAYLOAD / "local-bin" / name, Path(".local/bin") / name) for name in EXTRA_FILES)
@@ -139,7 +147,7 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
         if prev_file.is_file():
             prev = json.loads(prev_file.read_text(encoding="utf-8"))
             previous = {e["path"]: e for e in prev.get("entries", [])}
-        runid = time.strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}"
+        runid = time.strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}-{time.time_ns()}"
         backup_dir = state_dir / "backups" / runid
         backup_dir.mkdir(parents=True, exist_ok=False)
         changed: list[tuple[Path, Path | None]] = []
@@ -165,6 +173,34 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
                     str(backup.relative_to(home)) if backup else None)
                 records.append({"path": str(rel), "backup": baseline_backup,
                                 "sha256": digest_path(dest)})
+            # Retire obsolete user-level splash tooling from prior versions.
+            # Never touch /boot, Plymouth, or initramfs. If the old tool was
+            # edited, retain its existing state entry so restore stays safe.
+            for legacy in RETIRED_PATHS:
+                rec = previous.get(legacy)
+                if rec is None:
+                    continue
+                dest = home / legacy
+                if not (dest.exists() or dest.is_symlink()):
+                    continue
+                if digest_path(dest) != rec["sha256"]:
+                    log("Retaining user-modified legacy file:", legacy)
+                    records.append(rec)
+                    continue
+                backup = backup_dir / legacy
+                backup.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(dest), str(backup))
+                changed.append((dest, backup))
+                original = home / rec["backup"] if rec["backup"] else None
+                if original is not None:
+                    if not original.exists():
+                        raise RuntimeError(f"Missing original backup for {legacy}")
+                    dest.parent.mkdir(parents=True, exist_ok=True)
+                    if original.is_dir():
+                        shutil.copytree(original, dest, symlinks=True)
+                    else:
+                        shutil.copy2(original, dest)
+                log("Retired obsolete splash tool:", legacy)
             state = {"version":"1.0-base", "created":runid, "entries":records}
             state_tmp = state_dir / "state.json.tmp"
             state_tmp.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")

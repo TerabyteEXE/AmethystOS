@@ -1,0 +1,28 @@
+/* Scoped to the AmethystOS Settings window; does not alter other GTK apps. */
+window#amethyst-settings { background-color: #f7f7fc; color: #272338; font-family: "Noto Sans", sans-serif; font-size: 11pt; }
+window#amethyst-settings headerbar { background: #eeeeF6; background-image: none; border: none; border-bottom: 1px solid #d8d6e4; box-shadow: none; color: #272338; min-height: 48px; }
+window#amethyst-settings headerbar label { color: #272338; }
+window#amethyst-settings box#amethyst-sidebar { background-color: #f0eff8; border-right: 1px solid #d8d6e4; }
+window#amethyst-settings label { color: #272338; }
+window#amethyst-settings label.dim-label { color: #69657b; }
+window#amethyst-settings label#amethyst-brand { font-size: 17px; font-weight: 700; color: #272338; }
+window#amethyst-settings label#amethyst-tagline { font-size: 10px; color: #69657b; letter-spacing: 1px; }
+window#amethyst-settings stacksidebar { background-color: transparent; }
+window#amethyst-settings stacksidebar list { background-color: transparent; }
+window#amethyst-settings stacksidebar row { border-radius: 7px; background-color: transparent; padding: 7px 8px; margin: 2px 8px; }
+window#amethyst-settings stacksidebar row:hover { background-color: #e8e5f4; }
+window#amethyst-settings stacksidebar row:selected { background-color: #e5e0f5; color: #675b9e; }
+window#amethyst-settings stacksidebar row:selected label { color: #675b9e; font-weight: 600; }
+window#amethyst-settings button { background: #ffffff; background-image: none; box-shadow: none; color: #272338; border: 1px solid #d8d6e4; border-radius: 8px; min-height: 27px; padding: 4px 12px; }
+window#amethyst-settings button:hover { background: #e8e5f4; border-color: #675b9e; }
+window#amethyst-settings button:active { background: #e5e0f5; }
+window#amethyst-settings combobox button { min-width: 120px; }
+window#amethyst-settings combobox window, window#amethyst-settings menu { background-color: #eeeeF6; color: #272338; }
+window#amethyst-settings switch { background-color: #ffffff; border: 1px solid #d8d6e4; border-radius: 999px; }
+window#amethyst-settings switch:checked { background-color: #675b9e; }
+window#amethyst-settings switch slider { background: #272338; border-radius: 999px; box-shadow: none; }
+window#amethyst-settings switch:checked slider { background-color: #ffffff; }
+window#amethyst-settings scrolledwindow { background-color: #f7f7fc; }
+window#amethyst-settings separator { background-color: #d8d6e4; min-width: 1px; min-height: 1px; }
+window#amethyst-settings spinner { color: #675b9e; }
+window#amethyst-settings label.error { color: #e67d91; }

@@ -24,11 +24,8 @@ def test_bundled_appearance():
  for name in ['dark','light']:
   for component in ['waybar/style.css','waybar/config.jsonc','kitty/kitty.conf','alacritty/alacritty.toml','fuzzel/fuzzel.ini','mako/config','gtk-3.0/settings.ini','gtk-4.0/settings.ini','qt6ct/qt6ct.conf']:
    assert (ROOT/'assets/themes'/name/component).is_file(),(name,component)
- assert (ROOT/'assets/plymouth/boot-logo.png').is_file()
  assert (ROOT/'payload/fastfetch/amethyst-logo.png').is_file()
  assert '__HOME__/.config/fastfetch/amethyst-logo.png' in (ROOT/'payload/fastfetch/config.jsonc').read_text()
- assert 'plymouth-set-default-theme "$THEME" -R' in (ROOT/'scripts/boot_theme.sh').read_text()
- assert 'plymouth-set-default-theme "$previous" -R' in (ROOT/'scripts/boot_theme.sh').read_text()
 
 
 def test_themes_scale_restore():

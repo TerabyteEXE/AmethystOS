@@ -163,7 +163,15 @@ The interactive menu was fixed for the documented `curl | bash` installer. It no
 - **Amethyst Dark / Light** recolor Waybar, launcher, notification and terminal files, coordinate GTK where available, and use the corresponding wallpaper.
 - **Interface scaling:** `amethyst-scale auto` leaves Niri's automatic per-monitor Wayland scaling alone. `amethyst-scale 125` adjusts bar and application font sizes; advanced users can choose 100, 115, 125, 150 or 175.
 - **Fastfetch** uses the official AmethystOS crystal PNG; terminal rendering support varies.
-- **Boot splash:** optional, system-wide and **not silently installed**. Run `amethyst-boot --apply` to add a minimal Plymouth crystal splash and rebuild initramfs, or `amethyst-boot --restore` to restore the previous Plymouth theme. Review `docs/RC22.md` before enabling this feature.
+- **Boot integration:** AmethystOS leaves Fedora’s boot screen and Plymouth configuration unchanged. Legacy splash tooling was retired; see `docs/UPGRADING.md` if you previously enabled it.
 - **Optional apps** can be selected individually. Steam, OBS Studio, Discord and Flatseal are installed from Flathub only after explicit opt-in. They are not required for the desktop.
 
 **Safety:** This is an AI-assisted experimental release candidate, not a security-audited operating system or ISO. Review scripts and test on Fedora with GNOME available for recovery.
+
+## RC2.5 — Settings and launcher cleanup
+
+- **Super+Space** continues to search apps, and now also finds a single **Amethyst Menu** entry. Open that entry to access the same six categories as **Super+D**, without filling search with dozens of settings shortcuts.
+- Amethyst Settings now has light/dark styling drawn from the desktop’s existing palettes and uses the project crystal logo. Theme changes update Settings without dismissing the window.
+- The experimental Plymouth/boot splash option has been removed; no boot files are changed during installation or upgrades.
+
+See [`docs/RELEASE_NOTES_RC25.md`](docs/RELEASE_NOTES_RC25.md) for compatibility and testing notes.

@@ -3,7 +3,7 @@
 
 The GUI is a frontend for the existing reversible, validated managers. It does
 not patch config files itself and never runs privileged commands without the
-user interacting with the existing terminal-based software/boot tools.
+user interacting with the existing terminal-based software tools.
 """
 from __future__ import annotations
 import json
@@ -16,7 +16,7 @@ from threading import Thread
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, GLib, GdkPixbuf
 from settings_backend import PAGES, MODULES, DENSITIES, POSITIONS, SCALES, page_for, bar_action, appearance_action
 
 HOME = Path.home()
@@ -28,7 +28,8 @@ STATE = HOME / '.local/state/amethystos-base-v1'
 class Settings(Gtk.Window):
     def __init__(self, requested='home'):
         super().__init__(title='AmethystOS Settings')
-        self.set_default_size(840, 620)
+        self.set_name("amethyst-settings")
+        self.set_default_size(870, 610)
         self.set_size_request(650, 470)
         self.set_border_width(0)
         self.set_position(Gtk.WindowPosition.CENTER)
@@ -42,7 +43,7 @@ class Settings(Gtk.Window):
 
         header = Gtk.HeaderBar()
         header.set_title('AmethystOS Settings')
-        header.set_subtitle('Desktop preferences')
+        header.set_subtitle('Appearance  •  Devices  •  Software')
         header.set_show_close_button(True)
         self.set_titlebar(header)
 
@@ -53,12 +54,33 @@ class Settings(Gtk.Window):
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.stack.set_transition_duration(160)
+        side_panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        side_panel.set_name('amethyst-sidebar')
+        side_panel.set_size_request(204, -1)
+        brand = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        brand.set_border_width(17)
+        logo = SHARE / 'assets/amethyst-logo.png'
+        if logo.is_file():
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(logo), 36, 36, True)
+                brand.pack_start(Gtk.Image.new_from_pixbuf(pixbuf), False, False, 0)
+            except (GLib.Error, OSError):
+                pass
+        brand_labels = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        brand_name = Gtk.Label(label='AmethystOS')
+        brand_name.set_name('amethyst-brand')
+        brand_name.set_xalign(0)
+        brand_labels.pack_start(brand_name, False, False, 0)
+        subtitle = Gtk.Label(label='DESKTOP SETTINGS')
+        subtitle.set_name('amethyst-tagline')
+        subtitle.set_xalign(0)
+        brand_labels.pack_start(subtitle, False, False, 0)
+        brand.pack_start(brand_labels, True, True, 0)
+        side_panel.pack_start(brand, False, False, 0)
         sidebar = Gtk.StackSidebar()
         sidebar.set_stack(self.stack)
-        sidebar.set_size_request(188, -1)
-        content.pack_start(sidebar, False, False, 0)
-        separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        content.pack_start(separator, False, False, 0)
+        side_panel.pack_start(sidebar, True, True, 0)
+        content.pack_start(side_panel, False, False, 0)
         content.pack_start(self.stack, True, True, 0)
         labels = {
             'home':'Overview', 'appearance':'Appearance', 'bar':'Top bar',
@@ -85,6 +107,30 @@ class Settings(Gtk.Window):
         self.busy_spinner = Gtk.Spinner()
         footer.pack_end(self.busy_spinner, False, False, 0)
         outer.pack_end(footer, False, False, 0)
+        self.theme_in_use = None
+        self._style_provider = None
+        self._apply_style(self.appearance_prefs.get('theme', 'dark'))
+
+    def _apply_style(self, theme):
+        """Load scoped CSS for Settings, tracking the active desktop theme."""
+        theme = theme if theme in ('light', 'dark') else 'dark'
+        css_file = SHARE / 'settings' / f'{theme}.css'
+        if not css_file.is_file():
+            return
+        screen = self.get_screen()
+        if screen is None:
+            return
+        try:
+            provider = Gtk.CssProvider()
+            provider.load_from_path(str(css_file))
+            if self._style_provider is not None:
+                Gtk.StyleContext.remove_provider_for_screen(screen, self._style_provider)
+            Gtk.StyleContext.add_provider_for_screen(
+                screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            self._style_provider = provider
+            self.theme_in_use = theme
+        except GLib.Error as exc:
+            print('AmethystOS Settings: CSS could not be loaded:', exc, file=sys.stderr)
 
     @staticmethod
     def _read_json(path, default):
@@ -159,6 +205,8 @@ class Settings(Gtk.Window):
         self._result(('Applied: ' if ok else 'Could not apply: ') + result, ok)
         self.bar_prefs = self._read_json(STATE/'bar.json', self.bar_prefs)
         self.appearance_prefs = self._read_json(STATE/'appearance.json', self.appearance_prefs)
+        if self.appearance_prefs.get('theme','dark') != self.theme_in_use:
+            self._apply_style(self.appearance_prefs.get('theme','dark'))
         self.sync_bar_widgets()
         return False
 
@@ -223,7 +271,7 @@ class Settings(Gtk.Window):
         self.stack.set_visible_child_name(name)
 
     def build_home(self, box):
-        self.heading(box, 'Your desktop, your way', 'One place for appearance, workspace, hardware, and maintenance settings.')
+        self.heading(box, 'Desktop settings', 'Control your AmethystOS desktop without leaving Settings.')
         self.section(box, 'Most used')
         self.button(box, 'Appearance', 'Dark / Light, wallpaper, and text scaling', lambda: self.to_page('appearance'))
         self.button(box, 'Top bar', 'Position, density, and visible status indicators', lambda: self.to_page('bar'))
@@ -307,10 +355,9 @@ class Settings(Gtk.Window):
         self.button(box,'System updates','Update Fedora packages and your Flatpak applications',lambda:self.run_bin('amethyst-software','update'))
 
     def build_system(self, box):
-        self.heading(box,'System','Troubleshooting, help, recovery, and optional system-level changes.')
+        self.heading(box,'System','Help, diagnostics, power and recovery tools.')
         self.button(box,'Keyboard shortcuts','Niri shortcut reference',lambda:self.open_program(['niri','msg','action','show-hotkey-overlay'],'Shortcut reference'))
         self.button(box,'Diagnostics','Check components and missing programs',lambda:self.open_program(['alacritty','-e',str(BIN/'amethyst-doctor')],'Diagnostics'))
-        self.button(box,'Boot splash','Optional Plymouth tool, needs sudo and a reboot',lambda:self.open_program(['alacritty','-e',str(BIN/'amethyst-boot'),'--status'],'Boot splash status'))
         self.button(box,'Power menu','Lock, log out, reboot, and shut down',lambda:self.open_program([BIN/'powermenu'],'Power menu'))
         self.note(box,'AmethystOS uses existing Fedora packages and does not replace GNOME. For recovery, use amethystos-uninstall.')
 

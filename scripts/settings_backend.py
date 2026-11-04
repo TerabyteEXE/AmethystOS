@@ -13,7 +13,7 @@ ALIASES = {
     'network':'devices', 'audio':'devices', 'bluetooth':'devices',
     'display':'desktop', 'workspaces':'desktop', 'calendar':'desktop',
     'updates':'software', 'install':'software', 'remove':'software',
-    'keys':'system', 'diagnostics':'system', 'boot':'system',
+    'keys':'system', 'diagnostics':'system',
 }
 MODULES = ('cpu', 'memory', 'battery', 'player', 'bluetooth', 'clipboard', 'tray')
 DENSITIES = ('compact', 'normal', 'roomy')

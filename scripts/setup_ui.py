@@ -44,7 +44,7 @@ def create_plan(selected: list[str], replace: bool = False, appearance: bool = T
     return {'groups': sorted(set(selected)), 'replace': bool(replace), 'apply_dark': bool(appearance), 'schema': 1}
 
 
-def draw(writer, selected, replace, appearance, theme, boot, page=0):
+def draw(writer, selected, replace, appearance, theme, page=0):
     writer.write('\033[2J\033[H')
     writer.write(f'{PURPLE}◆ AMETHYSTOS{RESET}  ·  FEDORA / NIRI  ·  SETUP\n')
     writer.write(f'{DIM}Select optional apps by number; Enter proceeds. GTK/desktop are included.\n')
@@ -61,7 +61,6 @@ def draw(writer, selected, replace, appearance, theme, boot, page=0):
     writer.write(f'\n {base+1:>2}. [{"✓" if replace else " "}] Back up and replace existing configs\n')
     writer.write(f' {base+2:>2}. [{"✓" if appearance else " "}] Coordinate GTK appearance with desktop\n')
     writer.write(f' {base+3:>2}. [{"✓" if theme == "light" else " "}] Start with Amethyst Light (otherwise Dark)\n')
-    writer.write(f' {base+4:>2}. [{"✓" if boot else " "}] Install Amethyst boot splash (system change, opt-in)\n')
     writer.write(f'\n{DIM}n = next page, p = previous page, Enter = continue{RESET}\n')
     writer.write(f'{PURPLE}amethystos › {RESET}')
     writer.flush()
@@ -72,7 +71,6 @@ def interactive_plan() -> dict:
     replace = False
     appearance = True
     theme = "dark"
-    boot = False
     page=0
     # Never open a terminal in 'r+' mode: Python's text I/O can seek between
     # writes and reads, but terminal devices are not seekable. The installer
@@ -80,7 +78,7 @@ def interactive_plan() -> dict:
     with (open('/dev/tty', 'r', encoding='utf-8') as tty_in,
           open('/dev/tty', 'w', encoding='utf-8', buffering=1) as tty_out):
         while True:
-            draw(tty_out, selected, replace, appearance, theme, boot, page)
+            draw(tty_out, selected, replace, appearance, theme, page)
             answer = tty_in.readline()
             if not answer:
                 raise RuntimeError('The setup terminal was closed')
@@ -101,8 +99,6 @@ def interactive_plan() -> dict:
                 appearance = not appearance
             elif choice == str(len(GROUPS) + 3):
                 theme = 'light' if theme == 'dark' else 'dark'
-            elif choice == str(len(GROUPS) + 4):
-                boot = not boot
             elif choice.isdigit() and 1 <= int(choice) <= len(GROUPS):
                 key = GROUPS[int(choice) - 1][0]
                 page=(int(choice)-1)//10
@@ -113,13 +109,13 @@ def interactive_plan() -> dict:
         tty_out.write('  Optional apps: ' + (', '.join(sorted(selected)) or '(none)') + '\n')
         tty_out.write('  Existing configs: ' + ('back up and replace' if replace else 'preserve') + '\n')
         tty_out.write('  Appearance: ' + (theme if appearance else 'do not change GNOME') + '\n')
-        tty_out.write('  Boot splash: ' + ('optional install enabled' if boot else 'unchanged') + '\n\n')
+        tty_out.write('  Boot configuration: unchanged by AmethystOS\n\n')
         tty_out.write('  Continue with Fedora package installation? [y/N] ')
         tty_out.flush()
         if tty_in.readline().strip().lower() not in ('y', 'yes'):
             raise KeyboardInterrupt
     plan=create_plan(list(selected), replace, appearance)
-    plan.update(theme=theme, boot=boot)
+    plan.update(theme=theme)
     return plan
 
 
@@ -130,14 +126,13 @@ def main():
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--no-theme', action='store_true')
     parser.add_argument('--theme', choices=('dark','light'), default='dark')
-    parser.add_argument('--boot-splash', action='store_true')
     parser.add_argument('--groups', default=None, help='comma-separated selection')
     args = parser.parse_args()
     try:
         if args.non_interactive or args.groups is not None:
             chosen = (args.groups.split(',') if args.groups else []) if args.groups is not None else sorted(DEFAULTS)
             plan = create_plan(chosen, args.replace, not args.no_theme)
-            plan.update(theme=args.theme, boot=args.boot_splash)
+            plan.update(theme=args.theme)
         else:
             plan = interactive_plan()
             if args.replace: plan['replace'] = True

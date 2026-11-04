@@ -14,7 +14,7 @@ if [[ "${1:-}" == --list ]]; then printf '%s\n' "${items[@]}"; exit 0; fi
 if ! command -v fuzzel >/dev/null; then echo 'Fuzzel is required' >&2; exit 1; fi
 choice=$(printf '%s\n' "${items[@]}" | fuzzel --dmenu --prompt 'Amethyst › ' --lines 8 --width 34) || exit 0
 case "$choice" in
- Applications) exec "$BIN/amethyst-launcher" ;;
+ Applications) exec fuzzel --prompt 'Search applications: ' --lines 10 --width 46 ;;
  Settings) exec "$BIN/amethyst-settings" ;;
  Software) exec "$BIN/amethyst-settings" software ;;
  Wallpapers) exec "$BIN/amethyst-wallpapers" ;;
