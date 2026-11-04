@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# No COPRs, AUR, RPM Fusion, Flatpak remotes or arbitrary installer scripts.
-# The official Fedora repository is the only source used by this installer.
+# The required desktop uses Fedora packages only, without COPR/RPM Fusion.
+# Optional user-selected Flatpaks may add the Flathub remote explicitly.
 AMETHYSTOS_REQUIRED=(
   niri xwayland-satellite waybar fuzzel mako swaybg
   alacritty kitty gtklock polkit-kde
@@ -8,7 +8,7 @@ AMETHYSTOS_REQUIRED=(
   NetworkManager network-manager-applet nm-connection-editor
   nautilus pavucontrol playerctl brightnessctl wl-clipboard cliphist
   pipewire wireplumber pipewire-pulseaudio bluez blueman libnotify jq gtk3 fish
-  adw-gtk3-theme papirus-icon-theme papirus-icon-theme-dark qt6ct
+  adw-gtk3-theme papirus-icon-theme papirus-icon-theme-dark qt6ct python3-gobject
   cascadia-mono-nf-fonts google-noto-sans-fonts
 )
 # These are cosmetic tools. Missing ones do NOT block the graphical desktop.

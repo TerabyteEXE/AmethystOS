@@ -2,7 +2,7 @@
 
 # AmethystOS
 
-**A straightforward Fedora + Niri desktop.**
+**A straightforward Fedora + Niri desktop, with keyboard-friendly everyday controls.**
 
 AmethystOS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a branded terminal installer, reversible settings, and optional application choices. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
 
@@ -74,6 +74,24 @@ personal wallpapers or GNOME.
 | Fonts and application themes | Cascadia Mono NF, Noto Sans, GTK3/4, Qt6ct |
 
 **AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. Both are copied if missing on every installation, without replacing files of the same name. A fresh, empty wallpaper directory selects Amethyst Dark by default; existing wallpaper choices remain untouched. Change through Super+Shift+W, `set-wallpaper`, or Amethyst Settings.
+
+## Search, software and controls (RC2.3)
+
+**Super+Space** opens Fuzzel to search both installed applications and AmethystOS
+system actions. Press **Super+Space again** to close the same launcher (or Esc).
+The dedicated **Super+D** actions menu has arrow-key navigation for Settings,
+installing/removing curated software, Fedora updates, wallpapers, the calendar,
+and power controls. Nothing in this menu bypasses your confirmation for system
+package changes.
+
+**Click the clock** for a calendar; hover for the month view. **Super+Shift+W**
+opens the new scrollable wallpaper thumbnail browser; select an image and click
+Apply or double-click it. It falls back to the older Fuzzel keyboard picker
+if GTK bindings are unavailable.
+
+Use **Super+Alt+B** or right-click the bar's gear icon to change Waybar's
+position, density, or visible modules. These preferences survive Light/Dark
+switching and scale changes. See [`docs/USABILITY.md`](docs/USABILITY.md).
 
 ## First shortcuts
 

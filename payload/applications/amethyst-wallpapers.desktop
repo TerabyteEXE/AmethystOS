@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AmethystOS · Wallpapers
+Comment=Browse and apply wallpapers
+Exec=__HOME__/.local/bin/amethyst-wallpapers
+Icon=preferences-desktop-wallpaper
+Categories=Settings;DesktopSettings;
+Terminal=false
+StartupNotify=false

@@ -26,6 +26,8 @@ EXTRA_FILES = (
     "powermenu", "set-wallpaper", "clipboard-history", "mako-history",
     "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
     "amethyst-theme", "amethyst-scale", "amethyst-boot",
+    "amethyst-launcher", "amethyst-hub", "amethyst-bar", "amethyst-wallpapers",
+    "amethyst-software", "amethyst-calendar",
 )
 SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
 
@@ -52,11 +54,13 @@ def sources() -> list[tuple[Path, Path]]:
     mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
     mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
     mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
+    for script in ("bar_config.py", "wallpaper_gui.py", "calendar_gui.py", "software.py"):
+        mapping.append((ROOT / "scripts" / script, Path(".local/share/amethystos") / script))
     mapping.append((ROOT / "scripts/boot_theme.sh", Path(".local/share/amethystos/boot_theme.sh")))
     mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
     mapping.append((ROOT / "assets/plymouth", Path(".local/share/amethystos/assets/plymouth")))
-    mapping.extend((PAYLOAD / "applications" / name, Path(".local/share/applications") / name)
-                   for name in ("amethyst-settings.desktop", "qt6ct.desktop", "nwg-look.desktop"))
+    mapping.extend((source,Path(".local/share/applications") / source.name)
+                   for source in sorted((PAYLOAD / "applications").glob("*.desktop")))
     mapping.extend((PAYLOAD / "local-bin" / name, Path(".local/bin") / name) for name in EXTRA_FILES)
     return mapping
 

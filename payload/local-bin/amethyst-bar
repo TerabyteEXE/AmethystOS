@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+PY="$HOME/.local/share/amethystos/bar_config.py"
+[[ -r "$PY" ]] || { echo 'AmethystOS bar manager missing. Reinstall AmethystOS.' >&2; exit 1; }
+if [[ "${1:-menu}" != menu ]]; then exec python3 "$PY" "$@"; fi
+choice=$(printf '%s\n' \
+  'Position — top' 'Position — bottom' \
+  'Density — compact' 'Density — normal' 'Density — roomy' \
+  'Show/hide CPU' 'Show/hide memory' 'Show/hide battery' \
+  'Show/hide media player' 'Show/hide Bluetooth' \
+  'Show/hide clipboard' 'Show/hide system tray' \
+  'Show current bar preferences' \
+  | fuzzel --dmenu --prompt 'Top bar settings › ' --lines 14 --width 40) || exit 0
+case "$choice" in
+ 'Position — top') exec python3 "$PY" position top ;;
+ 'Position — bottom') exec python3 "$PY" position bottom ;;
+ 'Density — compact') exec python3 "$PY" density compact ;;
+ 'Density — normal') exec python3 "$PY" density normal ;;
+ 'Density — roomy') exec python3 "$PY" density roomy ;;
+ 'Show/hide CPU') exec python3 "$PY" toggle cpu ;;
+ 'Show/hide memory') exec python3 "$PY" toggle memory ;;
+ 'Show/hide battery') exec python3 "$PY" toggle battery ;;
+ 'Show/hide media player') exec python3 "$PY" toggle player ;;
+ 'Show/hide Bluetooth') exec python3 "$PY" toggle bluetooth ;;
+ 'Show/hide clipboard') exec python3 "$PY" toggle clipboard ;;
+ 'Show/hide system tray') exec python3 "$PY" toggle tray ;;
+ 'Show current bar preferences') exec python3 "$PY" status ;;
+esac

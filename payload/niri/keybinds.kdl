@@ -17,10 +17,12 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
+    Mod+Space repeat=false hotkey-overlay-title="Search apps and AmethystOS actions (toggle)" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-launcher"; }
+    Mod+D repeat=false hotkey-overlay-title="AmethystOS quick actions" { spawn "sh" "-c" "$HOME/.local/bin/amethyst-hub"; }
     Mod+Shift+S { spawn "sh" "-c" "$HOME/.local/bin/amethyst-settings"; }
-    Mod+Shift+W { spawn "sh" "-c" "$HOME/.local/bin/set-wallpaper"; }
+    Mod+Shift+W { spawn "sh" "-c" "$HOME/.local/bin/amethyst-wallpapers"; }
     Mod+Shift+T { spawn "sh" "-c" "$HOME/.local/bin/amethyst-settings appearance"; }
+    Mod+Alt+B { spawn "sh" "-c" "$HOME/.local/bin/amethyst-bar menu"; }
 
     // Custom Application Shortcuts
     Mod+E { spawn "nautilus"; }
@@ -240,7 +242,7 @@ binds {
     Mod+Shift+Equal { set-window-height "+10%"; }
 
     // Move the focused window between the floating and the tiling layout.
-    Mod+D      { toggle-window-floating; }
+    Mod+Shift+D      { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
 
     // Toggle tabbed column display mode.

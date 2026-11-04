@@ -31,6 +31,15 @@ if [[ -s $HOME/.cache/amethystos/launch.log ]]; then
   printf '\nRecent Amethyst-launched app errors:\n'
   tail -n 14 "$HOME/.cache/amethystos/launch.log"
 fi
-printf '\nSome third-party desktop launchers require Flatpak runtimes,\n'
+for helper in amethyst-launcher amethyst-hub amethyst-software amethyst-bar amethyst-wallpapers amethyst-calendar; do
+  if [[ -x "$HOME/.local/bin/$helper" ]]; then printf '[ok] %s action installed\n' "$helper"
+  else printf '[!] Missing AmethystOS action: %s\n' "$helper"; fi
+done
+if python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' 2>/dev/null; then
+  echo '[ok] GTK wallpaper gallery and calendar available'
+else
+  echo '[!] Python GTK bindings missing: use the Fuzzel wallpaper picker fallback'
+fi
+printf '\nSome third-party desktop launchers require Flatpak runtimes,\n' 
 printf 'hardware acceleration, or dependencies outside AmethystOS.\n'
 printf 'For failures, open the app from Alacritty to view its error output.\n'

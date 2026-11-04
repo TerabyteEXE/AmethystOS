@@ -51,8 +51,13 @@ appearance() {
 item=${1:-menu}
 case "$item" in
   menu)
-    choice=$(choose 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Interface scaling' 'Workspaces' 'Display information' 'Boot splash' 'Wallpapers' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
+    choice=$(choose 'Search applications' 'Install application' 'Remove application' 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Interface scaling' 'Top bar settings' 'Workspaces' 'Display information' 'Boot splash' 'Wallpapers' 'Calendar' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
     case "$choice" in
+      'Search applications') exec "$HOME/.local/bin/amethyst-launcher" ;;
+      'Install application') exec "$HOME/.local/bin/amethyst-software" install ;;
+      'Remove application') exec "$HOME/.local/bin/amethyst-software" remove ;;
+      'Top bar settings') exec "$HOME/.local/bin/amethyst-bar" menu ;;
+      'Calendar') exec "$HOME/.local/bin/amethyst-calendar" ;;
       'Network') exec "$0" network ;;
       'Audio') exec "$0" audio ;;
       'Bluetooth') exec "$0" bluetooth ;;
@@ -110,9 +115,11 @@ case "$item" in
     # Niri does not expose GNOME's monitor-control DBus API; GNOME Settings
     # can exit immediately in a Niri session. Use Niri's own output API.
     terminal 'niri msg outputs' ;;
-  wallpaper) exec "$HOME/.local/bin/set-wallpaper" ;;
+  wallpaper) exec "$HOME/.local/bin/amethyst-wallpapers" ;;
+  bar) exec "$HOME/.local/bin/amethyst-bar" menu ;;
+  calendar) exec "$HOME/.local/bin/amethyst-calendar" ;;
   keys) niri msg action show-hotkey-overlay || notify 'Use Super+Shift+/ for the Niri shortcut overlay' ;;
-  updates) terminal 'sudo dnf upgrade --refresh' ;;
+  updates) exec "$HOME/.local/bin/amethyst-software" update ;;
   diagnostics) terminal '$HOME/.local/bin/amethyst-doctor' ;;
-  *) echo 'Usage: amethyst-settings [network|audio|bluetooth|appearance|dark|light|display|wallpaper|keys|updates|diagnostics]' >&2; exit 2;;
+  *) echo 'Usage: amethyst-settings [network|audio|bluetooth|appearance|dark|light|display|wallpaper|bar|calendar|keys|updates|diagnostics]' >&2; exit 2;;
 esac

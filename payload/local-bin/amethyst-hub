@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Keyboard navigable command hub, using the same Fuzzel dmenu as the launcher.
+set -Eeuo pipefail
+BIN="$HOME/.local/bin"
+items=(
+ 'Search installed applications'
+ 'Amethyst Settings'
+ 'Install an application'
+ 'Remove an application'
+ 'Update Fedora and Flatpak apps'
+ 'Browse wallpapers'
+ 'Switch Light or Dark'
+ 'Customize top bar'
+ 'Calendar'
+ 'Keybindings'
+ 'Network'
+ 'Sound'
+ 'Bluetooth'
+ 'System diagnostics'
+ 'Restore AmethystOS config (with confirmation)'
+ 'Power menu'
+)
+if [[ "${1:-}" == --list ]]; then printf '%s\n' "${items[@]}"; exit 0; fi
+if ! command -v fuzzel >/dev/null; then echo 'Fuzzel is required' >&2; exit 1; fi
+choice=$(printf '%s\n' "${items[@]}" | fuzzel --dmenu --prompt 'Amethyst › ' --lines 14 --width 47) || exit 0
+case "$choice" in
+ 'Search installed applications') exec "$BIN/amethyst-launcher" ;;
+ 'Amethyst Settings') exec "$BIN/amethyst-settings" ;;
+ 'Install an application') exec "$BIN/amethyst-software" install ;;
+ 'Remove an application') exec "$BIN/amethyst-software" remove ;;
+ 'Update Fedora and Flatpak apps') exec "$BIN/amethyst-software" update ;;
+ 'Browse wallpapers') exec "$BIN/amethyst-wallpapers" ;;
+ 'Switch Light or Dark') exec "$BIN/amethyst-settings" appearance ;;
+ 'Customize top bar') exec "$BIN/amethyst-bar" menu ;;
+ 'Calendar') exec "$BIN/amethyst-calendar" ;;
+ 'Keybindings') exec "$BIN/amethyst-settings" keys ;;
+ 'Network') exec "$BIN/amethyst-settings" network ;;
+ 'Sound') exec "$BIN/amethyst-settings" audio ;;
+ 'Bluetooth') exec "$BIN/amethyst-settings" bluetooth ;;
+ 'System diagnostics') exec "$BIN/amethyst-settings" diagnostics ;;
+ 'Restore AmethystOS config (with confirmation)') exec alacritty -e "$BIN/amethystos-uninstall" ;;
+ 'Power menu') exec "$BIN/powermenu" ;;
+esac

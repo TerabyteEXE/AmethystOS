@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AmethystOS · Control Center
+Comment=Apps, software, updates and desktop controls
+Exec=__HOME__/.local/bin/amethyst-hub
+Icon=preferences-system
+Categories=Settings;System;
+Terminal=false
+StartupNotify=false

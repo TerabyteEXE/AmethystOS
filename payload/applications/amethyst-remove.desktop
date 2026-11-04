@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AmethystOS · Remove Software
+Comment=Remove a selected application
+Exec=__HOME__/.local/bin/amethyst-software remove
+Icon=system-software-install
+Categories=System;PackageManager;
+Terminal=false
+StartupNotify=false

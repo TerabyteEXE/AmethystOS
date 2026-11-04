@@ -31,6 +31,7 @@ bash tests/test_packages.sh
 python3 tests/test_polish.py
 python3 tests/test_rc22.py
 python3 tests/test_installer_tty.py
+python3 tests/test_usability.py
 
 echo '[test] Direct upstream config and safety checks'
 python3 - <<'PY'
@@ -38,7 +39,7 @@ from pathlib import Path
 p=Path('payload')
 assert 'include "keybinds.kdl"' in (p/'niri/config.kdl').read_text()
 assert 'include "basicsettings.kdl"' in (p/'niri/config.kdl').read_text()
-assert 'spawn "fuzzel"' in (p/'niri/keybinds.kdl').read_text()
+assert 'amethyst-launcher' in (p/'niri/keybinds.kdl').read_text()
 assert 'close-window' in (p/'niri/keybinds.kdl').read_text()
 assert not (p/'gtk-4.0/assets').exists()
 assert 'pkill -f xdg-desktop-portal-gnome' not in (p/'niri/autostart.sh').read_text()

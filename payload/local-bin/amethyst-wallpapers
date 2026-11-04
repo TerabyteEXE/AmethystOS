@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+helper="$HOME/.local/share/amethystos/wallpaper_gui.py"
+if [[ -r "$helper" ]] && command -v python3 >/dev/null 2>&1; then
+  if python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' >/dev/null 2>&1; then
+    exec python3 "$helper" "$@"
+  fi
+fi
+# A searchable keyboard-first picker remains usable without GTK bindings.
+exec "$HOME/.local/bin/set-wallpaper" "$@"

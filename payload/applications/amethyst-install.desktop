@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AmethystOS · Install Software
+Comment=Browse supported applications
+Exec=__HOME__/.local/bin/amethyst-software install
+Icon=system-software-install
+Categories=System;PackageManager;
+Terminal=false
+StartupNotify=false

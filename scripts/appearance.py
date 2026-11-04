@@ -9,6 +9,7 @@ import argparse, json, re, sys
 from pathlib import Path
 import subprocess
 from deploy import digest_path
+from bar_config import load as bar_load, render as bar_render
 
 THEME_FILES=(
  'waybar/style.css','waybar/config.jsonc','kitty/kitty.conf','alacritty/alacritty.toml',
@@ -99,6 +100,7 @@ def apply(home,theme=None,scale=None,gtk=True,reload=True):
  home=Path(home).resolve()
  pref=state_path(home)
  saved=json.loads(pref.read_text()) if pref.exists() else {'theme':'dark','scale':100}
+ explicit_theme = theme is not None
  theme=theme or saved['theme']; scale=int(scale if scale is not None else saved['scale'])
  if theme not in ('dark','light'): raise ValueError('Theme must be dark or light')
  if scale not in VALID_SIZES: raise ValueError('Choose 100, 115, 125, 150 or 175')
@@ -108,6 +110,11 @@ def apply(home,theme=None,scale=None,gtk=True,reload=True):
   f=root(home)/'themes'/theme/rel
   if not f.is_file(): raise RuntimeError('Missing installed AmethystOS theme file: '+str(f))
   replacements[home/'.config'/rel]=scaled_text(rel,f.read_text(),scale)
+ # Apply saved Waybar preferences after theme + text scaling.
+ waybar_cfg=home/'.config/waybar/config.jsonc'
+ waybar_css=home/'.config/waybar/style.css'
+ replacements[waybar_cfg],replacements[waybar_css]=bar_render(
+    replacements[waybar_cfg],replacements[waybar_css],bar_load(home))
  # Store originals before committing. All tracked files are guaranteed unchanged.
  originals={p:p.read_bytes() for p in replacements}
  try:
@@ -129,9 +136,11 @@ def apply(home,theme=None,scale=None,gtk=True,reload=True):
    subprocess.run(['python3',str(helper),theme],check=False)
   change_text_scale(home, scale)
  if home==Path.home().resolve() and reload:
-  wallpaper=home/'Pictures/wallpapers'/('AmethystDark.png' if theme=='dark' else 'AmethystLight.png')
-  if wallpaper.exists() and (home/'.local/bin/set-wallpaper').exists():
-   subprocess.run([str(home/'.local/bin/set-wallpaper'),'--file',str(wallpaper)],check=False)
+  # Do not reset a user's wallpaper when they change only bar or text size.
+  if explicit_theme:
+   wallpaper=home/'Pictures/wallpapers'/('AmethystDark.png' if theme=='dark' else 'AmethystLight.png')
+   if wallpaper.exists() and (home/'.local/bin/set-wallpaper').exists():
+    subprocess.run([str(home/'.local/bin/set-wallpaper'),'--file',str(wallpaper)],check=False)
   if shutil_which('pkill'):
    subprocess.run(['pkill','-x','-SIGUSR2','waybar'],check=False,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
  print(f'AmethystOS {theme} · {scale}% text and bar size. Niri output DPI remains automatic.')

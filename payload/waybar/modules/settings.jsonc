@@ -4,6 +4,6 @@
     "tooltip": true,
     "tooltip-format": "Amethyst Settings",
     "on-click": "~/.local/bin/amethyst-settings",
-    "on-click-right": "~/.local/bin/amethyst-doctor"
+    "on-click-right": "~/.local/bin/amethyst-bar menu"
   }
 }

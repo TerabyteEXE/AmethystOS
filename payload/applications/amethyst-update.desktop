@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AmethystOS · System Update
+Comment=Update Fedora and user Flatpaks
+Exec=__HOME__/.local/bin/amethyst-software update
+Icon=software-update-available
+Categories=System;
+Terminal=false
+StartupNotify=false
