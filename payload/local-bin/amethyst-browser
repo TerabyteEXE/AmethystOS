@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Browser shortcut works whether Firefox or Chromium was selected during setup.
+for browser in firefox chromium; do
+  if command -v "$browser" >/dev/null 2>&1; then
+    exec "$browser" "$@"
+  fi
+done
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send 'AmethystOS' 'No browser installed; install Firefox or Chromium via DNF.'
+fi
+printf 'No browser installed. Run sudo dnf install firefox or chromium.\n' >&2
+exit 127

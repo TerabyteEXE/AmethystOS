@@ -25,6 +25,6 @@ sudo() {
   return 0
 }
 amethystos_install_fedora_packages
-[[ $calls -eq 2 ]] || { echo "Expected 2 DNF operations, got $calls" >&2; exit 1; }
+[[ $calls -eq 3 ]] || { echo "Expected 3 DNF operations, got $calls" >&2; exit 1; }
 
 echo '[test] Missing Fedora 44 Starship cannot block required desktop packages: OK'

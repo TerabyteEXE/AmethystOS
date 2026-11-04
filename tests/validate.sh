@@ -25,9 +25,10 @@ find payload -name '*.sh' -type f -print0 | while IFS= read -r -d '' shfile; do
   if head -n1 "$shfile" | grep -q python; then python3 -m py_compile "$shfile"; else bash -n "$shfile"; fi
 done
 find payload/local-bin -type f -print0 | while IFS= read -r -d '' shfile; do bash -n "$shfile"; done
-python3 -m py_compile scripts/deploy.py
+python3 -m py_compile scripts/deploy.py scripts/setup_ui.py scripts/wallpapers.py scripts/desktop_prefs.py tests/test_polish.py
 bash -n scripts/packages.sh tests/test_packages.sh
 bash tests/test_packages.sh
+python3 tests/test_polish.py
 
 echo '[test] Direct upstream config and safety checks'
 python3 - <<'PY'

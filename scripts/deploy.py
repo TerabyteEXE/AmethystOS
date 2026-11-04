@@ -22,8 +22,11 @@ CONFIG_DIRS = (
     "gtk-3.0", "gtk-4.0", "qt6ct", "btop", "cava", "fastfetch",
     "starship", "fish",
 )
-EXTRA_FILES = ("powermenu", "set-wallpaper", "clipboard-history", "mako-history", "notification-history")
-SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish"}
+EXTRA_FILES = (
+    "powermenu", "set-wallpaper", "clipboard-history", "mako-history",
+    "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
+)
+SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
 
 
 def log(*message: object) -> None:
@@ -44,6 +47,11 @@ def expand_placeholders(base: Path, home: Path) -> None:
 def sources() -> list[tuple[Path, Path]]:
     mapping = [(PAYLOAD / name, Path(".config") / name) for name in CONFIG_DIRS]
     mapping.append((PAYLOAD / "xdg-desktop-portal/niri-portals.conf", Path(".config/xdg-desktop-portal/niri-portals.conf")))
+    # Keep a self-contained uninstaller after the one-command bootstrap archive is removed.
+    mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
+    mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
+    mapping.extend((PAYLOAD / "applications" / name, Path(".local/share/applications") / name)
+                   for name in ("amethyst-settings.desktop", "qt6ct.desktop", "nwg-look.desktop"))
     mapping.extend((PAYLOAD / "local-bin" / name, Path(".local/bin") / name) for name in EXTRA_FILES)
     return mapping
 
@@ -113,6 +121,15 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
             return
         if state_dir.exists() and not replace:
             raise RuntimeError("Existing AmethystOS state found; use --replace to reinstall safely")
+        # Preserve the ORIGINAL user configuration across repeated AmethystOS
+        # upgrades. Earlier versions replaced state.json and only backed up the
+        # previously installed Amethyst files; that made uninstall undo just
+        # one upgrade instead of returning to the pre-Amethyst desktop.
+        previous = {}
+        prev_file = state_dir / "state.json"
+        if prev_file.is_file():
+            prev = json.loads(prev_file.read_text(encoding="utf-8"))
+            previous = {e["path"]: e for e in prev.get("entries", [])}
         runid = time.strftime("%Y%m%d-%H%M%S") + f"-{os.getpid()}"
         backup_dir = state_dir / "backups" / runid
         backup_dir.mkdir(parents=True, exist_ok=False)
@@ -132,7 +149,12 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
                     shutil.copytree(source, dest, symlinks=False)
                 else:
                     shutil.copy2(source, dest)
-                records.append({"path": str(rel), "backup": str(backup.relative_to(home)) if backup else None,
+                # The latest replaced Amethyst version remains archived in the
+                # current run, while the restore target stays the user's
+                # original (if this path was already managed).
+                baseline_backup = previous[str(rel)]["backup"] if str(rel) in previous else (
+                    str(backup.relative_to(home)) if backup else None)
+                records.append({"path": str(rel), "backup": baseline_backup,
                                 "sha256": digest_path(dest)})
             state = {"version":"1.0-base", "created":runid, "entries":records}
             state_tmp = state_dir / "state.json.tmp"

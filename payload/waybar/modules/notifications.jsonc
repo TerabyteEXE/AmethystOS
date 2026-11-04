@@ -2,7 +2,7 @@
   // ───────── Notifications ─────────
   "custom/notifications": {
     "tooltip": true,
-    "tooltip-format": "Check all Notifications",
+    "tooltip-format": "Notification controls",
     "format": "{icon}",
     "format-icons": {
       "notification": "󱅫",

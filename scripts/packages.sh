@@ -1,38 +1,56 @@
 #!/usr/bin/env bash
-# AmethystOS Base v1 — Fedora package manifest and install operation.
-# Only official, already-enabled DNF repositories are used.
-# Keep this file sourceable so the package transaction can be tested offline.
-
+# No COPRs, AUR, RPM Fusion, Flatpak remotes or arbitrary installer scripts.
+# The official Fedora repository is the only source used by this installer.
 AMETHYSTOS_REQUIRED=(
   niri xwayland-satellite waybar fuzzel mako swaybg
   alacritty kitty gtklock polkit-kde
   xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring
   NetworkManager network-manager-applet nm-connection-editor
-  nautilus firefox pavucontrol playerctl brightnessctl
-  wl-clipboard cliphist pipewire wireplumber pipewire-pulseaudio
-  bluez libnotify jq gtk3 fish
+  nautilus pavucontrol playerctl brightnessctl wl-clipboard cliphist
+  pipewire wireplumber pipewire-pulseaudio bluez blueman libnotify jq gtk3 fish
+  adw-gtk3-theme papirus-icon-theme-dark qt6ct
+  cascadia-mono-nf-fonts google-noto-sans-fonts
 )
+# These are cosmetic tools. Missing ones do NOT block the graphical desktop.
+AMETHYSTOS_OPTIONAL=(starship fastfetch btop cava nwg-look gammastep grim slurp zoxide)
 
-# None of these is essential for starting a working Niri desktop.
-# Starship is intentionally optional: Fedora may need a separate COPR for it.
-# Fish initialization already checks for the executable before loading it.
-AMETHYSTOS_OPTIONAL=(
-  starship fastfetch papirus-icon-theme-dark adw-gtk3-theme
-  cascadia-code-nf-fonts btop cava qt6ct nwg-look grim slurp zoxide
+# Software chosen in the terminal UI; packages are from configured Fedora repos.
+# This is intentionally not a general-purpose package-name input field.
+declare -A AMETHYSTOS_APP_GROUPS=(
+  [firefox]='firefox'
+  [chromium]='chromium'
+  [essentials]='gnome-calculator gnome-text-editor file-roller loupe'
+  [office]='libreoffice-writer thunderbird'
+  [creative]='gimp inkscape krita'
+  [dev]='git micro neovim python3-pip'
+  [media]='celluloid rhythmbox'
+  [gaming]='lutris gamemode mangohud'
 )
 
 amethystos_install_fedora_packages() {
-  printf 'Installing %s essential Fedora packages (sudo required once).\n' "${#AMETHYSTOS_REQUIRED[@]}"
-  sudo dnf install -y "${AMETHYSTOS_REQUIRED[@]}"
+  local groups="${1:-firefox,essentials}" group
+  printf 'Installing %s essential Fedora packages.\n' "${#AMETHYSTOS_REQUIRED[@]}"
+  sudo dnf install -y "${AMETHYSTOS_REQUIRED[@]}" || return
   printf 'Installing optional desktop extras where available.\n'
-  # Fedora 44 uses DNF5. --skip-unavailable allows the optional package group
-  # to continue even if (for example) Starship has no candidate in enabled repos.
   if ! sudo dnf install -y --skip-unavailable "${AMETHYSTOS_OPTIONAL[@]}"; then
-    printf '%s\n' 'WARNING: Optional desktop extras could not all be installed.' \
-      'The essential Niri desktop packages succeeded; continuing.' >&2
+    printf '%s\n' 'Optional system extras were unavailable; continuing.' >&2
   fi
-  if ! command -v starship >/dev/null 2>&1; then
-    printf '%s\n' 'Note: Starship is unavailable in your enabled repositories.' \
-      'Fish will use its normal prompt. Starship can be installed later if desired.'
+  local -a pkgs=()
+  local -a selected=()
+  IFS=',' read -r -a selected <<< "$groups"
+  for group in "${selected[@]}"; do
+    [[ -n "$group" ]] || continue
+    if [[ ! -v "AMETHYSTOS_APP_GROUPS[$group]" ]]; then
+      echo "Unknown application group: $group" >&2; return 2
+    fi
+    local -a parts=()
+    read -r -a parts <<< "${AMETHYSTOS_APP_GROUPS[$group]}"
+    pkgs+=("${parts[@]}")
+  done
+  if ((${#pkgs[@]})); then
+    printf 'Installing selected applications: %s\n' "${pkgs[*]}"
+    if ! sudo dnf install -y --skip-unavailable "${pkgs[@]}"; then
+      printf '%s\n' 'Some selected apps could not be installed. The desktop remains usable.' >&2
+    fi
   fi
 }

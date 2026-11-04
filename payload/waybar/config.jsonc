@@ -19,12 +19,17 @@
     "~/.config/waybar/modules/clipboard.jsonc",
     "~/.config/waybar/modules/notifications.jsonc",
     "~/.config/waybar/modules/power.jsonc",
+    "~/.config/waybar/modules/settings.jsonc",
+    "~/.config/waybar/modules/logo.jsonc",
     "~/.config/waybar/modules/cpu.jsonc",
     "~/.config/waybar/modules/memory.jsonc",
     "~/.config/waybar/modules/battery.jsonc",
   ],
 
+  "tray": {"spacing": 5, "icon-size": 14},
+
   "modules-left": [
+    "custom/logo",
     "niri/workspaces",
   ],
 
@@ -39,6 +44,8 @@
     "bluetooth",
     "custom/clipboard",
     "custom/notifications",
+    "custom/settings",
+    "tray",
     "custom/power",
   ],
 }

@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# A small desktop control menu with guaranteed fallbacks and readable errors.
+set -u
+notify() { command -v notify-send >/dev/null && notify-send 'AmethystOS' "$*" || printf '%s\n' "$*" >&2; }
+launch() {
+  local cmd=$1; shift
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    notify "$cmd is not installed. Install it using Fedora DNF."; return 1
+  fi
+  local logdir="$HOME/.cache/amethystos"
+  mkdir -p "$logdir"
+  "$cmd" "$@" >>"$logdir/launch.log" 2>&1 &
+}
+terminal() {
+  if command -v alacritty >/dev/null; then
+    alacritty -e bash -lc "$*; echo; read -r -p 'Press Enter to close...'" &
+  elif command -v kitty >/dev/null; then
+    kitty bash -lc "$*; echo; read -r -p 'Press Enter to close...'" &
+  else
+    notify 'No terminal emulator available'; return 1
+  fi
+}
+choose() {
+  if [[ -n ${WAYLAND_DISPLAY:-} ]] && command -v fuzzel >/dev/null; then
+    printf '%s\n' "$@" | fuzzel --dmenu --prompt 'Amethyst Settings: ' --width 36
+  elif [[ -e /dev/tty ]]; then
+    printf '%s\n' "$@" | nl -w2 -s'. ' >&2
+    printf 'Selection: ' >&2
+    local n
+    read -r n </dev/tty || return 1
+    [[ "$n" =~ ^[0-9]+$ ]] || return 1
+    printf '%s\n' "$@" | sed -n "${n}p"
+  else
+    echo 'Open this command in a Wayland session, or provide a category.' >&2; return 1
+  fi
+}
+appearance() {
+  local mode=$1
+  local helper="$HOME/.local/share/amethystos/desktop_prefs.py"
+  if [[ ! -r "$helper" ]]; then notify 'Appearance helper missing'; return 1; fi
+  if ! python3 "$helper" "$mode"; then
+    notify 'Could not update GTK appearance. Use GNOME Settings to change it.'
+    return 1
+  fi
+  # Use the matching official wallpaper if it was installed; this does not
+  # prevent manually picking another wallpaper afterward.
+  local wall="$HOME/Pictures/wallpapers/Amethyst${mode^}.png"
+  if [[ -f "$wall" ]]; then "$HOME/.local/bin/set-wallpaper" --file "$wall"; fi
+  notify "AmethystOS $mode appearance applied. Some applications require a restart."
+}
+item=${1:-menu}
+case "$item" in
+  menu)
+    choice=$(choose 'Network' 'Audio' 'Bluetooth' 'Appearance' 'Display information' 'Wallpapers' 'Keyboard shortcuts' 'Software updates' 'Diagnostics') || exit 0
+    case "$choice" in
+      'Network') exec "$0" network ;;
+      'Audio') exec "$0" audio ;;
+      'Bluetooth') exec "$0" bluetooth ;;
+      'Appearance') exec "$0" appearance ;;
+      'Display information') exec "$0" display ;;
+      'Wallpapers') exec "$0" wallpaper ;;
+      'Keyboard shortcuts') exec "$0" keys ;;
+      'Software updates') exec "$0" updates ;;
+      'Diagnostics') exec "$0" diagnostics ;;
+    esac ;;
+  network) launch nm-connection-editor ;;
+  audio) launch pavucontrol ;;
+  bluetooth)
+    if command -v blueman-manager >/dev/null; then launch blueman-manager
+    else terminal 'bluetoothctl devices; bluetoothctl show'; fi ;;
+  appearance)
+    choice=$(choose 'Dark GTK appearance' 'Light GTK appearance' 'GTK settings' 'Qt settings' 'Choose wallpaper') || exit 0
+    case "$choice" in
+      'Dark GTK appearance') appearance dark;;
+      'Light GTK appearance') appearance light;;
+      'GTK settings') launch nwg-look;;
+      'Qt settings') launch qt6ct;;
+      'Choose wallpaper') exec "$0" wallpaper;;
+    esac ;;
+  dark|light) appearance "$item" ;;
+  display)
+    # Niri does not expose GNOME's monitor-control DBus API; GNOME Settings
+    # can exit immediately in a Niri session. Use Niri's own output API.
+    terminal 'niri msg outputs' ;;
+  wallpaper) exec "$HOME/.local/bin/set-wallpaper" ;;
+  keys) niri msg action show-hotkey-overlay || notify 'Use Super+Shift+/ for the Niri shortcut overlay' ;;
+  updates) terminal 'sudo dnf upgrade --refresh' ;;
+  diagnostics) terminal '$HOME/.local/bin/amethyst-doctor' ;;
+  *) echo 'Usage: amethyst-settings [network|audio|bluetooth|appearance|dark|light|display|wallpaper|keys|updates|diagnostics]' >&2; exit 2;;
+esac

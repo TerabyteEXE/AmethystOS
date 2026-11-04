@@ -12,6 +12,6 @@
     "format-full": "󰁹 {capacity}%",
     "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
     "tooltip-format": "{timeTo}\n{capacity}%\n{power}W",
-    "on-click": "pavucontrol"
+    "on-click": "~/.local/bin/amethyst-settings"
   }
 }

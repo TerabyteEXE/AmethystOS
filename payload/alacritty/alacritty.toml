@@ -2,27 +2,27 @@
 live_config_reload = true
 
 [window]
-decorations = "None"
+decorations = "Full"
 padding = { x = 10, y = 10 }
 opacity = 0.90
 
 [font]
-size = 9
+size = 12
 
 [font.normal]
-family = "CaskaydiaCove Nerd Font"
+family = "Cascadia Mono NF"
 style = "Regular"
 
 [font.bold]
-family = "CaskaydiaCove Nerd Font"
+family = "Cascadia Mono NF"
 style = "Bold"
 
 [font.italic]
-family = "CaskaydiaCove Nerd Font"
+family = "Cascadia Mono NF"
 style = "Italic"
 
 [font.bold_italic]
-family = "CaskaydiaCove Nerd Font"
+family = "Cascadia Mono NF"
 style = "Bold Italic"
 
 [scrolling]

@@ -16,3 +16,11 @@
 - Removed source's non-Linux Windows `.lnk` placeholder, original wallpapers with unverified rights, personal shell paths, Arch branding, unrelated dev applications, shell swap and Arch package installer.
 
 **Package code** is not embedded. Fedora distributes Niri, Waybar, Fuzzel, and the other installed applications under their own licenses. Their upstream projects are credited in the original source README at the source URL.
+
+## AmethystOS v1 polish adaptations
+
+Replaced unavailable fonts with Fedora's Cascadia Mono NF; increased terminal
+text sizes; added complete GNOME/GTK and Qt6 appearance integration, a small
+settings menu, proper Waybar settings/tray actions, browser fallback shortcuts,
+a reversible installer UI and an optional application manifest. These are
+AmethystOS-specific additions to the MIT-licensed source configuration.

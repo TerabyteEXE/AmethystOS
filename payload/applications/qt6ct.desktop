@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Qt Appearance
+Exec=qt6ct
+Icon=preferences-desktop-theme
+Categories=Settings;DesktopSettings;
+NoDisplay=true

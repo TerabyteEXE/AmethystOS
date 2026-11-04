@@ -15,7 +15,6 @@
     "format": "<span foreground='#c6ccd2'>󰒃</span>",
     "tooltip": true,
     "tooltip-format": "Session",
-    "on-click": "",
-    "on-click": ""
+    "on-click": "~/.local/bin/amethyst-settings keys"
   }
 }

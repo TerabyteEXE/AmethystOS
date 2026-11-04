@@ -1,123 +1,153 @@
 #!/usr/bin/env bash
-# AmethystOS — Fedora installation wrapper for the upstream Niri dotfiles.
+# AmethystOS: one installer, user-selectable Fedora apps, recoverable dotfiles.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DRY=0
-REPLACE=0
-SKIP_PACKAGES=0
+DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0
+APP_GROUPS='' APPS_SET=0
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY=1 ;;
     --replace) REPLACE=1 ;;
     --no-packages) SKIP_PACKAGES=1 ;;
+    --non-interactive) NON_INTERACTIVE=1 ;;
+    --no-theme) NO_THEME=1 ;;
+    --apps=*) APP_GROUPS=${arg#--apps=}; APPS_SET=1 ;;
     --help|-h)
-      printf '%s\n' 'AmethystOS Base v1 — Fedora + Niri' \
-       'Usage: bash install.sh [--dry-run] [--replace] [--no-packages]' \
-       '  --replace       Back up and replace existing user dotfiles' \
-       '  --no-packages   Skip Fedora package installation (advanced)' \
-       '  --dry-run       Test without changing the system'; exit 0 ;;
-    *) printf 'Unknown argument: %s\n' "$arg" >&2; exit 2 ;;
+      cat <<'HELP'
+AmethystOS — Fedora + Niri
+Usage: bash install.sh [--dry-run] [--replace] [--no-packages]
+                       [--non-interactive] [--apps=browser,essentials,dev]
+  Interactive setup uses a branded terminal menu and makes optional apps selectable.
+  --replace         Back up and replace existing user configurations
+  --non-interactive Use default app selections, no terminal prompts
+  --apps=...        Comma-separated app groups; empty value installs no extras
+  --no-packages     Don't run DNF (advanced)
+  --no-theme        Do not change existing GNOME/GTK appearance preferences
+  --dry-run         Validate the plan without modifying the system
+The persistent removal command after install is: amethystos-uninstall
+HELP
+      exit 0 ;;
+    *) printf 'Unknown option: %s\n' "$arg" >&2; exit 2 ;;
   esac
 done
-
-if [[ ${EUID:-$(id -u)} -eq 0 && $DRY -eq 0 ]]; then
-  echo 'Do not run AmethystOS installer as root (sudo is requested only for DNF).' >&2
-  exit 2
+if (( DRY == 0 )) && (( ${EUID:-$(id -u)} == 0 )); then
+  echo 'Run as your normal user, not root (sudo is used for DNF only).' >&2; exit 2
 fi
-
-if [[ $DRY -eq 0 ]]; then
-  if [[ ! -r /etc/os-release ]]; then echo 'Cannot detect Fedora.' >&2; exit 2; fi
+if (( DRY == 0 )); then
+  [[ -r /etc/os-release ]] || { echo 'Cannot detect Fedora.' >&2; exit 2; }
   # shellcheck disable=SC1091
   source /etc/os-release
-  if [[ ${ID:-} != fedora ]]; then echo 'AmethystOS v1 supports Fedora Workstation only.' >&2; exit 2; fi
-  if [[ ! $(command -v dnf) ]]; then echo 'DNF was not found.' >&2; exit 2; fi
+  [[ ${ID:-} == fedora ]] || { echo 'AmethystOS requires Fedora Workstation.' >&2; exit 2; }
+  command -v dnf >/dev/null || { echo 'DNF was not found.' >&2; exit 2; }
 fi
-command -v python3 >/dev/null || { echo 'Python 3 is required' >&2; exit 2; }
+command -v python3 >/dev/null || { echo 'Python 3 is required.' >&2; exit 2; }
+TMPPLAN=$(mktemp)
+cleanup() { rm -f -- "$TMPPLAN"; [[ ! -t 1 ]] || printf '\033[?25h'; }
+trap cleanup EXIT
+trap 'code=$?; printf "\n[amethystos] Setup stopped (exit %s). Existing user configs are protected.\n" "$code" >&2' ERR
 
-printf '\033[?25l'
-trap 'printf "\033[?25h"' EXIT
-BOLD=$'\033[1m'; DIM=$'\033[2m'; AQUA=$'\033[38;5;116m'; RESET=$'\033[0m'
-step() {
-  local i=$1 label=$2 done=0 bar='' n=0
-  done=$((i*4))
-  for ((n=0;n<20;n++)); do if ((n<done)); then bar+='━'; else bar+='─'; fi; done
-  printf '\n%s [%d/5] %s\n %s[%s]%s\n' "$AQUA" "$i" "$label" "$RESET" "$bar" "$RESET"
+PURPLE=$'\033[38;5;141m'; GREEN=$'\033[38;5;116m'; DIM=$'\033[2m'; BOLD=$'\033[1m'; RESET=$'\033[0m'
+if [[ -t 1 ]]; then printf '\033[?25l'; fi
+stage() {
+  local n=$1 label=$2 x filled bar=''
+  filled=$((n*3))
+  for ((x=0; x<21; x++)); do
+    if ((x<filled)); then bar+='━'; else bar+='─'; fi
+  done
+  printf '\n%s[%d/7]%s %s\n  %s%s%s\n' "$PURPLE" "$n" "$RESET" "$label" "$GREEN" "$bar" "$RESET"
 }
+printf '\n%s◆ AMETHYSTOS%s     %sFEDORA + NIRI  ·  INSTALLER%s\n' "$BOLD$PURPLE" "$RESET" "$DIM" "$RESET"
+printf '  Existing Fedora and GNOME are preserved. Review scripts before installing.\n'
 
-printf '\n%sAMETHYSTOS%s  /  BASE v1\n%sFedora + Niri  ·  one desktop, one installer%s\n' "$BOLD$AQUA" "$RESET" "$DIM" "$RESET"
-printf 'This installer adds a configured Niri desktop to Fedora Workstation.\n'
-printf 'GNOME, the login manager, and your personal files are not removed.\n'
-printf 'Code is MIT-licensed; please review the security notes before use.\n\n'
-
-step 1 'Checking storage, system and source files'
-if [[ ! -f "$ROOT/LICENSE.upstream" || ! -f "$ROOT/payload/niri/config.kdl" || ! -f "$ROOT/payload/waybar/config.jsonc" ]]; then
-  echo 'Installation archive incomplete.' >&2; exit 1
-fi
-if [[ $DRY -eq 0 && $SKIP_PACKAGES -eq 0 ]]; then
+stage 1 'Checking the source, storage and system'
+for path in LICENSE.upstream payload/niri/config.kdl payload/waybar/config.jsonc assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
+  [[ -s "$ROOT/$path" ]] || { echo "Missing: $path" >&2; exit 1; }
+done
+if (( ! DRY && ! SKIP_PACKAGES )); then
   free_kb=$(df -Pk / | awk 'NR==2 {print $4}')
   if [[ -n "$free_kb" ]] && (( free_kb < 1048576 )); then
-    printf '\nNot enough free space on / (about %s MiB available). Free at least 1 GiB and retry.\n' "$((free_kb/1024))" >&2
+    printf 'Not enough root disk space: %s MiB free; need at least 1 GiB.\n' "$((free_kb/1024))" >&2
     exit 1
   fi
 fi
 
-step 2 'Preparing Fedora software'
-if [[ $DRY -eq 1 ]]; then
-  echo 'Dry run: no DNF operations'
-elif [[ $SKIP_PACKAGES -eq 1 ]]; then
-  echo 'Skipping packages by request'
-else
-  # DNF packages are separated into essential runtime pieces and optional polish.
-  # In particular Starship requires a non-default Fedora repository, so a missing
-  # package must never block the compositor/desktop installation.
-  # No COPR/AUR/custom repositories are enabled automatically.
-  # No global changes to GDM or the user's login shell.
-  # shellcheck disable=SC1091
-  source "$ROOT/scripts/packages.sh"
-  amethystos_install_fedora_packages
+stage 2 'Choosing applications and upgrade behavior'
+uiargs=(--output "$TMPPLAN")
+if (( DRY || NON_INTERACTIVE )) || [[ ! -t 1 ]]; then uiargs+=(--non-interactive); fi
+if (( APPS_SET )); then uiargs+=(--groups "$APP_GROUPS"); fi
+if (( REPLACE )); then uiargs+=(--replace); fi
+if (( NO_THEME )); then uiargs+=(--no-theme); fi
+python3 "$ROOT/scripts/setup_ui.py" "${uiargs[@]}"
+readarray -t selection < <(python3 - "$TMPPLAN" <<'PY'
+import json,sys
+p=json.load(open(sys.argv[1]))
+print(','.join(p['groups']))
+print('1' if p['replace'] else '0')
+print('1' if p.get('apply_dark') else '0')
+PY
+)
+APP_GROUPS=${selection[0]}
+REPLACE=${selection[1]}
+APPLY_DARK=${selection[2]}
+printf 'Optional apps: %s\n' "${APP_GROUPS:-none}"
 
-fi
-
-step 3 'Checking existing configurations'
+stage 3 'Checking existing desktop settings (before DNF changes)'
 conflicts=()
 for name in niri waybar fuzzel kitty alacritty mako niri-lock gtk-3.0 gtk-4.0 qt6ct btop cava fastfetch starship fish; do
   [[ -e "$HOME/.config/$name" || -L "$HOME/.config/$name" ]] && conflicts+=("$name")
 done
-[[ -e "$HOME/.config/xdg-desktop-portal/niri-portals.conf" ]] && conflicts+=("niri-portals.conf")
-if (( ${#conflicts[@]} > 0 )); then
-  if [[ $REPLACE -eq 0 && $DRY -eq 0 ]]; then
-    printf '\nExisting settings found for: %s\n' "${conflicts[*]}"
-    printf 'Replace these configs after making a recoverable backup? [y/N] '
-    read -r reply </dev/tty || reply='n'
-    case "$reply" in y|Y|yes|YES) REPLACE=1;; *) echo 'No configs were changed. Re-run with --replace if desired.'; exit 1;; esac
+[[ -e "$HOME/.config/xdg-desktop-portal/niri-portals.conf" ]] && conflicts+=('niri-portals.conf')
+if (( ${#conflicts[@]} )); then
+  printf 'Existing config paths: %s\n' "${conflicts[*]}"
+  if (( ! REPLACE && ! DRY )); then
+    if (( NON_INTERACTIVE )) || [[ ! -e /dev/tty ]]; then
+      echo 'Refusing to overwrite. Re-run with --replace after reviewing the backups.' >&2; exit 1
+    fi
+    printf 'Back up and replace existing configs? Type REPLACE to proceed: '
+    read -r reply </dev/tty || reply=''
+    [[ "$reply" == REPLACE ]] || { echo 'Canceled. No configs were changed.'; exit 1; }
+    REPLACE=1
   fi
 fi
 
-step 4 'Validating and deploying the original desktop configuration'
+
+stage 4 'Installing the Fedora desktop and selected apps'
+if (( DRY )); then
+  echo 'Dry run: DNF packages will not be changed.'
+elif (( SKIP_PACKAGES )); then
+  echo 'Packages skipped by request. You are responsible for dependencies.'
+else
+  # shellcheck disable=SC1091
+  source "$ROOT/scripts/packages.sh"
+  amethystos_install_fedora_packages "$APP_GROUPS"
+fi
+
+stage 5 'Validating Niri and installing desktop configurations'
 args=(install)
 (( REPLACE )) && args+=(--replace)
 (( DRY )) && args+=(--dry-run)
 (( DRY || SKIP_PACKAGES )) || args+=(--require-niri)
 python3 "$ROOT/scripts/deploy.py" "${args[@]}"
 
-step 5 'Finishing'
-if [[ $DRY -eq 1 ]]; then
-  echo 'Dry-run complete. No changes made.'
+stage 6 'Preparing the official light and dark wallpapers'
+if (( DRY )); then
+  echo 'Dry run: both Amethyst wallpapers are present in the bundle.'
 else
-  mkdir -p "$HOME/Pictures/wallpapers" "$HOME/Pictures/Screenshots"
-  # Copy official wallpapers only if the user has no images in their wallpaper folder.
-  # Existing artwork and selected wallpapers always take precedence.
-  existing_wallpaper=$(find "$HOME/Pictures/wallpapers" -maxdepth 1 -type f \
-    \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) -print -quit)
-  if [[ -z "$existing_wallpaper" ]]; then
-    if [[ -f "$ROOT/assets/wallpapers/AmethystDark.png" && -f "$ROOT/assets/wallpapers/AmethystLight.png" ]]; then
-      install -m 0644 "$ROOT/assets/wallpapers/AmethystDark.png" "$HOME/Pictures/wallpapers/AmethystDark.png"
-      install -m 0644 "$ROOT/assets/wallpapers/AmethystLight.png" "$HOME/Pictures/wallpapers/AmethystLight.png"
-      echo 'Installed AmethystOS dark and light wallpapers (existing selections untouched).'
+  python3 "$ROOT/scripts/wallpapers.py"
+  if (( APPLY_DARK )); then
+    if ! python3 "$ROOT/scripts/desktop_prefs.py" dark; then
+      echo 'Note: GSettings appearance preference unavailable; GTK configs are still installed.' >&2
     fi
   fi
-  echo 'Done. Log out and choose Niri from the Fedora login screen.'
-  echo 'Keybinds: Super+Return terminal; Super+Space search; Super+Q close; Super+P power menu.'
-  echo 'Restore previous settings: bash uninstall.sh (checks for user modifications first).'
-  echo 'No reboot required; keep GNOME as your recovery session.'
+  mkdir -p "$HOME/Pictures/Screenshots"
+fi
+
+stage 7 'Finished'
+if (( DRY )); then
+  echo 'Dry run complete. No changes made.'
+else
+  printf '%sAmethystOS is installed.%s Log out, select Niri at the login screen.\n' "$GREEN" "$RESET"
+  printf 'Settings: %samethyst-settings%s   |   Check installation: %samethyst-doctor%s\n' "$BOLD" "$RESET" "$BOLD" "$RESET"
+  echo 'Wallpaper picker: set-wallpaper  |  Uninstall: amethystos-uninstall'
+  echo 'GNOME is left available as your backup graphical session.'
 fi

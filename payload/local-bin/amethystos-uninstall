@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Persistent restore command installed by the same tracked deployment system.
+set -Eeuo pipefail
+HOME="${HOME:?}"
+SCRIPT="$HOME/.local/share/amethystos/deploy.py"
+[[ -r "$SCRIPT" ]] || { echo 'AmethystOS restore helper missing. Use your repository copy of uninstall.sh.' >&2; exit 1; }
+DRY=0 YES=0
+for arg in "$@"; do
+  case "$arg" in --dry-run) DRY=1 ;; --yes) YES=1 ;; --help|-h)
+      echo 'amethystos-uninstall [--dry-run] [--yes] — restore original dotfiles; packages and wallpapers are left installed.'; exit 0 ;;
+    *) echo "Unknown option: $arg" >&2; exit 2 ;;
+  esac
+done
+printf '\n\033[38;5;141m◆ AMETHYSTOS  /  RESTORE\033[0m\n'
+printf 'The restore removes managed dotfiles and reinstates backed-up originals.\n'
+printf 'It refuses if a managed configuration was edited since installation.\n'
+printf 'Fedora packages and personal wallpapers will remain.\n\n'
+if (( DRY )); then
+  exec python3 "$SCRIPT" restore --dry-run
+fi
+if (( ! YES )); then
+  if [[ ! -e /dev/tty ]]; then echo 'Confirmation required. Use --yes for unattended uninstall.' >&2; exit 1; fi
+  printf 'Type RESTORE to continue: '
+  read -r answer </dev/tty || answer=''
+  [[ "$answer" == RESTORE ]] || { echo 'No files changed.'; exit 1; }
+fi
+python3 "$SCRIPT" restore --dry-run >/dev/null
+PREF="$HOME/.local/share/amethystos/desktop_prefs.py"
+if [[ -r "$PREF" ]]; then python3 "$PREF" restore || true; fi
+python3 "$SCRIPT" restore
+printf 'Your original configurations have been restored. Log out and return to GNOME if needed.\n'

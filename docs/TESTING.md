@@ -14,7 +14,7 @@ Manual Fedora GNOME/Niri login test (not verified in the development container):
 9. From GNOME, test `bash install.sh --replace`; inspect backup folder and `bash uninstall.sh` recovery.
 10. Reboot and verify GNOME remains available. Repeat after Fedora update.
 
-Known caveats: packaged Nerd font fallback differs slightly from upstream's exact Fira Code Nerd font; source wallpapers are excluded pending rights verification; GPU and portal behavior vary across hardware. Do not mark this stable solely on the CI green checkmark.
+Known caveats: the Fedora Cascadia Mono NF package may differ in glyph shapes from the original rice. Original Amethyst Dark and Light wallpapers are included, but third-party wallpapers are excluded. GPU and portal behavior vary across hardware. Do not mark this stable solely on the CI green checkmark.
 
 ## Fedora 44 missing-package regression
 
@@ -23,3 +23,29 @@ DNF installation where Starship is unavailable and verifies the required
 packages still install. On real Fedora 44, verify that the optional extras
 message does not abort installation, then log into Niri and confirm that Fish
 works with its normal prompt if Starship is missing.
+
+## v1 polish release tests
+
+The portable test suite also validates the terminal setup plan, missing-package
+handling, wallpaper non-overwrite behavior, Waybar commands, app settings, GTK
+preferences with a fake GSettings service, multi-upgrade backup preservation,
+and the persistent uninstall command.
+
+Manual release gates (must run in a REAL Fedora/Niri session):
+
+1. Use the default app selections, then retry installation choosing Chromium
+   only, to verify the Super+B browser fallback.
+2. Launch both Alacritty and Kitty and check glyph width and icon rendering
+   with `fc-match 'Cascadia Mono NF'`.
+3. Open Amethyst Settings from Waybar and Super+Shift+S; test network, audio,
+   Bluetooth (on hardware), GTK mode and wallpaper switching.
+4. Launch third-party apps from Fuzzel, inspect errors in the terminal if they
+   quit, and report the exact app name and error.
+5. Test GTK3, GTK4/libadwaita, and Qt6 applications. Flatpaks may require
+   their own theme configurations.
+6. Test install → upgrade → uninstaller and confirm that original config files
+   are restored and Fedora/GNOME/packages remain intact.
+7. Test the Waybar tray and menu entries, multimedia controls, screenshots,
+   suspending, networking and locking on the actual target hardware.
+
+Never describe the release as "fully verified" until these tests pass.

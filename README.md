@@ -4,7 +4,7 @@
 
 **A straightforward Fedora + Niri desktop.**
 
-AmethystOS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a small, guided installer. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
+AmethystOS brings a configured [Niri](https://github.com/YaLTeR/niri) desktop to **Fedora Workstation** with a branded terminal installer, reversible settings, and optional application choices. It keeps your existing Fedora installation and GNOME fallback. This is a **v1 release candidate**, not a separate Linux distribution or bootable ISO.
 
 **[Website](https://terabyteexe.github.io/AmethystOS/) · [Installation](https://terabyteexe.github.io/AmethystOS/install.html) · [Wiki](https://terabyteexe.github.io/AmethystOS/wiki/index.html) · [Keybindings](https://terabyteexe.github.io/AmethystOS/wiki/keybinds.html)**
 
@@ -31,6 +31,33 @@ bash install.sh
 
 When the installer is complete, **log out, choose Niri at the Fedora login screen**, and log back in. GNOME stays installed. Existing dotfiles require explicit approval and are backed up before replacement.
 
+## Installer, software choices and removal
+
+Run `bash install.sh` or use the one-command bootstrap above. On a normal Fedora
+terminal the **terminal UI** offers a set of optional application groups:
+Firefox, Chromium, everyday utilities, office/mail, creative software,
+development, media, and gaming tools. You can deselect all extras; required Niri
+components, terminal fonts, portals, Waybar, audio and network tools are always
+installed. Packages come only from your enabled Fedora repositories. A missing
+optional app is reported and skipped rather than breaking the desktop.
+
+The terminal UI also asks whether to back up and replace existing dotfiles and
+whether to coordinate GTK/libadwaita dark appearance with the Niri desktop.
+Appearance preferences affect your GNOME fallback too; AmethystOS saves their
+previous values and restores them on uninstall **unless you have changed them
+outside AmethystOS**. Qt and Flatpak apps can retain their own styling.
+
+After a remote installation, the recovery tool remains available:
+
+```bash
+amethystos-uninstall --dry-run # inspect what would be restored
+amethystos-uninstall           # asks for RESTORE confirmation
+```
+
+It restores tracked configuration files, preserving their original backups even
+after AmethystOS upgrades. It does **not** remove installed Fedora packages,
+personal wallpapers or GNOME.
+
 ## What's included
 
 | Desktop element | Project |
@@ -43,8 +70,10 @@ When the installer is complete, **log out, choose Niri at the Fedora login scree
 | Wallpaper | Swaybg and a wallpaper picker |
 | Lock screen | GTKLock |
 | Audio and network integration | Fedora packages and supporting desktop tools |
+| System settings | Amethyst Settings (Super+Shift+S and Waybar gear) |
+| Fonts and application themes | Cascadia Mono NF, Noto Sans, GTK3/4, Qt6ct |
 
-**AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. On first installation only, both are copied if `~/Pictures/wallpapers/` contains no images. Your current wallpaper and selection are not replaced.
+**AmethystDark.png** and **AmethystLight.png** are included under `assets/wallpapers/`. Both are copied if missing on every installation, without replacing files of the same name. A fresh, empty wallpaper directory selects Amethyst Dark by default; existing wallpaper choices remain untouched. Change through Super+Shift+W, `set-wallpaper`, or Amethyst Settings.
 
 ## First shortcuts
 
@@ -64,9 +93,10 @@ The [keybinding reference](wiki/keybinds.html) is **generated directly from** [`
 
 ```bash
 bash install.sh --dry-run   # inspect the plan without modifying anything
-bash install.sh             # install on Fedora Workstation
+bash install.sh             # terminal GUI installer, selected apps and backups
 bash install.sh --replace   # replace existing dotfiles with backups
-bash uninstall.sh           # restore tracked configs, if unmodified
+amethystos-uninstall       # persistent uninstaller after remote installation
+bash uninstall.sh           # same restore from a local repo checkout
 bash tests/validate.sh      # portable tests and Niri validation, where available
 ```
 
@@ -99,4 +129,4 @@ If you are switching from an earlier installation, read [the upgrade notes](docs
 
 ## Status
 
-**v1 site release candidate.** The desktop has been tested by its maintainer, but specific Fedora versions, other GPUs, display configurations, and third-party components still need wider testing. Local automated checks do not prove all hardware and graphical integrations work on every computer. See [`docs/TESTING.md`](docs/TESTING.md) and [`docs/SECURITY.md`](docs/SECURITY.md).
+**v1 polish release candidate.** The desktop has been tested by its maintainer, but specific Fedora versions, other GPUs, display configurations, and third-party components still need wider testing. Local automated checks do not prove all hardware and graphical integrations work on every computer. See [`docs/TESTING.md`](docs/TESTING.md) and [`docs/SECURITY.md`](docs/SECURITY.md).

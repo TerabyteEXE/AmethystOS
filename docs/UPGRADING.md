@@ -12,4 +12,16 @@ To upgrade:
 
 The wallpaper picker uses the new saved selection file. Previously selected wallpapers are not deleted; select your preferred image again if needed.
 
-To restore **this release** use `bash uninstall.sh` from an AmethystOS checkout. To restore older releases, use the matching older release and its backup state.
+To restore **this release**, run the installed `amethystos-uninstall` tool. It is available after remote installs, and `bash uninstall.sh` from a checkout still works. To restore older releases, use the matching older release and its backup state.
+
+## v1 polish release
+
+Install the update with `--replace` or select replacement in the terminal UI.
+All original dotfiles are backed up; repeated upgrades retain the first known
+pre-Amethyst backup and archive intermediate releases. Select optional apps
+again in the new menu. The new GTK/Qt integration installs Cascadia Mono NF
+and coordinates optional GTK appearance preferences with reversible backups.
+
+The two official wallpapers are copied when missing; existing image files and
+selection are preserved. The menu launcher settings are available from the
+Waybar gear or Super+Shift+S.

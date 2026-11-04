@@ -5,8 +5,8 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: "CaskaydiaCove Nerd Font", "Cascadia Code NF", "FiraCode Nerd Font Mono", sans-serif;
-    font-size: 11px;
+    font-family: "Cascadia Mono NF", "DejaVu Sans", sans-serif;
+    font-size: 12px;
     font-weight: 500;
     min-height: 0;
     box-shadow: none;
@@ -16,7 +16,7 @@
 
 window#waybar {
     background: transparent;
-    color: #000000;
+    color: #cdd6f4;
 }
 
 tooltip {
@@ -249,3 +249,10 @@ tooltip label {
 #custom-player:hover {
     color: #cba6f7;
 }
+
+/* AmethystOS settings and tray affordances. */
+#custom-settings, #tray {
+    background: #000000; color: #cba6f7;
+    border-radius: 10px; margin: 1px; padding: 2px 9px;
+}
+#custom-settings:hover { background: #313244; }

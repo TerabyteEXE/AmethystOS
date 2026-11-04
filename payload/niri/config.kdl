@@ -274,6 +274,7 @@ layout {
 // Set environment variables
 environment {
   XCURSOR_THEME "Adwaita"
+  QT_QPA_PLATFORMTHEME "qt6ct"
   XCURSOR_SIZE "24"
 }
 

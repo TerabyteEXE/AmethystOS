@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Amethyst Settings
+Comment=Manage network, sound, wallpapers and the Niri desktop
+Exec=__HOME__/.local/bin/amethyst-settings
+Icon=preferences-system
+Categories=Settings;DesktopSettings;
+Terminal=false
+StartupNotify=true
