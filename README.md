@@ -47,11 +47,20 @@ bash install.sh
 | First login | AmethystOS Welcome (dismissible; optional show-at-login) |
 | System updates | `amethyst-update` |
 | Recovery | `amethystos-uninstall --dry-run`, then `amethystos-uninstall` |
+| Login screen | Optional Noctalia Greeter (GDM retained for recovery) |
 
 Noctalia v5 uses its own TOML configuration. Its saved graphical preferences
 are **not** migrated from v4; AmethystOS installs a new custom palette with
 its own purple accent. The original Niri window layout and core shortcuts
 remain, but shell command bindings use the new `noctalia msg` interface.
+
+## Optional matching login screen
+
+To replace the GNOME/GDM sign-in screen with **Noctalia Greeter** using the
+Amethyst wallpaper and synced Noctalia palette, follow the
+[greeter installation and recovery guide](docs/GREETER.md). This is an
+**opt-in system-level change**, never made during the normal installer.
+GNOME remains available.
 
 ## Useful shortcuts
 

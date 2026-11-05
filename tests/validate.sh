@@ -11,7 +11,7 @@ for f in LICENSE LICENSE.gigi README.md \
   index.html install.html about.html wiki/index.html wiki/keybinds.html; do
   test -s "$f" || { echo "missing $f" >&2; exit 1; }
 done
-for f in install.sh bootstrap.sh uninstall.sh scripts/packages.sh tests/test_packages.sh; do bash -n "$f"; done
+for f in install.sh bootstrap.sh uninstall.sh scripts/packages.sh scripts/greeter.sh tests/test_packages.sh; do bash -n "$f"; done
 find payload/local-bin -type f ! -name amethyst-welcome ! -name '*.pyc' -print0 | while IFS= read -r -d '' p; do bash -n "$p"; done
 python3 -m py_compile scripts/*.py payload/local-bin/amethyst-welcome tests/test_desktop.py
 python3 scripts/build_site.py --check
@@ -25,6 +25,16 @@ PYTOML
 bash tests/test_packages.sh
 python3 tests/test_setup_ui_pty.py
 python3 tests/test_desktop.py
+bash scripts/greeter.sh --help >/dev/null
+python3 - <<'PYGREETER'
+import pathlib
+s = pathlib.Path('scripts/greeter.sh').read_text()
+for token in ('systemctl disable "$active"', 'systemctl enable greetd.service',
+              'systemctl enable "$prior"', '--setup-system', 'amethyst-dark.png'):
+    assert token in s, token
+assert pathlib.Path('docs/GREETER.md').is_file()
+print('[ok] Opt-in Noctalia Greeter and restore controls')
+PYGREETER
 bash install.sh --dry-run >/dev/null
 echo '[ok] Installer dry-run'
 if command -v niri >/dev/null 2>&1; then

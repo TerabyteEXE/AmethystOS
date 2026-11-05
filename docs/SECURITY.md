@@ -27,3 +27,13 @@ secure or repair unknown runtime crashes.
 The persistent `amethystos-uninstall` command restores original dotfiles but
 retains installed Fedora packages and personal wallpapers to avoid data loss.
 Always test restore before relying on a newer release.
+
+
+## Optional login-screen integration
+
+`bash scripts/greeter.sh prepare/activate` is an **explicit opt-in**, separate
+from `install.sh`. It installs Fedora packages from configured repositories,
+backs up and updates `/etc/greetd/config.toml`, and changes the enabled display
+manager on *the next boot*, without uninstalling GNOME. The optional Terra
+repository must be enabled manually and is not trusted automatically. Read
+[docs/GREETER.md](GREETER.md) for the complete safety and recovery procedure.
