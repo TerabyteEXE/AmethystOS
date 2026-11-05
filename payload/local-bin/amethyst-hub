@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# Legacy Super+D and launcher shortcut both open the same categorized UI.
-set -Eeuo pipefail
-if [[ "${1:-}" == --list ]]; then
-  printf '%s\n' Applications Settings Software Wallpapers Calendar Power
-  exit 0
-fi
-exec "$HOME/.local/bin/amethyst-launcher"

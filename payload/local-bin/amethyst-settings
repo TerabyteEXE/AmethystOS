@@ -1,44 +1,4 @@
 #!/usr/bin/env bash
-# Single, category-based AmethystOS Settings entry point.
-# On Fedora/Niri it runs the persistent GTK interface; the simple keyboard menu
-# is retained for recovery when GTK bindings are unavailable.
 set -Eeuo pipefail
-page="${1:-home}"
-case "$page" in
-  dark|light) exec "$HOME/.local/bin/amethyst-theme" "$page" ;;
-  keys) exec niri msg action show-hotkey-overlay ;;
-  updates) exec "$HOME/.local/bin/amethyst-software" update ;;
-  diagnostics) exec alacritty -e "$HOME/.local/bin/amethyst-doctor" ;;
-esac
-GUI="$HOME/.local/share/amethystos/settings_gui.py"
-if [[ -r "$GUI" ]] && [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] && \
-   python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' >/dev/null 2>&1; then
-  exec python3 "$GUI" "$page"
-fi
-# Fallback: menu remains usable in a terminal, without needing GTK bindings.
-if ! command -v fuzzel >/dev/null 2>&1 && [[ ! -r /dev/tty ]]; then
-  printf 'AmethystOS Settings: install python3-gobject and GTK3, or run in a graphical session.\n' >&2
-  exit 1
-fi
-items=( 'Appearance' 'Top bar' 'Devices' 'Workspaces' 'Software' 'System' 'Wallpapers' 'Exit' )
-while true; do
-  if [[ -n "${WAYLAND_DISPLAY:-}" ]] && command -v fuzzel >/dev/null 2>&1; then
-    choice=$(printf '%s\n' "${items[@]}" | fuzzel --dmenu --prompt 'Amethyst Settings › ') || exit 0
-  else
-    printf '%s\n' "${items[@]}" | nl -ba -w2 -s'. ' >&2
-    printf 'Choose (1–8): ' >&2
-    read -r n </dev/tty || exit 0
-    [[ "$n" =~ ^[1-8]$ ]] || continue
-    choice="${items[n-1]}"
-  fi
-  case "$choice" in
-    Appearance) "$HOME/.local/bin/amethyst-theme" dark || true ;;
-    'Top bar') "$HOME/.local/bin/amethyst-bar" menu || true ;;
-    Devices) command -v nm-connection-editor >/dev/null && nm-connection-editor >/dev/null 2>&1 & ;;
-    Workspaces) command -v niri >/dev/null && niri msg action focus-workspace one || true ;;
-    Software) "$HOME/.local/bin/amethyst-software" install || true ;;
-    System) "$HOME/.local/bin/amethyst-doctor" || true ;;
-    Wallpapers) "$HOME/.local/bin/amethyst-wallpapers" || true ;;
-    Exit|'') exit 0 ;;
-  esac
-done
+command -v qs >/dev/null || { echo "Noctalia Shell v4 is not installed. See docs/GIGI_MIGRATION.md" >&2; exit 1; }
+exec qs -c noctalia-shell ipc call settings toggle

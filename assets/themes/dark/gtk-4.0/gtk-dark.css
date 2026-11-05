@@ -1,6 +1,0 @@
-/* AmethystOS GTK4: modest accent overrides, using the native toolkit layout. */
-@define-color accent_color #c6a9f2;
-@define-color accent_bg_color #78569e;
-@define-color accent_fg_color #ffffff;
-@define-color selected_bg_color #78569e;
-@define-color selected_fg_color #ffffff;

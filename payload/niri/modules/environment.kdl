@@ -1,0 +1,11 @@
+environment {
+  XCURSOR_THEME "Adwaita"
+  XCURSOR_SIZE "24"
+}
+cursor {
+  xcursor-theme "Adwaita"
+  xcursor-size 24
+}
+hotkey-overlay { skip-at-startup; }
+// Application titlebars can provide familiar mouse-accessible close controls.
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"

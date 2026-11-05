@@ -1,4 +1,4 @@
-name: Validate AmethystOS Niri Base
+name: Validate AmethystOS Gigi Rice Rebase
 on:
   push:
   pull_request:
@@ -9,7 +9,7 @@ jobs:
     container: fedora:44
     steps:
       - uses: actions/checkout@v4
-      - name: Install test tools and Fedora Niri parser
+      - name: Install Python, Niri parser, and shell utilities
         run: dnf install -y niri python3 bash findutils coreutils
-      - name: Run installer and configuration validation
+      - name: Check shell scripts, configs, documentation, and backups
         run: bash tests/validate.sh

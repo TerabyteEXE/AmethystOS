@@ -1,0 +1,7 @@
+// Gigi's Noctalia v4 shell, launched once within Niri.
+spawn-sh-at-startup "command -v qs >/dev/null 2>&1 && exec qs -c noctalia-shell"
+spawn-sh-at-startup "[ -x /usr/libexec/polkit-kde-authentication-agent-1 ] && exec /usr/libexec/polkit-kde-authentication-agent-1"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
+spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
+// MPD-MPRIS is an optional user service. It is intentionally not auto-launched.
+spawn-sh-at-startup "sleep 3; $HOME/.local/bin/amethyst-wallpaper apply-first-use >/dev/null 2>&1"

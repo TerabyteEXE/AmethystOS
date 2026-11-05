@@ -1,93 +1,77 @@
 #!/usr/bin/env bash
-# The required desktop uses Fedora packages only, without COPR/RPM Fusion.
-# Optional user-selected Flatpaks may add the Flathub remote explicitly.
+# Required packages come from Fedora 44 repos, except Noctalia v4 legacy.
+# Noctalia v5 from Fedora is NOT compatible with this Gigi configuration.
 AMETHYSTOS_REQUIRED=(
-  niri xwayland-satellite waybar fuzzel mako swaybg
-  alacritty kitty gtklock polkit-kde
-  xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring
-  NetworkManager network-manager-applet nm-connection-editor
-  nautilus pavucontrol playerctl brightnessctl wl-clipboard cliphist
-  pipewire wireplumber pipewire-pulseaudio bluez blueman libnotify jq gtk3 fish
-  adw-gtk3-theme papirus-icon-theme papirus-icon-theme-dark qt6ct python3-gobject
-  cascadia-mono-nf-fonts google-noto-sans-fonts
+  niri xwayland-satellite kitty nautilus firefox gnome-text-editor
+  polkit-kde xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+  gnome-keyring NetworkManager network-manager-applet
+  pavucontrol playerctl brightnessctl wl-clipboard cliphist
+  pipewire wireplumber pipewire-pulseaudio bluez blueman
+  jq gtk3 python3 python3-gobject imagemagick git
+  fish fastfetch mpv mpd neovim
+  papirus-icon-theme papirus-icon-theme-dark
+  google-noto-sans-fonts cascadia-mono-nf-fonts
 )
-# These are cosmetic tools. Missing ones do NOT block the graphical desktop.
-AMETHYSTOS_OPTIONAL=(gtk-layer-shell starship fastfetch btop cava nwg-look gammastep grim slurp zoxide chafa)
-
-# Software chosen in the terminal UI; packages are from configured Fedora repos.
-# This is intentionally not a general-purpose package-name input field.
+AMETHYSTOS_OPTIONAL=(starship btop yazi rmpc celluloid qt6ct chafa zoxide)
 declare -A AMETHYSTOS_APP_GROUPS=(
-  [firefox]='firefox'
-  [chromium]='chromium'
-  [essentials]='gnome-calculator gnome-text-editor file-roller loupe'
-  [office]='libreoffice-writer thunderbird'
-  [creative]='gimp inkscape krita'
-  [dev]='git micro neovim python3-pip'
-  [media]='celluloid rhythmbox'
-  [gaming]='lutris gamemode mangohud'
-  [steam]=''
-  [obs]=''
-  [discord]=''
-  [flatseal]=''
-  [libreoffice]='libreoffice-writer libreoffice-calc'
-  [thunderbird]='thunderbird'
-  [gimp]='gimp'
-  [krita]='krita'
-  [inkscape]='inkscape'
-  [kdenlive]='kdenlive'
-  [audacity]='audacity'
-  [git]='git'
-  [neovim]='neovim'
-  [lutris]='lutris gamemode'
-  [celluloid]='celluloid'
-  [btop]='btop'
+ [firefox]='firefox' [chromium]='chromium' [essentials]='gnome-calculator gnome-text-editor file-roller'
+ [office]='libreoffice-writer thunderbird' [creative]='gimp inkscape krita'
+ [dev]='git micro neovim python3-pip' [media]='celluloid rhythmbox'
+ [gaming]='lutris gamemode mangohud' [steam]='' [obs]='' [discord]='' [flatseal]=''
+ [libreoffice]='libreoffice-writer libreoffice-calc' [thunderbird]='thunderbird'
+ [gimp]='gimp' [krita]='krita' [inkscape]='inkscape' [kdenlive]='kdenlive'
+ [audacity]='audacity' [git]='git' [neovim]='neovim' [lutris]='lutris gamemode'
+ [celluloid]='celluloid' [btop]='btop'
 )
 
+amethystos_install_legacy() {
+  if rpm -q noctalia-legacy >/dev/null 2>&1 || rpm -q noctalia-shell >/dev/null 2>&1; then
+    echo '[ok] Existing Noctalia legacy package detected.'; return
+  fi
+  if sudo dnf install -y noctalia-legacy; then return 0; fi
+  echo >&2 'Noctalia v4.7.7 is required; Fedora noctalia v5 does not work with this rice.'
+  echo >&2 'A third-party repository is needed for this archived shell. See docs/GIGI_MIGRATION.md.'
+  if [[ ${AMETHYSTOS_ALLOW_TERRA:-0} != 1 ]]; then
+    if [[ -r /dev/tty && ${AMETHYSTOS_NONINTERACTIVE:-0} != 1 ]]; then
+      printf '\n%s\n' 'Noctalia v4 needs an external package provider.' >/dev/tty
+      printf '%s\n' 'Read: https://docs.noctalia.dev/noctalia-shell-legacy/getting-started/installation/' >/dev/tty
+      printf '%s\n' 'Terra bootstrap uses --nogpgcheck. Only proceed if you trust this source.' >/dev/tty
+      printf 'Type TRUST TERRA to enable the third-party repository (or anything else to cancel): ' >/dev/tty
+      IFS= read -r consent </dev/tty || consent=''
+      [[ "$consent" == 'TRUST TERRA' ]] || { echo 'Declined external repository; stopping before dotfiles are installed.' >&2; return 1; }
+    else
+      echo >&2 'A third-party repository is required. For unattended install, review and pass --allow-terra explicitly.'
+      return 1
+    fi
+  fi
+  echo >&2 'Enabling Terra (third party) with explicit permission.'
+  # This command comes from Noctalia legacy install documentation. The bootstrap RPM
+  # bypasses signature checks: require explicit trust. Do not run via a pipe or without notice.
+  sudo dnf install -y --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release || return
+  sudo dnf install -y noctalia-legacy || sudo dnf install -y noctalia-shell
+}
 amethystos_install_fedora_packages() {
   local groups="${1:-firefox,essentials}" group
-  printf 'Installing %s essential Fedora packages.\n' "${#AMETHYSTOS_REQUIRED[@]}"
+  echo 'Installing Fedora Niri desktop, graphics and Noctalia dependencies.'
   sudo dnf install -y "${AMETHYSTOS_REQUIRED[@]}" || return
-  printf 'Installing optional desktop extras where available.\n'
-  if ! sudo dnf install -y --skip-unavailable "${AMETHYSTOS_OPTIONAL[@]}"; then
-    printf '%s\n' 'Optional system extras were unavailable; continuing.' >&2
-  fi
-  local -a pkgs=()
-  local -a selected=()
+  amethystos_install_legacy || return
+  sudo dnf install -y --skip-unavailable "${AMETHYSTOS_OPTIONAL[@]}" || echo 'Optional extras skipped.' >&2
+  local -a pkgs=() selected=() parts=() flatapps=()
   IFS=',' read -r -a selected <<< "$groups"
   for group in "${selected[@]}"; do
     [[ -n "$group" ]] || continue
-    if [[ ! -v "AMETHYSTOS_APP_GROUPS[$group]" ]]; then
-      echo "Unknown application group: $group" >&2; return 2
-    fi
-    local -a parts=()
+    if [[ ! -v "AMETHYSTOS_APP_GROUPS[$group]" ]]; then echo "Unknown app group: $group" >&2; return 2; fi
     read -r -a parts <<< "${AMETHYSTOS_APP_GROUPS[$group]}"
     pkgs+=("${parts[@]}")
   done
-  if ((${#pkgs[@]})); then
-    printf 'Installing selected applications: %s\n' "${pkgs[*]}"
-    if ! sudo dnf install -y --skip-unavailable "${pkgs[@]}"; then
-      printf '%s\n' 'Some selected apps could not be installed. The desktop remains usable.' >&2
-    fi
-  fi
-  # Third-party Flatpak sources are installed only when explicitly selected.
-  # The remote is user-scoped; no surprise system-wide repo changes.
-  local -a flatapps=()
+  if ((${#pkgs[@]})); then sudo dnf install -y --skip-unavailable "${pkgs[@]}" || echo 'Some optional apps unavailable.' >&2; fi
   [[ ",$groups," == *,steam,* ]] && flatapps+=(com.valvesoftware.Steam)
   [[ ",$groups," == *,obs,* ]] && flatapps+=(com.obsproject.Studio)
   [[ ",$groups," == *,discord,* ]] && flatapps+=(com.discordapp.Discord)
   [[ ",$groups," == *,flatseal,* ]] && flatapps+=(com.github.tchx84.Flatseal)
   if ((${#flatapps[@]})); then
-    if ! command -v flatpak >/dev/null 2>&1; then
-      sudo dnf install -y flatpak || { echo 'Flatpak unavailable, skipping selected Flathub apps' >&2; return 0; }
-    fi
-    echo 'Selected Flathub applications require the Flathub user repository.'
-    echo 'You explicitly selected them in the installer; adding Flathub for this user.'
-    if ! flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo; then
-      echo 'Flathub could not be added; skipping these optional applications.' >&2
-      return 0
-    fi
-    for app in "${flatapps[@]}"; do
-      flatpak install --user -y --noninteractive flathub "$app" || echo "Could not install optional Flatpak: $app" >&2
-    done
+    command -v flatpak >/dev/null || sudo dnf install -y flatpak
+    flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || return
+    for app in "${flatapps[@]}"; do flatpak install --user -y --noninteractive flathub "$app" || echo "Skipped $app" >&2; done
   fi
 }

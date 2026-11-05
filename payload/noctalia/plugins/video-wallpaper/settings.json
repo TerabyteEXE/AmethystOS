@@ -1,0 +1,14 @@
+{
+  "activeBackend": "qt6-multimedia",
+  "automationMode": "random",
+  "automationTime": 300,
+  "fillMode": "fit",
+  "mpvSocket": "/tmp/mpv-socket",
+  "profile": "default",
+  "volume": 1,
+  "wallpapersFolder": "",
+  "thumbCacheReady": false,
+  "enabled": false,
+  "monitorSpecific": false,
+  "automationCustomTime": []
+}

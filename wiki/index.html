@@ -10,29 +10,27 @@
 <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
 <nav id="site-nav" class="navlinks" data-navlinks aria-label="Main navigation"><a href="../index.html">Home</a><a href="../install.html">Install</a><a href="../wiki/index.html" aria-current="page">Documentation</a><a href="../wiki/keybinds.html">Keybindings</a><a class="nav-github" href="https://github.com/TerabyteEXE/AmethystOS" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 </div></header><main id="content"><div class="wrap"><div class="page-title"><p class="eyebrow">AmethystOS / Documentation</p><h1>The AmethystOS wiki</h1><p class="lead">A simple guide to your old new OS.</p></div>
-<div class="doc-shell"><aside class="side-nav" aria-label="Wiki pages"><p class="side-label">Documentation</p><a class="active" href="index.html">Start here</a><a class="" href="../install.html">Installation</a><a class="" href="keybinds.html">Keybindings</a><a class="" href="customization.html">Customization</a><a class="" href="troubleshooting.html">Troubleshooting</a></aside><article class="doc-content"><h2>Welcome to the wiki</h2>
-<p>The basics of the AmethystOS desktop, from just starting to customizing the Niri configuration. This section documents the actual v1 base instead of features planned for future releases so it might not reflect all the latest changes and may lack detailed information.</p>
+<div class="doc-shell"><aside class="side-nav" aria-label="Wiki pages"><p class="side-label">Documentation</p><a class="active" href="index.html">Start here</a><a class="" href="../install.html">Installation</a><a class="" href="keybinds.html">Keybindings</a><a class="" href="customization.html">Customization</a><a class="" href="troubleshooting.html">Troubleshooting</a></aside><article class="doc-content"><h2>Welcome to AmethystOS</h2>
+<p>AmethystOS is Fedora Workstation with a carefully adapted copy of <a href="https://github.com/deadduck-09/gigis-rice">Gigi's Rice</a>. Niri manages windows. <strong>Noctalia Shell v4</strong> provides the launcher, status bar, quick controls, calendar, notifications, settings, and wallpaper browser as one integrated desktop.</p>
+<p><strong>Required version:</strong> this original rice needs <strong>Noctalia v4.7.7</strong>, not the incompatible v5 package in Fedora 44. <a href="../install.html">See installation notes</a>.</p>
 <div class="doc-card-grid">
-<a class="doc-card" href="../install.html"><h3>Installation ↗</h3><p>System requirements, one command, manual setup and recovery.</p></a>
-<a class="doc-card" href="keybinds.html"><h3>Keybindings ↗</h3><p>Search every active shortcut in the shipped Niri configuration.</p></a>
-<a class="doc-card" href="customization.html"><h3>Customization ↗</h3><p>Wallpaper, Waybar, launcher, and Niri's configuration files.</p></a>
-<a class="doc-card" href="troubleshooting.html"><h3>Troubleshooting ↗</h3><p>Solutions for installation, black screens, and broken desktop components.</p></a>
+<a class="doc-card" href="../install.html"><h3>Install ↗</h3><p>One command, third-party legacy package consent, backups.</p></a>
+<a class="doc-card" href="keybinds.html"><h3>Keyboard shortcuts ↗</h3><p>Search the real Gigi-derived Niri bindings.</p></a>
+<a class="doc-card" href="customization.html"><h3>Customize ↗</h3><p>Noctalia bar, wallpapers, widgets and themes.</p></a>
+<a class="doc-card" href="troubleshooting.html"><h3>Troubleshoot ↗</h3><p>Find out what to do if a shell component does not launch.</p></a>
 </div>
-<h2>Get started in a minute</h2><p>After logging into the Niri session, these shortcuts will get you moving:</p>
-<table class="key-table"><tbody>
-<tr><td><span class="kbd">Super + Enter</span></td><td>Open Alacritty terminal</td></tr>
-<tr><td><span class="kbd">Super + Space</span></td><td>Search installed applications</td></tr>
+<h2>First shortcuts</h2><table class="key-table"><tbody>
+<tr><td><span class="kbd">Super + Space</span></td><td>Search apps in Noctalia</td></tr>
+<tr><td><span class="kbd">Super + D</span></td><td>Same launcher</td></tr>
+<tr><td><span class="kbd">Super + Shift + S</span></td><td>Noctalia settings</td></tr>
+<tr><td><span class="kbd">Super + Shift + W</span></td><td>Choose wallpaper</td></tr>
+<tr><td><span class="kbd">Super + T</span></td><td>Open Kitty terminal</td></tr>
 <tr><td><span class="kbd">Super + W</span></td><td>Close the focused window</td></tr>
-<tr><td><span class="kbd">Super + Shift + Tab</span></td><td>Toggle tabbed columns</td></tr>
-<tr><td><span class="kbd">Super + H / L</span></td><td>Move between columns</td></tr>
-<tr><td><span class="kbd">Super + O</span></td><td>Show workspace overview</td></tr>
-<tr><td><span class="kbd">Super + Shift + /</span></td><td>Open built-in hotkey overlay</td></tr>
+<tr><td><span class="kbd">Super + 1–5</span></td><td>Five named workspaces</td></tr>
+<tr><td><span class="kbd">Ctrl + Super + K</span></td><td>Full keybinding guide</td></tr>
 </tbody></table>
-<h2>What AmethystOS installs</h2>
-<p>Niri handles the window layout. Waybar displays desktop status. Fuzzel launches apps, Mako handles notifications, swaybg displays wallpapers, and Alacritty is the default terminal.</p>
-<p>Its important to note that Fedora keeps managing packages, user accounts, hardware, and updates. AmethystOS on purpose does not replace Fedora's system services or default login manager as I wanted the OS to not skip on security like other distributions which prioritize visual designs over some simple security.</p>
-<h2>Project transparency</h2>
-<p>The installer and documentation were created with help from AI. They have of course not received an independent security audit. Use them with the same caution you would use with any third-party Linux scripts or distros you find on the internet.</p></article></div></div></main>
+<h2>Themes and wallpapers</h2><p>AmethystDark.png and AmethystLight.png are included. Noctalia supports matching light/dark color schemes, wallpaper switching and bar/widget customization. Original anime wallpapers from Gigi's repository were intentionally not copied.</p>
+<h2>Credits</h2><p>Gigi's Niri and Noctalia configuration is MIT-licensed. Noctalia and plugins have separate licenses. See <a href="https://github.com/TerabyteEXE/AmethystOS/blob/main/docs/GIGI_MIGRATION.md">the complete migration notes</a>.</p></article></div></div></main>
 <footer class="footer"><div class="wrap footer-inner"><div>
 <p><strong>AmethystOS</strong> · An independent Fedora + Niri desktop project. Not affiliated with Fedora, or Niri.</p>
 <div class="footer-links"><a href="../wiki/index.html">Documentation</a><a href="../wiki/troubleshooting.html">Support</a><a href="https://github.com/TerabyteEXE/AmethystOS">Source code</a></div>

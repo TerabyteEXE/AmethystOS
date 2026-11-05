@@ -17,27 +17,12 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = ROOT / "payload"
-CONFIG_DIRS = (
-    "niri", "waybar", "fuzzel", "kitty", "alacritty", "mako", "niri-lock",
-    "gtk-3.0", "gtk-4.0", "qt6ct", "btop", "cava", "fastfetch",
-    "starship", "fish",
-)
-EXTRA_FILES = (
-    "powermenu", "set-wallpaper", "clipboard-history", "mako-history",
-    "notification-history", "amethystos-uninstall", "amethyst-settings", "amethyst-doctor", "amethyst-browser",
-    "amethyst-theme", "amethyst-scale",
-    "amethyst-launcher", "amethyst-hub", "amethyst-bar", "amethyst-wallpapers",
-    "amethyst-software", "amethyst-calendar", "amethyst-popover", "amethyst-update",
-)
-SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop"}
-
-# User-owned files from older releases, not Plymouth system files. A migration
-# may retire them only when their hashes still match our deployment record.
-RETIRED_PATHS = (
-    ".local/bin/amethyst-boot",
-    ".local/share/amethystos/boot_theme.sh",
-    ".local/share/amethystos/assets/plymouth",
-)
+CONFIG_DIRS = ("niri", "noctalia", "kitty", "fish", "mpd", "mpv", "rmpc", "yazi", "nvim", "fastfetch")
+EXTRA_FILES = ("amethystos-uninstall", "amethyst-update", "amethyst-doctor", "amethyst-browser",
+               "amethyst-settings", "amethyst-launcher", "amethyst-keys", "amethyst-wallpaper", "amethyst-theme")
+SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop", ".qml"}
+RETIRED_PATHS = (".local/bin/amethyst-boot", ".local/share/amethystos/boot_theme.sh",
+                 ".local/share/amethystos/assets/plymouth")
 
 
 def log(*message: object) -> None:
@@ -57,25 +42,17 @@ def expand_placeholders(base: Path, home: Path) -> None:
 
 def sources() -> list[tuple[Path, Path]]:
     mapping = [(PAYLOAD / name, Path(".config") / name) for name in CONFIG_DIRS]
+    mapping.append((PAYLOAD / "starship.toml", Path(".config/starship.toml")))
     mapping.append((PAYLOAD / "xdg-desktop-portal/niri-portals.conf", Path(".config/xdg-desktop-portal/niri-portals.conf")))
-    # Keep a self-contained uninstaller after the one-command bootstrap archive is removed.
     mapping.append((ROOT / "scripts/deploy.py", Path(".local/share/amethystos/deploy.py")))
-    mapping.append((ROOT / "scripts/desktop_prefs.py", Path(".local/share/amethystos/desktop_prefs.py")))
-    mapping.append((ROOT / "scripts/appearance.py", Path(".local/share/amethystos/appearance.py")))
-    for script in ("bar_config.py", "launcher_gui.py", "bar_popup.py", "wallpaper_gui.py", "calendar_gui.py", "software.py", "system_update.py", "settings_gui.py", "settings_backend.py", "ui_style.py"):
-        mapping.append((ROOT / "scripts" / script, Path(".local/share/amethystos") / script))
-    mapping.append((ROOT / "assets/themes", Path(".local/share/amethystos/themes")))
-    mapping.append((ROOT / "assets/settings", Path(".local/share/amethystos/settings")))
-    mapping.append((ROOT / "assets/launcher", Path(".local/share/amethystos/launcher")))
-    mapping.append((ROOT / "assets/popups", Path(".local/share/amethystos/popups")))
-    mapping.append((ROOT / "assets/gallery", Path(".local/share/amethystos/gallery")))
+    mapping.append((ROOT / "scripts/system_update.py", Path(".local/share/amethystos/system_update.py")))
     mapping.append((ROOT / "VERSION", Path(".local/share/amethystos/VERSION")))
     mapping.append((ROOT / "assets/branding/amethyst-logo.png", Path(".local/share/amethystos/assets/amethyst-logo.png")))
+    mapping.append((ROOT / "docs/KEYBINDINGS.txt", Path(".local/share/amethystos/KEYBINDINGS.txt")))
     mapping.extend((source,Path(".local/share/applications") / source.name)
                    for source in sorted((PAYLOAD / "applications").glob("*.desktop")))
     mapping.extend((PAYLOAD / "local-bin" / name, Path(".local/bin") / name) for name in EXTRA_FILES)
     return mapping
-
 
 def digest_path(path: Path) -> str:
     sha = hashlib.sha256()
@@ -101,10 +78,6 @@ def stage_files(stage: Path, home: Path) -> list[tuple[Path, Path]]:
             shutil.copy2(source, target)
         entries.append((target, home / dest))
     expand_placeholders(stage, home)
-    for path in (stage / ".config/niri/autostart.sh", stage / ".config/niri-lock/lock.sh"):
-        path.chmod(0o755)
-    for path in (stage / ".config/waybar/scripts").glob("*.sh"):
-        path.chmod(0o755)
     for path in (stage / ".local/bin").iterdir():
         path.chmod(0o755)
     return entries
@@ -177,34 +150,31 @@ def install(home: Path, replace: bool, dry_run: bool, require_niri: bool) -> Non
                     str(backup.relative_to(home)) if backup else None)
                 records.append({"path": str(rel), "backup": baseline_backup,
                                 "sha256": digest_path(dest)})
-            # Retire obsolete user-level splash tooling from prior versions.
-            # Never touch /boot, Plymouth, or initramfs. If the old tool was
-            # edited, retain its existing state entry so restore stays safe.
-            for legacy in RETIRED_PATHS:
-                rec = previous.get(legacy)
-                if rec is None:
+            # Retire older Amethyst-owned rice files (Waybar, Fuzzel, Mako,
+            # GTK popups etc.), but NEVER remove user-modified files.
+            # Preserve the first pre-Amethyst backup so uninstall remains reversible.
+            new_paths = {str(dest.relative_to(home)) for _, dest in entries}
+            for legacy, rec in previous.items():
+                if legacy in new_paths:
                     continue
                 dest = home / legacy
-                if not (dest.exists() or dest.is_symlink()):
-                    continue
-                if digest_path(dest) != rec["sha256"]:
-                    log("Retaining user-modified legacy file:", legacy)
-                    records.append(rec)
-                    continue
-                backup = backup_dir / legacy
-                backup.parent.mkdir(parents=True, exist_ok=True)
-                shutil.move(str(dest), str(backup))
-                changed.append((dest, backup))
-                original = home / rec["backup"] if rec["backup"] else None
-                if original is not None:
-                    if not original.exists():
-                        raise RuntimeError(f"Missing original backup for {legacy}")
+                original = home / rec["backup"] if rec.get("backup") else None
+                if dest.exists() or dest.is_symlink():
+                    if digest_path(dest) != rec["sha256"]:
+                        log("Preserving modified old desktop file:", legacy)
+                        records.append(rec)
+                        continue
+                    saved = backup_dir / legacy
+                    saved.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.move(str(dest), str(saved))
+                    changed.append((dest, saved))
+                if original is not None and original.exists():
                     dest.parent.mkdir(parents=True, exist_ok=True)
                     if original.is_dir():
                         shutil.copytree(original, dest, symlinks=True)
                     else:
                         shutil.copy2(original, dest)
-                log("Retired obsolete splash tool:", legacy)
+                log("Retired previous AmethystOS desktop component:", legacy)
             state = {"version":"1.0-base", "created":runid, "entries":records}
             state_tmp = state_dir / "state.json.tmp"
             state_tmp.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -Eeuo pipefail
-script="$HOME/.local/share/amethystos/software.py"
-[[ -r "$script" ]] || { echo 'AmethystOS software menu not installed' >&2; exit 1; }
-exec python3 "$script" "$@"

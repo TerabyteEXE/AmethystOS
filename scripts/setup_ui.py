@@ -47,7 +47,7 @@ def create_plan(selected: list[str], replace: bool = False, appearance: bool = T
 def draw(writer, selected, replace, appearance, theme, page=0):
     writer.write('\033[2J\033[H')
     writer.write(f'{PURPLE}◆ AMETHYSTOS{RESET}  ·  FEDORA / NIRI  ·  SETUP\n')
-    writer.write(f'{DIM}Select optional apps by number; Enter proceeds. GTK/desktop are included.\n')
+    writer.write(f'{DIM}Select optional apps by number; Enter proceeds. Niri + Noctalia v4 are required.\n')
     writer.write(f'Steam, OBS, Discord, and Flatseal use Flathub only when chosen.{RESET}\n\n')
     page_size=10
     start=page*page_size
@@ -59,7 +59,7 @@ def draw(writer, selected, replace, appearance, theme, page=0):
         writer.write(f'{n:>2}. [{mark}] {title:<25} {DIM}{info}{RESET}\n')
     base = len(GROUPS)
     writer.write(f'\n {base+1:>2}. [{"✓" if replace else " "}] Back up and replace existing configs\n')
-    writer.write(f' {base+2:>2}. [{"✓" if appearance else " "}] Coordinate GTK appearance with desktop\n')
+    writer.write(f' {base+2:>2}. [{"✓" if appearance else " "}] Coordinate Noctalia dark/light appearance\n')
     writer.write(f' {base+3:>2}. [{"✓" if theme == "light" else " "}] Start with Amethyst Light (otherwise Dark)\n')
     writer.write(f'\n{DIM}n = next page, p = previous page, Enter = continue{RESET}\n')
     writer.write(f'{PURPLE}amethystos › {RESET}')
@@ -108,8 +108,8 @@ def interactive_plan() -> dict:
         tty_out.write(f'{BOLD}{PURPLE}◆ AMETHYSTOS{RESET}  Your choices\n\n')
         tty_out.write('  Optional apps: ' + (', '.join(sorted(selected)) or '(none)') + '\n')
         tty_out.write('  Existing configs: ' + ('back up and replace' if replace else 'preserve') + '\n')
-        tty_out.write('  Appearance: ' + (theme if appearance else 'do not change GNOME') + '\n')
-        tty_out.write('  Boot configuration: unchanged by AmethystOS\n\n')
+        tty_out.write('  Appearance: ' + (theme if appearance else 'preserve preferences') + '\n')
+        tty_out.write('  Fedora boot configuration: unchanged\n\n')
         tty_out.write('  Continue with Fedora package installation? [y/N] ')
         tty_out.flush()
         if tty_in.readline().strip().lower() not in ('y', 'yes'):

@@ -1,7 +1,0 @@
-// A quiet Plymouth splash with a centered AmethystOS crystal.
-Window.SetBackgroundTopColor(0.055, 0.047, 0.09);
-Window.SetBackgroundBottomColor(0.055, 0.047, 0.09);
-logo_image = Image("logo.png");
-logo = Sprite(logo_image);
-logo.SetX(Window.GetWidth() / 2 - logo_image.GetWidth() / 2);
-logo.SetY(Window.GetHeight() / 2 - logo_image.GetHeight() / 2);

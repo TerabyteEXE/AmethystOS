@@ -1,45 +1,15 @@
 #!/usr/bin/env bash
-# Report missing desktop components and user application launch issues.
 set -u
-printf '\n◆ AMETHYSTOS / SYSTEM CHECK\n'
-if command -v niri >/dev/null 2>&1; then
-  printf '[ok] Niri available\n'
-  if niri validate >/dev/null 2>&1; then echo '[ok] Niri config parses'; else echo '[!] Niri config validation failed: run niri validate'; fi
+printf '%s\n' 'AMETHYSTOS · Niri + Gigi/Noctalia v4 diagnostics'
+for cmd in niri qs kitty wpctl nmcli fastfetch; do
+  if command -v "$cmd" >/dev/null 2>&1; then echo "[ok] $cmd"; else echo "[missing] $cmd"; fi
+done
+if rpm -q noctalia-legacy >/dev/null 2>&1 || rpm -q noctalia-shell >/dev/null 2>&1; then
+  echo '[ok] Noctalia v4 package detected'
 else
-  echo '[!] Niri not on PATH'
+  echo '[warning] Noctalia legacy v4 package not confirmed (Fedora noctalia v5 is incompatible)'
 fi
-for prog in waybar fuzzel alacritty kitty mako swaybg gtklock \
-            nm-connection-editor pavucontrol blueman-manager qt6ct \
-            firefox nautilus cliphist; do
-  if command -v "$prog" >/dev/null 2>&1; then printf '[ok] %s\n' "$prog"
-  else printf '[!] Missing command: %s\n' "$prog"; fi
-done
-if command -v fc-list >/dev/null 2>&1; then
-  if fc-list : family | grep -Eiq '(Cascadia Mono NF|CaskaydiaCove Nerd)'; then
-    echo '[ok] Nerd Font is installed'
-  else echo '[!] Cascadia Mono NF font missing — text/icons can look incorrect'; fi
+if command -v niri >/dev/null 2>&1; then niri validate 2>&1 || true; fi
+if [[ "${XDG_CURRENT_DESKTOP:-}" != *niri* && "${XDG_CURRENT_DESKTOP:-}" != *Niri* ]]; then
+  echo '[info] Run inside a Niri session to check graphical integrations.'
 fi
-for path in "$HOME/.config/waybar/config.jsonc" "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/qt6ct/qt6ct.conf"; do
-  [[ -s "$path" ]] && echo "[ok] $path" || echo "[!] Missing config $path"
-done
-if [[ $# -gt 0 && "$1" == --app ]]; then
-  printf '\nTo troubleshoot an app, run the exact desktop ID in a terminal:\n'
-  printf '  gtk-launch %s\n' "${2:-application.desktop}"
-  printf 'Or run the command shown in its .desktop Exec= line.\n'
-fi
-if [[ -s $HOME/.cache/amethystos/launch.log ]]; then
-  printf '\nRecent Amethyst-launched app errors:\n'
-  tail -n 14 "$HOME/.cache/amethystos/launch.log"
-fi
-for helper in amethyst-launcher amethyst-hub amethyst-software amethyst-bar amethyst-wallpapers amethyst-calendar; do
-  if [[ -x "$HOME/.local/bin/$helper" ]]; then printf '[ok] %s action installed\n' "$helper"
-  else printf '[!] Missing AmethystOS action: %s\n' "$helper"; fi
-done
-if python3 -c 'import gi; gi.require_version("Gtk", "3.0"); from gi.repository import Gtk' 2>/dev/null; then
-  echo '[ok] GTK wallpaper gallery and calendar available'
-else
-  echo '[!] Python GTK bindings missing: use the Fuzzel wallpaper picker fallback'
-fi
-printf '\nSome third-party desktop launchers require Flatpak runtimes,\n' 
-printf 'hardware acceleration, or dependencies outside AmethystOS.\n'
-printf 'For failures, open the app from Alacritty to view its error output.\n'

@@ -2,11 +2,12 @@
 # AmethystOS: one installer, user-selectable Fedora apps, recoverable dotfiles.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0 PRESERVE_APPEARANCE=0
+DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0 PRESERVE_APPEARANCE=0 ALLOW_TERRA=0
 APP_GROUPS='' APPS_SET=0 START_THEME=dark
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY=1 ;;
+    --allow-terra) ALLOW_TERRA=1 ;;
     --replace) REPLACE=1 ;;
     --no-packages) SKIP_PACKAGES=1 ;;
     --non-interactive) NON_INTERACTIVE=1 ;;
@@ -21,13 +22,14 @@ AmethystOS — Fedora + Niri
 Usage: bash install.sh [--dry-run] [--replace] [--no-packages]
                        [--non-interactive] [--apps=browser,essentials,dev]
   Interactive setup uses a branded terminal menu and makes optional apps selectable.
+  --allow-terra     Explicitly allow third-party Terra for Noctalia legacy v4
   --replace         Back up and replace existing user configurations
   --non-interactive Use default app selections, no terminal prompts
   --apps=...        Comma-separated app groups; empty value installs no extras
   --theme=light     Set Amethyst Light on first login (default Dark)
   --no-packages     Don't run DNF (advanced)
-  --no-theme        Do not change existing GNOME/GTK appearance preferences
-  --preserve-appearance  Preserve theme, scaling and selected wallpaper on upgrade
+  --no-theme        Keep current appearance selection if reinstalling
+  --preserve-appearance  Leave current appearance preferences and wallpaper alone
   --dry-run         Validate the plan without modifying the system
 The persistent removal command after install is: amethystos-uninstall
 HELP
@@ -65,7 +67,7 @@ printf '\n%s◆ AMETHYSTOS%s     %sFEDORA + NIRI  ·  INSTALLER%s\n' "$BOLD$PURP
 printf '  Existing Fedora and GNOME are preserved. Review scripts before installing.\n'
 
 stage 1 'Checking the source, storage and system'
-for path in LICENSE.upstream payload/niri/config.kdl payload/waybar/config.jsonc assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
+for path in LICENSE LICENSE.gigi payload/niri/config.kdl payload/noctalia/settings.json payload/niri/modules/keybinds.kdl assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
   [[ -s "$ROOT/$path" ]] || { echo "Missing: $path" >&2; exit 1; }
 done
 if (( ! DRY && ! SKIP_PACKAGES )); then
@@ -101,7 +103,7 @@ printf 'Optional apps: %s\n' "${APP_GROUPS:-none}"
 
 stage 3 'Checking existing desktop settings (before DNF changes)'
 conflicts=()
-for name in niri waybar fuzzel kitty alacritty mako niri-lock gtk-3.0 gtk-4.0 qt6ct btop cava fastfetch starship fish; do
+for name in niri noctalia kitty fish mpd mpv rmpc yazi nvim fastfetch; do
   [[ -e "$HOME/.config/$name" || -L "$HOME/.config/$name" ]] && conflicts+=("$name")
 done
 [[ -e "$HOME/.config/xdg-desktop-portal/niri-portals.conf" ]] && conflicts+=('niri-portals.conf')
@@ -127,6 +129,7 @@ elif (( SKIP_PACKAGES )); then
 else
   # shellcheck disable=SC1091
   source "$ROOT/scripts/packages.sh"
+  export AMETHYSTOS_ALLOW_TERRA="$ALLOW_TERRA" AMETHYSTOS_NONINTERACTIVE="$NON_INTERACTIVE"
   amethystos_install_fedora_packages "$APP_GROUPS"
 fi
 
@@ -137,33 +140,13 @@ args=(install)
 (( DRY || SKIP_PACKAGES )) || args+=(--require-niri)
 python3 "$ROOT/scripts/deploy.py" "${args[@]}"
 
-stage 6 'Preparing the official light and dark wallpapers'
+stage 6 'Preparing Amethyst Dark and Light wallpapers'
 if (( DRY )); then
   echo 'Dry run: both Amethyst wallpapers are present in the bundle.'
 else
   python3 "$ROOT/scripts/wallpapers.py"
-  if (( APPLY_DARK )); then
-    if ! python3 "$ROOT/scripts/desktop_prefs.py" "$START_THEME"; then
-      echo 'Note: GSettings appearance preference unavailable; GTK configs are still installed.' >&2
-    fi
-  fi
-  if (( PRESERVE_APPEARANCE )); then
-    # Theme and size are read from the existing appearance.json by the scale
-    # command, without asking for a new theme (which would reset wallpaper).
-    saved_scale=$(python3 - <<'PYINNER'
-import json
-from pathlib import Path
-p=Path.home()/'.local/state/amethystos-base-v1/appearance.json'
-try: print(int(json.loads(p.read_text()).get('scale',100)))
-except (OSError,ValueError,TypeError): print(100)
-PYINNER
-)
-    if ! "$HOME/.local/bin/amethyst-scale" "$saved_scale" --no-gtk; then
-      echo 'Appearance restoration incomplete; settings remain available.' >&2
-    fi
-  elif ! "$HOME/.local/bin/amethyst-theme" "$START_THEME" --no-gtk; then
-    echo 'Theme colors could not be fully applied; desktop configs are still present.' >&2
-  fi
+  # Noctalia owns the bar, launcher, notifications, and theme. No old Waybar/GTK scripts.
+  echo 'Appearance and wallpapers can be adjusted in Noctalia Settings (Super+Shift+S).'
   mkdir -p "$HOME/Pictures/Screenshots"
 fi
 
@@ -173,6 +156,6 @@ if (( DRY )); then
 else
   printf '%sAmethystOS is installed.%s Log out, select Niri at the login screen.\n' "$GREEN" "$RESET"
   printf 'Settings: %samethyst-settings%s   |   Check installation: %samethyst-doctor%s\n' "$BOLD" "$RESET" "$BOLD" "$RESET"
-  echo 'Wallpaper picker: set-wallpaper  |  Uninstall: amethystos-uninstall'
+  echo 'Wallpapers: Noctalia Settings  |  Uninstall: amethystos-uninstall'
   echo 'GNOME is left available as your backup graphical session.'
 fi

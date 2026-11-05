@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=GTK Appearance
-Exec=nwg-look
-Icon=preferences-desktop-theme
-Categories=Settings;DesktopSettings;
-NoDisplay=true

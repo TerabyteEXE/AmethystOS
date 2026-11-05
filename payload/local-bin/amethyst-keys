@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+DOC="$HOME/.local/share/amethystos/KEYBINDINGS.txt"
+[[ -r "$DOC" ]] || { echo "Shortcut guide not installed: $DOC" >&2; exit 1; }
+if command -v kitty >/dev/null; then
+    exec kitty --title "AmethystOS Keybindings" -e less "$DOC"
+fi
+exec less "$DOC"

@@ -10,29 +10,17 @@
 <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="site-nav">Menu</button>
 <nav id="site-nav" class="navlinks" data-navlinks aria-label="Main navigation"><a href="../index.html">Home</a><a href="../install.html">Install</a><a href="../wiki/index.html" aria-current="page">Documentation</a><a href="../wiki/keybinds.html">Keybindings</a><a class="nav-github" href="https://github.com/TerabyteEXE/AmethystOS" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav>
 </div></header><main id="content"><div class="wrap"><div class="page-title"><p class="eyebrow">AmethystOS / Documentation</p><h1>Customization</h1><p class="lead">Make the desktop yours, one config at a time.</p></div>
-<div class="doc-shell"><aside class="side-nav" aria-label="Wiki pages"><p class="side-label">Documentation</p><a class="" href="index.html">Start here</a><a class="" href="../install.html">Installation</a><a class="" href="keybinds.html">Keybindings</a><a class="active" href="customization.html">Customization</a><a class="" href="troubleshooting.html">Troubleshooting</a></aside><article class="doc-content"><p>Open <strong>Amethyst Settings (Super + Shift + S)</strong> to change your theme and text scale. The <strong>Top bar</strong> category lets you adjust Waybar position, size and visible modules without closing Settings. Super + W closes windows; Super + Shift + Tab toggles tabbed columns.</p>
-<h2>Where the configuration lives</h2>
-<p>The install places Niri and application configuration in your home directory. Niri uses the KDL format and can reload changes to its configuration. <a href="https://niri-wm.github.io/niri/Configuration%3A-Introduction.html">Official Niri documentation ↗</a></p>
-<table class="key-table"><tbody>
-<tr><td><span class="inline-code">~/.config/niri/</span></td><td>Layouts, keybindings, window rules and session startup</td></tr>
-<tr><td><span class="inline-code">~/.config/waybar/</span></td><td>Panel modules and CSS styling</td></tr>
-<tr><td><span class="inline-code">~/.config/fuzzel/</span></td><td>Application launcher appearance</td></tr>
-<tr><td><span class="inline-code">~/.config/mako/</span></td><td>Notification settings</td></tr>
-<tr><td><span class="inline-code">~/.config/alacritty/</span></td><td>Default terminal theme</td></tr>
-</tbody></table>
-<h2>Changing keybindings</h2><p>Edit <span class="inline-code">~/.config/niri/keybinds.kdl</span>. The site's <a href="keybinds.html">reference</a> is generated from the repository's default file, not your personal edits.</p>
-<div class="code-box"><div class="code-head"><span>In a Niri installation</span><button type="button" class="copy-btn" data-copy="niri-validate" aria-label="Copy command">Copy</button></div><pre id="niri-validate"><code>niri validate</code></pre></div>
-<p>Run the validator after changes; it reports invalid syntax and configuration errors.</p>
-<h2>Wallpaper</h2><p>AmethystOS includes an original default wallpaper, <strong>Amethyst Light</strong> or <strong>Amethyst Dark</strong>. The installer copies these files whenever they are missing, without overwriting existing files or your saved selection in <span class="inline-code">~/Pictures/wallpapers/</span>; your own wallpapers take precedence. Fresh installs with an empty wallpaper folder select Amethyst Dark by default.</p>
-<p>Open the wallpaper picker in a terminal:</p><div class="code-box"><div class="code-head"><span>Niri Terminal</span><button type="button" class="copy-btn" data-copy="wallpaper-picker" aria-label="Copy command">Copy</button></div><pre id="wallpaper-picker"><code>~/.local/bin/set-wallpaper
-# Or switch directly:
-set-wallpaper --light
-set-wallpaper --dark</code></pre></div>
-<p>Or copy your own JPEG, PNG or WebP files into <span class="inline-code">~/Pictures/wallpapers/</span> and use the same picker.</p>
-<h2>Amethyst Settings</h2><p>Use <span class="inline-code">Super + Shift + S</span> or the gear on the Waybar to open the settings menu for network, audio, Bluetooth, GTK/Qt appearance, display information and wallpapers. Changing GTK preferences also changes the appearance preference used by GNOME; previous values are saved for restoration.</p><p>Not every app follows system colors. Libadwaita uses the GTK color-scheme setting, Qt6 uses qt6ct, while Electron apps, Flatpaks and third-party programs may have their own theme settings.</p><h2>Adjusting the bar</h2><p>Edit <span class="inline-code">~/.config/waybar/style.css</span> for colors and font sizes. The module configuration is in <span class="inline-code">~/.config/waybar/config.jsonc</span> and related <span class="inline-code">modules/</span> files. Restart Waybar after editing:</p>
-<div class="code-box"><div class="code-head"><span>Niri Terminal</span><button type="button" class="copy-btn" data-copy="waybar-restart" aria-label="Copy command">Copy</button></div><pre id="waybar-restart"><code>pkill -x waybar
-waybar &gt;/dev/null 2&gt;&amp;1 &amp;</code></pre></div>
-<div class="note"><strong>Tip:</strong> Keep a backup of your modified config. Re-running the installer may ask whether to replace it with the repository defaults.</div></article></div></div></main>
+<div class="doc-shell"><aside class="side-nav" aria-label="Wiki pages"><p class="side-label">Documentation</p><a class="" href="index.html">Start here</a><a class="" href="../install.html">Installation</a><a class="" href="keybinds.html">Keybindings</a><a class="active" href="customization.html">Customization</a><a class="" href="troubleshooting.html">Troubleshooting</a></aside><article class="doc-content"><h2>Appearance and desktop controls</h2>
+<p>Use <strong>Super + Shift + S</strong> to open Noctalia's settings. This is the same shell that draws the top bar, calendar, notifications, launcher and popups. You do not need to configure Waybar or separately themed GTK launchers.</p>
+<h3>Amethyst Dark and Light</h3><p>AmethystOS ships a purple color scheme for both variants and copies your original wallpapers to <code>~/Pictures/wallpapers/</code>. To change themes, use Noctalia Settings or the following commands once the shell is running:</p>
+<pre><code>amethyst-theme dark
+amethyst-theme light</code></pre>
+<p>Existing selections are preserved during Amethyst upgrades; the installer only applies the default wallpaper on the first Noctalia session when no choice is saved.</p>
+<h3>Fine-tuning the bar and widgets</h3><p>Use the Noctalia Settings panel. The settings live at <code>~/.config/noctalia/settings.json</code>. The bar layout, attached panels and plugins originate from Gigi's Rice.</p>
+<h3>Niri windows, shortcuts and animations</h3><p>Compositor modules live under <code>~/.config/niri/modules/</code>. <code>config.kdl</code> loads them. The original Gigi window animation and visual settings are preserved, with Amethyst-purple accents. The hard-coded 1366×768 laptop output was removed, so your monitors are detected normally.</p>
+<pre><code>niri validate
+niri msg outputs</code></pre>
+<p>Back up your own changes before running a config replacement. Existing modified files may be protected or cause the uninstaller to request manual recovery.</p></article></div></div></main>
 <footer class="footer"><div class="wrap footer-inner"><div>
 <p><strong>AmethystOS</strong> · An independent Fedora + Niri desktop project. Not affiliated with Fedora, or Niri.</p>
 <div class="footer-links"><a href="../wiki/index.html">Documentation</a><a href="../wiki/troubleshooting.html">Support</a><a href="https://github.com/TerabyteEXE/AmethystOS">Source code</a></div>

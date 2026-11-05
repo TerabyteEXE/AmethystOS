@@ -1,0 +1,120 @@
+# AMETHYSTOS · NIRI / NOCTALIA v4 KEYBINDINGS
+
+Super+Shift+Slash            Show hotkey overlay
+Super+L                      Lock screen
+Super+Comma                  Choose wallpaper
+Super+Period                 Emoji picker
+Super+V                      Clipboard history
+Super+D                      Toggle Noctalia launcher
+Super+Space                  Toggle Noctalia launcher
+Super+Shift+S                Open Noctalia settings
+Super+Shift+W                Choose wallpaper
+Super+Shift+T                Open Noctalia settings
+Ctrl+Super+K                 Open searchable keybinding guide
+Super+N                      Show notification history
+Super+Escape                 Power and session menu
+Super+Alt+I                  Open Noctalia settings
+Super+T                      Open Kitty terminal
+Super+B                      Open browser
+Super+E                      Open Files
+Super+M                      Open video player
+Super+O                      Open text editor
+Super+C                      Open text editor
+Super+Alt+S                  Spawn sh pkill orca || exec orca
+XF86AudioRaiseVolume         Adjust volume or microphone
+XF86AudioLowerVolume         Adjust volume or microphone
+XF86AudioMute                Adjust volume or microphone
+XF86AudioMicMute             Adjust volume or microphone
+XF86AudioPlay                Media playback control
+XF86AudioStop                Media playback control
+XF86AudioPrev                Media playback control
+XF86AudioNext                Media playback control
+XF86MonBrightnessUp          Adjust brightness
+XF86MonBrightnessDown        Adjust brightness
+Super+W                      Close active window
+Super+Tab                    Toggle overview
+Super+Left                   Focus column left
+Super+Down                   Focus window down
+Super+Up                     Focus window up
+Super+Right                  Focus column right
+Super+Shift+Left             Move column left
+Super+Shift+Down             Move window down
+Super+Shift+Up               Move window up
+Super+Shift+Right            Move column right
+Super+Shift+H                Move column left
+Super+Shift+J                Move window down
+Super+Shift+K                Move window up
+Super+Shift+L                Move column right
+Super+Home                   Focus column first
+Super+End                    Focus column last
+Super+Ctrl+Home              Move column to first
+Super+Ctrl+End               Move column to last
+Super+Ctrl+Left              Focus monitor left
+Super+Ctrl+Down              Focus monitor down
+Super+Ctrl+Up                Focus monitor up
+Super+Ctrl+Right             Focus monitor right
+Super+Shift+Ctrl+Left        Move column to monitor left
+Super+Shift+Ctrl+Down        Move column to monitor down
+Super+Shift+Ctrl+Up          Move column to monitor up
+Super+Shift+Ctrl+Right       Move column to monitor right
+Super+Shift+Ctrl+H           Move column to monitor left
+Super+Shift+Ctrl+J           Move column to monitor down
+Super+Shift+Ctrl+K           Move column to monitor up
+Super+Shift+Ctrl+L           Move column to monitor right
+Super+1                      Focus workspace one
+Super+2                      Focus workspace two
+Super+3                      Focus workspace three
+Super+4                      Focus workspace four
+Super+5                      Focus workspace five
+Super+Shift+1                Move column to workspace one
+Super+Shift+2                Move column to workspace two
+Super+Shift+3                Move column to workspace three
+Super+Shift+4                Move column to workspace four
+Super+Shift+5                Move column to workspace five
+Ctrl+Super+V                 Toggle window floating
+Ctrl+Alt+V                   Switch focus between floating and tiling
+Print                        Take screenshot
+Ctrl+Print                   Take screenshot
+Alt+Print                    Take screenshot
+Super+Page Down              Focus workspace focus-workspace-down
+Super+Page Up                Focus workspace focus-workspace-up
+Super+U                      Focus workspace focus-workspace-down
+Super+I                      Focus workspace focus-workspace-up
+Super+Ctrl+Page Down         Move column to workspace move-column-to-workspace-down
+Super+Ctrl+Page Up           Move column to workspace move-column-to-workspace-up
+Super+Ctrl+U                 Move column to workspace move-column-to-workspace-down
+Super+Ctrl+I                 Move column to workspace move-column-to-workspace-up
+Super+Shift+Page Down        Move workspace down
+Super+Shift+Page Up          Move workspace up
+Super+Shift+U                Move workspace down
+Super+Shift+I                Move workspace up
+Super+WheelScrollDown        Focus workspace focus-workspace-down
+Super+WheelScrollUp          Focus workspace focus-workspace-up
+Super+Ctrl+WheelScrollDown   Move column to workspace move-column-to-workspace-down
+Super+Ctrl+WheelScrollUp     Move column to workspace move-column-to-workspace-up
+Super+WheelScrollRight       Focus column right
+Super+WheelScrollLeft        Focus column left
+Super+Ctrl+WheelScrollRight  Move column right
+Super+Ctrl+WheelScrollLeft   Move column left
+Super+Shift+WheelScrollDown  Focus column right
+Super+Shift+WheelScrollUp    Focus column left
+Super+Ctrl+Shift+WheelScrollDown Move column right
+Super+Ctrl+Shift+WheelScrollUp Move column left
+Super+BracketLeft            Consume or expel window left
+Super+BracketRight           Consume or expel window right
+Super+Ctrl+Comma             Consume window into column
+Super+Ctrl+Period            Expel window from column
+Super+R                      Switch preset column width
+Super+Shift+R                Switch preset column width back
+Super+Ctrl+Shift+R           Switch preset window height
+Super+Ctrl+R                 Reset window height
+Super+F                      Maximize column
+Super+Shift+F                Fullscreen window
+Super+Ctrl+F                 Expand column to available width
+Super+Shift+C                Center column
+Super+Ctrl+C                 Center visible columns
+Super+Minus                  Set column width  10%
+Super+Equal                  Set column width +10%
+Super+Shift+Minus            Set window height  10%
+Super+Shift+Equal            Set window height +10%
+Ctrl+Alt+Delete              Quit

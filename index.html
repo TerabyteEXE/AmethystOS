@@ -16,25 +16,25 @@
         <img class="home-mark" src="assets/branding/amethyst-logo.png" alt="AmethystOS purple crystal logo" width="94" height="98">
         <h1 id="welcome">Welcome to AmethystOS</h1>
       </div>
-      <p class="lead">AmethystOS is a preconfigured Niri desktop for Fedora. It brings together a tiling window manager, a simple launcher, a status bar and useful keyboard shortcuts in one neat installable setup.</p>
-      <p class="project-meta">Currently in Beta · Free and open-source desktop operating system</p>
+      <p class="lead">AmethystOS is a preconfigured Niri desktop for Fedora. It brings together the original Gigi Niri rice, Noctalia Shell v4, rich integrated controls and familiar keyboard shortcuts in a single Fedora installer.</p>
+      <p class="project-meta">RC3 beta · Fedora + Niri · Gigi’s Rice (MIT) + Noctalia v4</p>
     </section>
 
     <section class="home-section" aria-labelledby="install-heading">
       <h2 id="install-heading">Get AmethystOS</h2>
-      <p>First install <a href="https://fedoraproject.org/workstation/">Fedora Workstation</a>. Then open Terminal and run the AmethystOS installer. It adds a Niri session and keeps GNOME available if you want to fall back due to stability issues.</p>
+      <p>First install <a href="https://fedoraproject.org/workstation/">Fedora Workstation</a>. Then open Terminal and run the AmethystOS installer. It adds a Niri session and keeps GNOME available. Gigi’s config needs the archived Noctalia v4 shell, which may require an explicitly approved third-party package source.</p>
       <div class="code-box">
         <div class="code-head"><span>Fedora Terminal</span><button type="button" class="copy-btn" data-copy="install-command" aria-label="Copy AmethystOS install command">Copy</button></div>
         <pre id="install-command"><code>curl -fsSL https://raw.githubusercontent.com/TerabyteEXE/AmethystOS/main/bootstrap.sh | bash</code></pre>
       </div>
       <p class="home-note">This runs code downloaded from GitHub. <a href="https://github.com/TerabyteEXE/AmethystOS/blob/main/bootstrap.sh">Read the installer</a> before using it. See the <a href="install.html">installation guide</a> for the manual method, requirements and recovery instructions.</p>
-    </section>
+    <p class="home-note"><strong>Compatibility:</strong> This beta depends on archived Noctalia v4. Fedora’s regular Noctalia v5 package is not compatible. Check the <a href="install.html">installation notes</a> before updating.</p></section>
 
     <section class="home-section home-columns" aria-label="Project information and documentation">
       <div>
         <h2>About AmethystOS</h2>
         <p>AmethystOS is not a separate Linux distribution or bootable ISO yet. It is a set of desktop configurations with a Fedora installer for Niri.</p>
-        <p>The default desktop uses <a href="https://github.com/YaLTeR/niri">Niri</a> for dependable scrollable tiling for stability, along with Waybar, Fuzzel, Mako and Alacritty. It is intended to be easy to install, understand and modify to your liking.</p>
+        <p>The desktop uses <a href="https://github.com/YaLTeR/niri">Niri</a> and the actual <a href="https://github.com/deadduck-09/gigis-rice">Gigi’s Rice</a> configuration. <a href="https://docs.noctalia.dev/noctalia-shell-legacy/getting-started/installation/">Noctalia Shell v4</a> supplies its bar, launcher, settings, widgets, notifications and wallpaper manager. The original window effects remain, with Amethyst purple branding and wallpapers.</p>
         <p class="home-section">Read more about the project <a href="about.html">here!</a></p>
         <p class="home-note">The current releases are undergoing testing so please do not expect a perfect experience yet. The hope is that soon once the whole project has been properly made into a bootable installer it will be good enough for most people.</p>
       </div>
@@ -44,7 +44,7 @@
           <li><a href="install.html">Installation</a><span class="detail">Requirements, setup and backups</span></li>
           <li><a href="wiki/index.html">Getting started</a><span class="detail">Simple stuff for starting out</span></li>
           <li><a href="wiki/keybinds.html">Keyboard shortcuts</a><span class="detail">Search the shipped Niri keybindings</span></li>
-          <li><a href="wiki/customization.html">Customization</a><span class="detail">Wallpaper, bar and Niri settings</span></li>
+          <li><a href="wiki/customization.html">Customization</a><span class="detail">Noctalia shell, wallpaper and Niri settings</span></li>
           <li><a href="wiki/troubleshooting.html">Troubleshooting</a><span class="detail">Common installation and session issues</span></li>
         </ul>
       </div>
@@ -55,7 +55,7 @@
       <table class="facts">
         <tbody>
           <tr><th scope="row">Base Distro</th><td>Fedora Workstation</td></tr>
-          <tr><th scope="row">Desktop</th><td>Niri (Wayland)</td></tr>
+          <tr><th scope="row">Desktop</th><td>Niri + Noctalia Shell v4.7.7 (Gigi’s Rice)</td></tr>
           <tr><th scope="row">Distribution</th><td><a href="https://github.com/TerabyteEXE/AmethystOS">Source code on GitHub</a></td></tr>
           <tr><th scope="row">Development</th><td>This is a small project, I use LLMs to do the programing while I focuse on the UI and workflow. Since AI is used I would reccomend you treat it as such and understand the risks of using AI generated code. I will no try and lie to you, I want you to understand the tool is going to make mistakes.</td></tr>
         </tbody>
@@ -64,6 +64,6 @@
 </div>
 </main>
 <footer class="footer"><div class="wrap footer-inner"><div>
-<p><strong>AmethystOS</strong> · An independent Fedora + Niri desktop project. Not affiliated with Fedora, or Niri.</p>
+<p><strong>AmethystOS</strong> · An independent Fedora + Niri desktop project. Not affiliated with Fedora, Niri or Noctalia.</p>
 <div class="footer-links"><a href="wiki/index.html">Documentation</a><a href="wiki/troubleshooting.html">Support</a><a href="https://github.com/TerabyteEXE/AmethystOS">Source code</a></div>
 </div></footer></body></html>
