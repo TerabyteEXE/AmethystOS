@@ -39,5 +39,24 @@ background_opacity = 0.88
 compositor_blur = true
 scale = 1.0
 start = ["launcher", "workspaces"]
-center = ["clock"]
+center = ["amethyst-cat", "clock"]
 end = ["tray", "network", "bluetooth", "volume", "battery", "notifications", "control-center", "session"]
+
+# AmethystOS branding and the official Noctalia v5 Bongo Cat widget.
+# The earlier QML-based catwalk plugin is for Noctalia v4 and is not compatible.
+[widget.amethyst-cat]
+type = "noctalia/bongocat:cat"
+
+[widget.control-center]
+type = "control-center"
+custom_image = "__HOME__/.local/share/amethystos/assets/amethyst-logo.png"
+custom_image_colorize = false
+
+[widget.launcher]
+type = "launcher"
+custom_image = "__HOME__/.local/share/amethystos/assets/amethyst-logo.png"
+custom_image_colorize = false
+
+[plugins]
+enabled = ["noctalia/bongocat"]
+auto_update = "official"

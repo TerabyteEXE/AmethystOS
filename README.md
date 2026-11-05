@@ -78,10 +78,9 @@ upstream projects; AmethystOS is an independent desktop configuration.
 
 ## Attribution and licenses
 
-This project incorporates Niri dotfiles from **Gigi's Rice by Gigi / deadduck-09**
-(2026), used under the MIT license. The original license is preserved in
-[`third_party/gigis-rice/LICENSE`](third_party/gigis-rice/LICENSE) and
-[`LICENSE.gigi`](LICENSE.gigi), with original source material retained for
-reference. Noctalia, Fedora, and other components are separate projects with
-their own licenses. The bundled AmethystOS wallpapers and logo are project
-artwork, not part of those third-party MIT grants.
+AmethystOS is an independent configuration of Fedora, Niri and Noctalia v5.
+These components retain their own licenses. Project artwork is separate from
+upstream licenses. A historical MIT-licensed dotfiles source by Gigi
+(deadduck-09) contributed to earlier versions; its license notice is retained
+in [`LICENSE.gigi`](LICENSE.gigi) and
+[`third_party/gigis-rice/LICENSE`](third_party/gigis-rice/LICENSE).

@@ -24,18 +24,13 @@ def check_configuration():
     assert palette['dark']['mPrimary'] == '#B48AF2'
     assert palette['light']['mPrimary'] == '#7035AB'
 
-    # Legacy v4 settings.json may remain in the bundled payload for the
-    # default Noctalia configuration.
-    assert (P / 'noctalia/settings.json').exists()
-
-    # A bundled plugins directory is not, by itself, evidence of a failed
-    # Noctalia v5 migration. Some repositories retain plugin assets or
-    # compatibility files. Validate the v5 config above rather than failing
-    # simply because a folder is present.
-    plugins = P / 'noctalia/plugins'
-    if plugins.exists():
-        assert plugins.is_dir(), 'noctalia/plugins exists but is not a directory'
-        print('[info] Bundled Noctalia plugin directory detected; retaining it')
+    # Noctalia v5 no longer loads legacy settings.json or QML plugins.
+    assert not (P / 'noctalia/settings.json').exists()
+    assert not (P / 'noctalia/plugins').exists()
+    assert shell['plugins']['enabled'] == ['noctalia/bongocat']
+    assert shell['widget']['amethyst-cat']['type'] == 'noctalia/bongocat:cat'
+    assert 'amethyst-cat' in shell['bar']['default']['center']
+    assert 'amethyst-logo.png' in shell['widget']['control-center']['custom_image']
 
     for path in (P / 'niri/modules/autostarts.kdl', P / 'niri/modules/keybinds.kdl'):
         txt = path.read_text()
@@ -102,7 +97,7 @@ def check_deploy():
         assert (noct / 'settings.json').is_file()
         deploy.install(home, replace=True, dry_run=False, require_niri=False)
         assert (noct / 'config.toml').is_file()
-        assert (noct / 'settings.json').is_file()
+        assert 'amethyst-cat' in (noct / 'config.toml').read_text()
         assert (home / '.local/bin/amethyst-welcome').is_file()
         assert (home / '.local/share/applications/amethyst-welcome.desktop').is_file()
         assert (home / '.local/share/icons/hicolor/128x128/apps/amethystos.png').is_file()

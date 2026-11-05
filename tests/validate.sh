@@ -4,7 +4,7 @@ trap 'code=$?; echo "[test] FAILED line $LINENO: $BASH_COMMAND (exit $code)" >&2
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 echo '[test] Repository, website and licensing'
-for f in LICENSE LICENSE.gigi third_party/gigis-rice/LICENSE README.md \
+for f in LICENSE LICENSE.gigi README.md \
   payload/niri/config.kdl payload/niri/modules/keybinds.kdl \
   payload/noctalia/config.toml payload/noctalia/palettes/Amethyst.json \
   assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png \
