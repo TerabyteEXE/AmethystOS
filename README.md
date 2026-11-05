@@ -84,12 +84,3 @@ and keep backups. Fedora and Noctalia are maintained by their respective
 upstream projects; AmethystOS is an independent desktop configuration.
 
 [Installation guide](install.html) · [Security](docs/SECURITY.md) · [Migration](docs/NOCTALIA_V5_MIGRATION.md)
-
-## Attribution and licenses
-
-AmethystOS is an independent configuration of Fedora, Niri and Noctalia v5.
-These components retain their own licenses. Project artwork is separate from
-upstream licenses. A historical MIT-licensed dotfiles source by Gigi
-(deadduck-09) contributed to earlier versions; its license notice is retained
-in [`LICENSE.gigi`](LICENSE.gigi) and
-[`third_party/gigis-rice/LICENSE`](third_party/gigis-rice/LICENSE).
