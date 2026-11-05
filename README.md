@@ -4,14 +4,7 @@
 
 AmethystOS installs a curated desktop experience onto Fedora Workstation. It
 is not yet a separate bootable distribution. Your existing GNOME login stays
-available as a fallback. The project uses original AmethystOS crystal
-branding, light/dark wallpapers, and a clean, accessible setup.
-
-> **RC4 migration preview.** This release moves to the stable Noctalia **v5**
-> package from Fedora 44's official repositories. Noctalia v4 settings and
-> plugins cannot be used unchanged. Back up your working RC3.1 configuration
-> and read [the v5 migration notes](docs/NOCTALIA_V5_MIGRATION.md) before
-> upgrading. A fresh graphical Fedora/Niri test is still required.
+available as a fallback.
 
 ## Install
 
@@ -49,25 +42,20 @@ bash install.sh
 | Recovery | `amethystos-uninstall --dry-run`, then `amethystos-uninstall` |
 | Login screen | Optional Noctalia Greeter (GDM retained for recovery) |
 
-Noctalia v5 uses its own TOML configuration. Its saved graphical preferences
-are **not** migrated from v4; AmethystOS installs a new custom palette with
-its own purple accent. The original Niri window layout and core shortcuts
-remain, but shell command bindings use the new `noctalia msg` interface.
-
 ## Optional matching login screen
 
 To replace the GNOME/GDM sign-in screen with **Noctalia Greeter** using the
 Amethyst wallpaper and synced Noctalia palette, follow the
 [greeter installation and recovery guide](docs/GREETER.md). This is an
 **opt-in system-level change**, never made during the normal installer.
-GNOME remains available.
+GNOMEs login screen will still be available.
 
 ## Useful shortcuts
 
 | Shortcut | Action |
 |---|---|
 | Super+Space | Toggle the app launcher |
-| Super+D | Open the same launcher |
+| Super+D | Open the same launcher bc I had this as another feature |
 | Super+Shift+S | Open settings |
 | Ctrl+Super+K | Open shortcuts guide |
 | Super+W | Close the active window |
@@ -78,16 +66,12 @@ See the [keybinding reference](wiki/keybinds.html) and [wiki](wiki/index.html).
 
 ## Development and security
 
-The source is **AI-assisted and experimental**, not independently security
+The source is **AI-assisted**, not independently security
 reviewed. Read installers before executing them, verify third-party software,
 and keep backups. Fedora and Noctalia are maintained by their respective
 upstream projects; AmethystOS is an independent desktop configuration.
 
 [Installation guide](install.html) · [Security](docs/SECURITY.md) · [Migration](docs/NOCTALIA_V5_MIGRATION.md)
 
-## Attribution and licenses
-
-AmethystOS includes some historical Gigi-derived Neovim configuration files.
-Their original MIT license and copyright notice are preserved at
-[`third_party/gigis-rice/LICENSE`](third_party/gigis-rice/LICENSE).
-The Niri and Noctalia desktop experience is maintained separately by AmethystOS.
+## Thanks
+Thank you for checking AmethystOS out!
