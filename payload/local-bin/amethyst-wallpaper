@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-# One-time wallpaper import after Noctalia starts; never overwrite later user selections.
+# Apply the first wallpaper only after shell startup. Never reset a user's
+# later choices during upgrades.
 STATE="$HOME/.local/state/amethystos-base-v1"
 MODE=${1:-}
 case "$MODE" in
@@ -11,23 +12,22 @@ case "$MODE" in
     IFS= read -r image <"$selection" || true
     [[ -f "$image" ]] || exit 0
     for i in {1..12}; do
-      if command -v qs >/dev/null 2>&1 && qs -c noctalia-shell ipc call wallpaper set "$image" >/dev/null 2>&1; then
+      if command -v noctalia >/dev/null 2>&1 && noctalia msg wallpaper-set "$image" >/dev/null 2>&1; then
         touch "$STATE/noctalia-wallpaper-initialized"
         exit 0
       fi
       sleep 1
     done
-    echo "Amethyst wallpaper could not be applied yet; choose it in Noctalia Settings." >&2
+    echo 'Amethyst wallpaper could not be applied; use Noctalia wallpaper settings.' >&2
     exit 1
     ;;
   dark|light)
     image="$HOME/Pictures/wallpapers/Amethyst${MODE^}.png"
-    [[ -f "$image" ]] || exit 1
-    qs -c noctalia-shell ipc call wallpaper set "$image"
-    mkdir -p "$STATE"; printf '%s\n' "$image" >"$STATE/wallpaper"
+    [[ -f "$image" ]] || { echo "Wallpaper missing: $image" >&2; exit 1; }
+    noctalia msg wallpaper-set "$image"
+    mkdir -p "$STATE"
+    printf '%s\n' "$image" >"$STATE/wallpaper"
+    touch "$STATE/noctalia-wallpaper-initialized"
     ;;
-  *)
-    echo 'Usage: amethyst-wallpaper dark|light|apply-first-use' >&2
-    exit 2
-    ;;
+  *) echo 'Usage: amethyst-wallpaper dark|light|apply-first-use' >&2; exit 2 ;;
 esac

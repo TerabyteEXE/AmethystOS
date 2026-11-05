@@ -1,0 +1,43 @@
+# AmethystOS desktop profile for Noctalia v5 (Fedora official package).
+# This file is user-editable. Changes made in Noctalia Settings live separately
+# under ~/.local/state/noctalia/settings.toml and take precedence.
+[theme]
+mode = "dark"
+shell_mode = "follow"
+source = "custom"
+custom_palette = "Amethyst"
+sync_color_scheme = true
+
+[accessibility]
+ui_scale = 1.1
+
+[shell]
+font_family = "Noto Sans"
+show_close_buttons = true
+popup_borders = true
+popup_shadows = true
+setup_wizard_enabled = false
+
+[shell.launcher]
+layout = "full"
+width = 760
+search_position = "top"
+default_view = "categories"
+show_navigation_labels = true
+show_icons = true
+show_settings_button = true
+show_session_button = true
+
+[bar.default]
+position = "top"
+enabled = true
+thickness = 40
+margin_ends = 10
+margin_edge = 6
+radius = 12
+background_opacity = 0.88
+compositor_blur = true
+scale = 1.0
+start = ["launcher", "workspaces"]
+center = ["clock"]
+end = ["tray", "network", "bluetooth", "volume", "battery", "notifications", "control-center", "session"]

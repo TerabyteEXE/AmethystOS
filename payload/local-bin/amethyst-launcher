@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-command -v qs >/dev/null || { echo "Noctalia Shell v4 is not installed" >&2; exit 1; }
-exec qs -c noctalia-shell ipc call launcher toggle
+exec noctalia msg panel-toggle launcher

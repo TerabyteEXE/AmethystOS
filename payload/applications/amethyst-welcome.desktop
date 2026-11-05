@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Welcome to AmethystOS
+Comment=Getting started, software and desktop shortcuts
+Exec=amethyst-welcome
+Icon=amethystos
+Terminal=false
+Categories=Settings;System;

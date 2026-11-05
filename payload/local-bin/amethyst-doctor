@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -u
-printf '%s\n' 'AMETHYSTOS · Niri + Gigi/Noctalia v4 diagnostics'
-for cmd in niri qs kitty wpctl nmcli fastfetch; do
+printf '%s\n' 'AMETHYSTOS · Fedora + Niri + Noctalia v5 diagnostics'
+for cmd in niri noctalia kitty wpctl nmcli fastfetch; do
   if command -v "$cmd" >/dev/null 2>&1; then echo "[ok] $cmd"; else echo "[missing] $cmd"; fi
 done
-if rpm -q noctalia-legacy >/dev/null 2>&1 || rpm -q noctalia-shell >/dev/null 2>&1; then
-  echo '[ok] Noctalia v4 package detected'
+if command -v rpm >/dev/null && rpm -q noctalia >/dev/null 2>&1; then
+  echo '[ok] Fedora Noctalia package detected'
 else
-  echo '[warning] Noctalia legacy v4 package not confirmed (Fedora noctalia v5 is incompatible)'
+  echo '[warning] Noctalia v5 package not confirmed'
 fi
-if command -v niri >/dev/null 2>&1; then niri validate 2>&1 || true; fi
-if [[ "${XDG_CURRENT_DESKTOP:-}" != *niri* && "${XDG_CURRENT_DESKTOP:-}" != *Niri* ]]; then
-  echo '[info] Run inside a Niri session to check graphical integrations.'
+if command -v niri >/dev/null; then niri validate 2>&1 || true; fi
+if command -v noctalia >/dev/null && [[ -n ${WAYLAND_DISPLAY:-} ]]; then
+  noctalia msg status 2>&1 || true
 fi

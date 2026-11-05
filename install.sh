@@ -2,12 +2,11 @@
 # AmethystOS: one installer, user-selectable Fedora apps, recoverable dotfiles.
 set -Eeuo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0 PRESERVE_APPEARANCE=0 ALLOW_TERRA=0
+DRY=0 REPLACE=0 SKIP_PACKAGES=0 NON_INTERACTIVE=0 NO_THEME=0 PRESERVE_APPEARANCE=0
 APP_GROUPS='' APPS_SET=0 START_THEME=dark
 for arg in "$@"; do
   case "$arg" in
     --dry-run) DRY=1 ;;
-    --allow-terra) ALLOW_TERRA=1 ;;
     --replace) REPLACE=1 ;;
     --no-packages) SKIP_PACKAGES=1 ;;
     --non-interactive) NON_INTERACTIVE=1 ;;
@@ -21,11 +20,10 @@ for arg in "$@"; do
 AmethystOS — Fedora + Niri
 Usage: bash install.sh [--dry-run] [--replace] [--no-packages]
                        [--non-interactive] [--apps=browser,essentials,dev]
-  Interactive setup uses a branded terminal menu and makes optional apps selectable.
-  --allow-terra     Explicitly allow third-party Terra for Noctalia legacy v4
+  Interactive setup uses arrow keys and Space to select individual optional apps.
   --replace         Back up and replace existing user configurations
-  --non-interactive Use default app selections, no terminal prompts
-  --apps=...        Comma-separated app groups; empty value installs no extras
+  --non-interactive Use no optional apps, no terminal prompts
+  --apps=...        Comma-separated app keys; empty value installs no extras
   --theme=light     Set Amethyst Light on first login (default Dark)
   --no-packages     Don't run DNF (advanced)
   --no-theme        Keep current appearance selection if reinstalling
@@ -67,7 +65,7 @@ printf '\n%s◆ AMETHYSTOS%s     %sFEDORA + NIRI  ·  INSTALLER%s\n' "$BOLD$PURP
 printf '  Existing Fedora and GNOME are preserved. Review scripts before installing.\n'
 
 stage 1 'Checking the source, storage and system'
-for path in LICENSE LICENSE.gigi payload/niri/config.kdl payload/noctalia/settings.json payload/niri/modules/keybinds.kdl assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
+for path in LICENSE third_party/gigis-rice/LICENSE payload/niri/config.kdl payload/noctalia/config.toml payload/noctalia/palettes/Amethyst.json payload/niri/modules/keybinds.kdl assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
   [[ -s "$ROOT/$path" ]] || { echo "Missing: $path" >&2; exit 1; }
 done
 if (( ! DRY && ! SKIP_PACKAGES )); then
@@ -129,7 +127,6 @@ elif (( SKIP_PACKAGES )); then
 else
   # shellcheck disable=SC1091
   source "$ROOT/scripts/packages.sh"
-  export AMETHYSTOS_ALLOW_TERRA="$ALLOW_TERRA" AMETHYSTOS_NONINTERACTIVE="$NON_INTERACTIVE"
   amethystos_install_fedora_packages "$APP_GROUPS"
 fi
 
@@ -144,9 +141,10 @@ stage 6 'Preparing Amethyst Dark and Light wallpapers'
 if (( DRY )); then
   echo 'Dry run: both Amethyst wallpapers are present in the bundle.'
 else
-  python3 "$ROOT/scripts/wallpapers.py"
+  python3 "$ROOT/scripts/wallpapers.py" --theme "$START_THEME"
   # Noctalia owns the bar, launcher, notifications, and theme. No old Waybar/GTK scripts.
-  echo 'Appearance and wallpapers can be adjusted in Noctalia Settings (Super+Shift+S).'
+  echo 'Appearance, wallpaper, bar and controls: Noctalia Settings (Super+Shift+S).'
+  echo 'Welcome window starts on your first Niri login (or run amethyst-welcome anytime).'
   mkdir -p "$HOME/Pictures/Screenshots"
 fi
 

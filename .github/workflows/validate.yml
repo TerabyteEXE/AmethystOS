@@ -1,4 +1,4 @@
-name: Validate AmethystOS Gigi Rice Rebase
+name: Validate AmethystOS · Niri + Noctalia v5
 on:
   push:
   pull_request:

@@ -1,5 +1,5 @@
-// AmethystOS — Gigi's Rice Niri base (MIT), adapted for Fedora 44.
-// Gigi's structure, animations and window geometry retained.
+// AmethystOS — Niri desktop configuration (Fedora + Noctalia v5).
+// Window geometry and navigation from the MIT-licensed upstream layout.
 workspace "one"
 workspace "two"
 workspace "three"
@@ -7,16 +7,10 @@ workspace "four"
 workspace "five"
 
 
-//     ██████╗ ██╗ ██████╗ ██╗███████╗      ██████╗ ██╗ ██████╗███████╗
-//    ██╔════╝ ██║██╔════╝ ██║██╔════╝      ██╔══██╗██║██╔════╝██╔════╝
-//    ██║  ███╗██║██║  ███╗██║███████╗█████╗██████╔╝██║██║     █████╗  
-//    ██║   ██║██║██║   ██║██║╚════██║╚════╝██╔══██╗██║██║     ██╔══╝  
-//    ╚██████╔╝██║╚██████╔╝██║███████║      ██║  ██║██║╚██████╗███████╗
-//     ╚═════╝ ╚═╝ ╚═════╝ ╚═╝╚══════╝      ╚═╝  ╚═╝╚═╝ ╚═════╝╚══════╝
-//    
+// AmethystOS Niri desktop: familiar tiling, five named workspaces.
 
 // "/-" comments out the following node. 
-// This is mostly made my keeping noctalia-shell in mind.
+// Niri tiling, named workspaces and the AmethystOS desktop.
 
 // Modules 
 include "./modules/input.kdl"

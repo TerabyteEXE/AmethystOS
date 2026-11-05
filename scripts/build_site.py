@@ -10,14 +10,17 @@ PAT=re.compile(r'^\s*([A-Za-z0-9_+]+)\s+[^{}]*\{\s*([^{}]+?)\s*\}\s*$')
 GROUPS=['Applications & shell','Workspaces','Window management','Media & hardware','System']
 
 def describe(a):
-    if 'launcher toggle' in a: return 'Toggle Noctalia launcher'
-    if 'settings toggle' in a: return 'Open Noctalia settings'
-    if 'wallpaper toggle' in a: return 'Choose wallpaper'
-    if 'controlCenter toggle' in a: return 'Open Noctalia control center'
+    if 'panel-toggle launcher' in a: return 'Toggle application launcher'
+    if 'panel-toggle clipboard' in a: return 'Open clipboard history'
+    if 'panel-toggle session' in a: return 'Power and session menu'
+    if 'panel-toggle notifications' in a: return 'Notification panel'
+    if 'settings-toggle' in a: return 'Open desktop settings'
+    if 'panel-toggle wallpaper' in a: return 'Choose wallpaper'
+    if 'panel-toggle control-center' in a: return 'Open control center'
     if 'notifications toggleHistory' in a: return 'Show notification history'
     if 'launcher clipboard' in a: return 'Clipboard history'
     if 'launcher emoji' in a: return 'Emoji picker'
-    if 'lockScreen' in a: return 'Lock screen'
+    if 'session lock' in a: return 'Lock screen'
     if 'sessionMenu' in a: return 'Power and session menu'
     if 'amethyst-keys' in a: return 'Open searchable keybinding guide'
     if 'amethyst-browser' in a: return 'Open browser'
@@ -45,7 +48,7 @@ def parse():
         if combo=='binds': continue
         if combo.startswith('XF86'): group='Media & hardware'
         elif 'workspace' in action: group='Workspaces'
-        elif action.startswith('spawn') or 'qs -c noctalia-shell' in action: group='Applications & shell'
+        elif action.startswith('spawn') or 'noctalia msg ' in action: group='Applications & shell'
         elif any(x in action for x in ('window','column','monitor','focus','fullscreen','floating')): group='Window management'
         else: group='System'
         keys.append((combo.replace('Super','Super').replace('_',' '),describe(action),group))
@@ -57,7 +60,7 @@ def build():
     old=HTML.read_text()
     start=old.split('<article class="doc-content">')[0]
     end=old.split('</article></div></div></main>',1)[1]
-    out=['<p>Shortcuts generated from the installed <code>payload/niri/modules/keybinds.kdl</code>. This release uses Gigi’s Niri config and Noctalia v4. Search by action or key.</p>',
+    out=['<p>Shortcuts generated from the installed <code>payload/niri/modules/keybinds.kdl</code>. This release uses AmethystOS Niri configuration and Noctalia v5. Search by action or key.</p>',
          '<input class="key-search" type="search" placeholder="Search shortcuts…" aria-label="Search keyboard shortcuts" data-key-search>',
          '<div class="key-controls">'+''.join('<button class="filter-btn" type="button" data-filter="'+html.escape(c,quote=True)+'" aria-pressed="'+('true' if i==0 else 'false')+'">'+html.escape(c)+'</button>' for i,c in enumerate(['all']+GROUPS))+'</div>',
          '<p data-result-count></p>']
@@ -70,7 +73,7 @@ def build():
         out.append('</tbody></table></section>')
     out.append('<p class="no-results" data-no-results>No shortcuts matched your search.</p>')
     text=start+'<article class="doc-content">'+'\n'.join(out)+'</article></div></div></main>'+end
-    plain='# AMETHYSTOS · NIRI / NOCTALIA v4 KEYBINDINGS\n\n'+'\n'.join(f'{k:<28} {a}' for k,a,g in keys)+'\n'
+    plain='# AMETHYSTOS · NIRI / NOCTALIA v5 KEYBINDINGS\n\n'+'\n'.join(f'{k:<28} {a}' for k,a,g in keys)+'\n'
     return text,plain
 
 def main():

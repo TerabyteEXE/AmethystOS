@@ -1,21 +1,8 @@
-
-//    ██╗      █████╗ ██╗   ██╗███████╗██████╗       ██████╗ ██╗   ██╗██╗     ███████╗███████╗
-//    ██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗      ██╔══██╗██║   ██║██║     ██╔════╝██╔════╝
-//    ██║     ███████║ ╚████╔╝ █████╗  ██████╔╝█████╗██████╔╝██║   ██║██║     █████╗  ███████╗
-//    ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗╚════╝██╔══██╗██║   ██║██║     ██╔══╝  ╚════██║
-//    ███████╗██║  ██║   ██║   ███████╗██║  ██║      ██║  ██║╚██████╔╝███████╗███████╗███████║
-//    ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝      ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝╚══════╝
-//                                                                                            
-
+// AmethystOS: Noctalia v5 uses native Wayland layer namespaces.
+// Preserve compositor blur without sampling wallpaper through the shell surface.
 layer-rule {
-  match namespace="^noctalia-overview*" //blur wallpaper on overview for noctalia-shell, enable "Overview wallpaper" in the settings
-  place-within-backdrop true
-}
-
-// Noctalia: blur everwhere without xray for better look //
-layer-rule {
-  match namespace="^noctalia-(background|launcher-overlay|dock)-.$"
-  background-effect {
-    xray false 
-  }
+    match namespace="^noctalia-(bar-|notification|dock|panel|attached-panel|osd|window-switcher)"
+    background-effect {
+        xray false
+    }
 }

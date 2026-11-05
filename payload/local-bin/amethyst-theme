@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 case "${1:-}" in
-  dark) qs -c noctalia-shell ipc call darkMode setDark; amethyst-wallpaper dark ;;
-  light) qs -c noctalia-shell ipc call darkMode setLight; amethyst-wallpaper light ;;
-  *) echo 'Usage: amethyst-theme dark|light (Noctalia v4)' >&2; exit 2 ;;
+  dark|light)
+    noctalia msg theme-mode-set "$1"
+    amethyst-wallpaper "$1"
+    ;;
+  *) echo 'Usage: amethyst-theme dark|light' >&2; exit 2 ;;
 esac

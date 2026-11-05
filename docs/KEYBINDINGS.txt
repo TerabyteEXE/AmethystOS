@@ -1,23 +1,23 @@
-# AMETHYSTOS · NIRI / NOCTALIA v4 KEYBINDINGS
+# AMETHYSTOS · NIRI / NOCTALIA v5 KEYBINDINGS
 
 Super+Shift+Slash            Show hotkey overlay
 Super+L                      Lock screen
 Super+Comma                  Choose wallpaper
-Super+Period                 Emoji picker
-Super+V                      Clipboard history
-Super+D                      Toggle Noctalia launcher
-Super+Space                  Toggle Noctalia launcher
-Super+Shift+S                Open Noctalia settings
+Super+Period                 Toggle application launcher
+Super+V                      Open clipboard history
+Super+D                      Toggle application launcher
+Super+Space                  Toggle application launcher
+Super+Shift+S                Open desktop settings
 Super+Shift+W                Choose wallpaper
-Super+Shift+T                Open Noctalia settings
+Super+Shift+T                Open desktop settings
 Ctrl+Super+K                 Open searchable keybinding guide
-Super+N                      Show notification history
+Super+N                      Notification panel
 Super+Escape                 Power and session menu
-Super+Alt+I                  Open Noctalia settings
+Super+Alt+I                  Open desktop settings
 Super+T                      Open Kitty terminal
 Super+B                      Open browser
 Super+E                      Open Files
-Super+M                      Open video player
+Super+M                      Spawn mpv
 Super+O                      Open text editor
 Super+C                      Open text editor
 Super+Alt+S                  Spawn sh pkill orca || exec orca

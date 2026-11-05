@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+"""AmethystOS first-login welcome screen. User session only; never elevates itself."""
+from __future__ import annotations
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+STATE = Path.home() / '.config/amethystos/welcome.json'
+LOGO = Path.home() / '.local/share/amethystos/assets/amethyst-logo.png'
+
+
+def load():
+    try:
+        val = json.loads(STATE.read_text(encoding='utf-8'))
+        return val if isinstance(val, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def save(always: bool):
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    tmp = STATE.with_name(STATE.name + '.tmp')
+    tmp.write_text(json.dumps({'seen': True, 'show_at_login': always}, indent=2) + '\n', encoding='utf-8')
+    tmp.replace(STATE)
+
+
+def launch(*args):
+    try:
+        subprocess.Popen(list(args), start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except OSError as err:
+        print(f'AmethystOS welcome: cannot open {args[0]}: {err}', file=sys.stderr)
+
+
+def main():
+    startup = '--first-run' in sys.argv
+    settings = load()
+    if startup and settings.get('seen') and not settings.get('show_at_login'):
+        return 0
+    if startup and not os.environ.get('WAYLAND_DISPLAY'):
+        return 0
+    try:
+        import gi
+        gi.require_version('Gtk', '3.0')
+        from gi.repository import Gtk, GdkPixbuf
+    except (ImportError, ValueError) as exc:
+        if not startup:
+            print(f'Graphical welcome app requires GTK3 / PyGObject: {exc}', file=sys.stderr)
+        return 1 if not startup else 0
+    init_result = Gtk.init_check(None)
+    screen_ok = init_result[0] if isinstance(init_result, tuple) else init_result
+    if not screen_ok:
+        return 1 if not startup else 0
+
+    window = Gtk.Window(title='Welcome to AmethystOS')
+    window.set_default_size(560, 485)
+    window.set_position(Gtk.WindowPosition.CENTER)
+    window.set_resizable(True)
+    window.set_icon_name('amethystos')
+    css = b'''
+    window, .main {background-color:#181522;color:#ebe4f5;}
+    label {color:#e9e1f3;}
+    .title {font-size:23px;font-weight:700;color:#f2eafa;}
+    .sub {color:#bfb1d0;font-size:12px;}
+    button {background:#282237;border:1px solid #4c3d63;border-radius:9px;padding:13px;text-shadow:none;color:#f2eafa;}
+    button:hover {background:#3d3057;border-color:#a785d9;}
+    checkbutton {color:#d1c2e6;}
+    '''
+    provider = Gtk.CssProvider()
+    provider.load_from_data(css)
+    Gtk.StyleContext.add_provider_for_screen(window.get_screen(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    column = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14)
+    column.set_border_width(26)
+    column.get_style_context().add_class('main')
+    window.add(column)
+    header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
+    if LOGO.is_file():
+        try:
+            pix = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(LOGO), 58, 58, True)
+            header.pack_start(Gtk.Image.new_from_pixbuf(pix), False, False, 0)
+        except Exception:
+            pass
+    heading = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+    title = Gtk.Label(label='Welcome to AmethystOS', xalign=0)
+    title.get_style_context().add_class('title')
+    heading.pack_start(title, False, False, 0)
+    sub = Gtk.Label(label='Fedora  •  Niri  •  Noctalia', xalign=0)
+    sub.get_style_context().add_class('sub')
+    heading.pack_start(sub, False, False, 0)
+    header.pack_start(heading, True, True, 0)
+    column.pack_start(header, False, False, 2)
+
+    desc = Gtk.Label(label='Your desktop is ready. Start with a few essentials, or close this window and explore.', xalign=0)
+    desc.set_line_wrap(True)
+    column.pack_start(desc, False, False, 4)
+
+    grid = Gtk.Grid(row_spacing=10, column_spacing=10)
+    actions = [
+        ('Desktop settings', ('noctalia', 'msg', 'settings-open')),
+        ('Applications', ('noctalia', 'msg', 'panel-toggle', 'launcher')),
+        ('Keyboard shortcuts', ('amethyst-keys',)),
+        ('Browse wallpapers', ('noctalia', 'msg', 'panel-toggle', 'wallpaper')),
+        ('Software update', ('kitty', '--title', 'AmethystOS Update', '-e', 'amethyst-update')),
+        ('Files', ('nautilus',)),
+    ]
+    for i, (name, command) in enumerate(actions):
+        button = Gtk.Button(label=name)
+        button.set_hexpand(True)
+        button.set_halign(Gtk.Align.FILL)
+        button.connect('clicked', lambda _btn, argv=command: launch(*argv))
+        grid.attach(button, i % 2, i // 2, 1, 1)
+    column.pack_start(grid, True, True, 4)
+
+    toggle = Gtk.CheckButton(label='Show this welcome screen when I log in')
+    toggle.set_active(bool(settings.get('show_at_login', False)))
+    column.pack_start(toggle, False, False, 2)
+    done = Gtk.Button(label='Start using AmethystOS')
+    column.pack_start(done, False, False, 2)
+
+    def close(*_):
+        save(toggle.get_active())
+        Gtk.main_quit()
+    window.connect('destroy', close)
+    done.connect('clicked', lambda *_: window.destroy())
+    window.show_all()
+    Gtk.main()
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

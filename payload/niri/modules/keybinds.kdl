@@ -12,25 +12,25 @@ binds {
   Super+Shift+Slash { show-hotkey-overlay; }
 
   // Noctalia binds // 
-  Super+L { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
-  Super+Comma { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle"; }
-  Super+Period { spawn-sh "qs -c noctalia-shell ipc call launcher emoji"; }
-  Super+V { spawn-sh "qs -c noctalia-shell ipc call launcher clipboard"; }
-  Super+D { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
-  Super+Space repeat=false hotkey-overlay-title="Amethyst launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
-  Super+Shift+S repeat=false hotkey-overlay-title="Noctalia settings" { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
-  Super+Shift+W repeat=false hotkey-overlay-title="Choose wallpaper" { spawn-sh "qs -c noctalia-shell ipc call wallpaper toggle"; }
-  Super+Shift+T repeat=false hotkey-overlay-title="Appearance" { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
+  Super+L { spawn-sh "noctalia msg session lock"; }
+  Super+Comma { spawn-sh "noctalia msg panel-toggle wallpaper"; }
+  Super+Period { spawn-sh "noctalia msg panel-toggle launcher"; }
+  Super+V { spawn-sh "noctalia msg panel-toggle clipboard"; }
+  Super+D { spawn-sh "noctalia msg panel-toggle launcher"; }
+  Super+Space repeat=false hotkey-overlay-title="Amethyst launcher" { spawn-sh "noctalia msg panel-toggle launcher"; }
+  Super+Shift+S repeat=false hotkey-overlay-title="AmethystOS settings" { spawn-sh "noctalia msg settings-toggle"; }
+  Super+Shift+W repeat=false hotkey-overlay-title="Choose wallpaper" { spawn-sh "noctalia msg panel-toggle wallpaper"; }
+  Super+Shift+T repeat=false hotkey-overlay-title="Appearance" { spawn-sh "noctalia msg settings-toggle"; }
   Ctrl+Super+K repeat=false hotkey-overlay-title="Keybinding guide" { spawn "amethyst-keys"; }
-  Super+N { spawn-sh "qs -c noctalia-shell ipc call notifications toggleHistory"; }
-  Super+Escape { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
-  Super+Alt+I { spawn-sh "qs -c noctalia-shell ipc call settings toggle"; }
+  Super+N { spawn-sh "noctalia msg panel-toggle notifications"; }
+  Super+Escape { spawn-sh "noctalia msg panel-toggle session"; }
+  Super+Alt+I { spawn-sh "noctalia msg settings-toggle"; }
 
   // Apps // 
   Super+T hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
   Super+B hotkey-overlay-title="Open browser" { spawn "amethyst-browser"; }
   Super+E hotkey-overlay-title="Open file manager" { spawn "nautilus"; }
-  Super+M hotkey-overlay-title="Open media player" { spawn "celluloid"; }
+  Super+M hotkey-overlay-title="Open media player" { spawn "mpv"; }
   Super+O hotkey-overlay-title="Open editor" { spawn "gnome-text-editor"; }
   Super+C hotkey-overlay-title="Open code editor" { spawn "gnome-text-editor"; }
 

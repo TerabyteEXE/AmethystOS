@@ -7,7 +7,7 @@ import shutil
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = ('AmethystDark.png', 'AmethystLight.png')
 
-def install_wallpapers(home: Path, source: Path = ROOT / 'assets/wallpapers') -> dict:
+def install_wallpapers(home: Path, source: Path = ROOT / 'assets/wallpapers', theme: str = "dark") -> dict:
     destination = home / 'Pictures/wallpapers'
     destination.mkdir(parents=True, exist_ok=True)
     new = []
@@ -25,7 +25,7 @@ def install_wallpapers(home: Path, source: Path = ROOT / 'assets/wallpapers') ->
     existing = [f for f in destination.iterdir() if f.suffix.lower() in ('.png','.jpeg','.jpg','.webp') and f.name not in NAMES]
     if not selection.exists() and not existing:
         selection.parent.mkdir(parents=True, exist_ok=True)
-        selection.write_text(str(destination / NAMES[0]) + '\n', encoding='utf-8')
+        selection.write_text(str(destination / (NAMES[1] if theme == 'light' else NAMES[0])) + '\n', encoding='utf-8')
         selected = True
     else:
         selected = False
@@ -34,7 +34,8 @@ def install_wallpapers(home: Path, source: Path = ROOT / 'assets/wallpapers') ->
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--home', type=Path, default=Path.home())
+    ap.add_argument('--theme', choices=('dark','light'), default='dark')
     opts = ap.parse_args()
-    result = install_wallpapers(opts.home)
+    result = install_wallpapers(opts.home, theme=opts.theme)
     print('Amethyst wallpapers ready: ' + ', '.join(NAMES))
-    print('Selected Amethyst Dark as first-use wallpaper' if result['selected_dark'] else 'Preserved your existing wallpaper choice')
+    print(f'Selected Amethyst {opts.theme.title()} as first-use wallpaper' if result['selected_dark'] else 'Preserved your existing wallpaper choice')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AmethystOS base: stage, validate, deploy, and restore the upstream dotfiles.
+"""AmethystOS base: stage, validate, deploy, and restore the Niri/Noctalia desktop.
 
 No commands are run as root. Existing files are never deleted without a backup.
 """
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PAYLOAD = ROOT / "payload"
 CONFIG_DIRS = ("niri", "noctalia", "kitty", "fish", "mpd", "mpv", "rmpc", "yazi", "nvim", "fastfetch")
 EXTRA_FILES = ("amethystos-uninstall", "amethyst-update", "amethyst-doctor", "amethyst-browser",
-               "amethyst-settings", "amethyst-launcher", "amethyst-keys", "amethyst-wallpaper", "amethyst-theme")
+               "amethyst-settings", "amethyst-launcher", "amethyst-keys", "amethyst-wallpaper", "amethyst-theme", "amethyst-welcome")
 SUFFIXES = {".sh", ".kdl", ".css", ".ini", ".toml", ".json", ".jsonc", ".conf", ".fish", ".desktop", ".qml"}
 RETIRED_PATHS = (".local/bin/amethyst-boot", ".local/share/amethystos/boot_theme.sh",
                  ".local/share/amethystos/assets/plymouth")
@@ -48,6 +48,7 @@ def sources() -> list[tuple[Path, Path]]:
     mapping.append((ROOT / "scripts/system_update.py", Path(".local/share/amethystos/system_update.py")))
     mapping.append((ROOT / "VERSION", Path(".local/share/amethystos/VERSION")))
     mapping.append((ROOT / "assets/branding/amethyst-logo.png", Path(".local/share/amethystos/assets/amethyst-logo.png")))
+    mapping.append((PAYLOAD / "icons/hicolor/128x128/apps/amethystos.png", Path(".local/share/icons/hicolor/128x128/apps/amethystos.png")))
     mapping.append((ROOT / "docs/KEYBINDINGS.txt", Path(".local/share/amethystos/KEYBINDINGS.txt")))
     mapping.extend((source,Path(".local/share/applications") / source.name)
                    for source in sorted((PAYLOAD / "applications").glob("*.desktop")))

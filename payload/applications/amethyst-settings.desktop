@@ -3,6 +3,6 @@ Type=Application
 Name=AmethystOS Settings
 Comment=Noctalia appearance, shell, wallpaper and system settings
 Exec=amethyst-settings
-Icon=preferences-desktop
+Icon=amethystos
 Terminal=false
 Categories=Settings;DesktopSettings;
