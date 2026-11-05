@@ -51,8 +51,12 @@ def check_configuration():
     assert 'noctalia msg wallpaper-set' in (P / 'local-bin/amethyst-wallpaper').read_text()
     for name in ('AmethystDark.png', 'AmethystLight.png'):
         assert (ROOT / 'assets/wallpapers' / name).stat().st_size > 100000
-    assert (ROOT / 'third_party/gigis-rice/LICENSE').read_bytes() == (ROOT / 'LICENSE.gigi').read_bytes()
-    assert 'Gigi' in (ROOT / 'README.md').read_text().split('## Attribution and licenses')[-1]
+    # The bundled Neovim configuration retains an upstream MIT notice.
+    license_text = (ROOT / 'third_party/gigis-rice/LICENSE').read_text()
+    assert 'MIT License' in license_text and 'Copyright (c) 2026 Gigi' in license_text
+    readme = (ROOT / 'README.md').read_text()
+    assert '## Attribution and licenses' in readme
+    assert 'Gigi' in readme.split('## Attribution and licenses', 1)[1]
     for file in (ROOT / 'index.html', ROOT / 'install.html', ROOT / 'about.html'):
         page_text = file.read_text().lower()
         assert 'noctalia v5' in page_text or file.name == 'about.html'

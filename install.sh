@@ -65,7 +65,7 @@ printf '\n%s◆ AMETHYSTOS%s     %sFEDORA + NIRI  ·  INSTALLER%s\n' "$BOLD$PURP
 printf '  Existing Fedora and GNOME are preserved. Review scripts before installing.\n'
 
 stage 1 'Checking the source, storage and system'
-for path in LICENSE LICENSE.gigi payload/niri/config.kdl payload/noctalia/config.toml payload/noctalia/palettes/Amethyst.json payload/niri/modules/keybinds.kdl assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
+for path in LICENSE third_party/gigis-rice/LICENSE payload/niri/config.kdl payload/noctalia/config.toml payload/noctalia/palettes/Amethyst.json payload/niri/modules/keybinds.kdl assets/wallpapers/AmethystDark.png assets/wallpapers/AmethystLight.png; do
   [[ -s "$ROOT/$path" ]] || { echo "Missing: $path" >&2; exit 1; }
 done
 if (( ! DRY && ! SKIP_PACKAGES )); then

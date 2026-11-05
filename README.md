@@ -84,3 +84,10 @@ and keep backups. Fedora and Noctalia are maintained by their respective
 upstream projects; AmethystOS is an independent desktop configuration.
 
 [Installation guide](install.html) · [Security](docs/SECURITY.md) · [Migration](docs/NOCTALIA_V5_MIGRATION.md)
+
+## Attribution and licenses
+
+AmethystOS includes some historical Gigi-derived Neovim configuration files.
+Their original MIT license and copyright notice are preserved at
+[`third_party/gigis-rice/LICENSE`](third_party/gigis-rice/LICENSE).
+The Niri and Noctalia desktop experience is maintained separately by AmethystOS.
