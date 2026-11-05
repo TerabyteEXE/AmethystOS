@@ -102,7 +102,7 @@ def check_deploy():
         assert (noct / 'settings.json').is_file()
         deploy.install(home, replace=True, dry_run=False, require_niri=False)
         assert (noct / 'config.toml').is_file()
-        assert not (noct / 'settings.json').exists()
+        assert (noct / 'settings.json').is_file()
         assert (home / '.local/bin/amethyst-welcome').is_file()
         assert (home / '.local/share/applications/amethyst-welcome.desktop').is_file()
         assert (home / '.local/share/icons/hicolor/128x128/apps/amethystos.png').is_file()
