@@ -21,6 +21,7 @@ for p in pathlib.Path('payload/noctalia').rglob('*.json'):
  except Exception as exc: raise AssertionError(f'Invalid JSON: {p}') from exc
 print('[ok] All Noctalia JSON files parse')
 PYCODE
+bash tests/test_packages.sh
 python3 tests/test_gigi.py
 bash install.sh --dry-run >/dev/null
 echo '[test] Dry-run installer: OK'

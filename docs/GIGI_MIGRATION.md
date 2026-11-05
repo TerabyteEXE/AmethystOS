@@ -33,3 +33,11 @@ If you previously installed legacy Noctalia or a v5 binary, check which `qs` you
 - A live Fedora login has not been tested in this development environment. The portable tests can validate files, installers and migration but cannot guarantee Niri/Noctalia graphics, hardware, shell plugin compatibility, or animations.
 - Some plugins rely on separate optional software or remote plugin catalogs; the code is bundled but individual functions may need additional dependencies.
 - Noctalia v4 is archived. There is no promise of continued security or compatibility updates; plan a future, tested port to maintained v5 before presenting this as a long-term stable system.
+
+## Fedora 44 package hotfix (RC3.1)
+
+Fedora's image-conversion package is called `ImageMagick` (capital M), not `imagemagick`.
+RC3.1 corrects that required dependency and adds a simulated package-install regression test.
+The installer also now honors an explicit empty optional-app selection.
+The failed DNF transaction occurs before dotfiles are deployed; it does not require a Fedora reinstall.
+Noctalia legacy remains a separate third-party dependency requiring explicit approval and testing.

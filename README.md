@@ -1,8 +1,12 @@
-# AmethystOS — Niri + Gigi's Rice (RC3 beta)
+# AmethystOS — Niri + Gigi's Rice (RC3.1 beta)
 
 **AmethystOS** is a Fedora Workstation desktop setup with the [Gigi's Rice](https://github.com/deadduck-09/gigis-rice) **MIT-licensed Niri configuration and Noctalia Shell v4**. The original Gigi layout, window effects, plugins, and desktop shell are retained; Fedora-specific startup fixes and Amethyst purple branding are applied. This is **not yet a separate ISO/distribution**.
 
 **Important compatibility warning:** Gigi's Rice is archived and targets **Noctalia Shell v4.7.7**. Fedora 44's official `noctalia` package is v5 and **cannot run Gigi's v4 configs unchanged**. You must install the **legacy v4 shell**, which may require a third-party package repository. We will not silently enable one. [Read the installation caveat](docs/GIGI_MIGRATION.md).
+
+## RC3.1 Fedora 44 installer fix
+
+Corrected the required `ImageMagick` package spelling for Fedora 44 and fixed the no-optional-apps selection. The desktop, themes, and Noctalia configuration are unchanged. Existing beta installations can rerun the installer; the package failure happened before dotfiles were replaced. See `docs/GIGI_MIGRATION.md` for the separate legacy-Noctalia dependency warning.
 
 ## Install
 

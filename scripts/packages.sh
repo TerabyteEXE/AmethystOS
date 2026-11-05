@@ -7,7 +7,7 @@ AMETHYSTOS_REQUIRED=(
   gnome-keyring NetworkManager network-manager-applet
   pavucontrol playerctl brightnessctl wl-clipboard cliphist
   pipewire wireplumber pipewire-pulseaudio bluez blueman
-  jq gtk3 python3 python3-gobject imagemagick git
+  jq gtk3 python3 python3-gobject ImageMagick git
   fish fastfetch mpv mpd neovim
   papirus-icon-theme papirus-icon-theme-dark
   google-noto-sans-fonts cascadia-mono-nf-fonts
@@ -51,7 +51,9 @@ amethystos_install_legacy() {
   sudo dnf install -y noctalia-legacy || sudo dnf install -y noctalia-shell
 }
 amethystos_install_fedora_packages() {
-  local groups="${1:-firefox,essentials}" group
+  # Treat an explicit empty string as "no optional apps", not the default group.
+  # The installer always passes the user's choice, including "" for none.
+  local groups="${1-firefox,essentials}" group
   echo 'Installing Fedora Niri desktop, graphics and Noctalia dependencies.'
   sudo dnf install -y "${AMETHYSTOS_REQUIRED[@]}" || return
   amethystos_install_legacy || return
