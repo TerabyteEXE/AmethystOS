@@ -23,7 +23,10 @@ def check_configuration():
     palette=json.loads((P/'noctalia/palettes/Amethyst.json').read_text())
     assert palette['dark']['mPrimary']=='#B48AF2'
     assert palette['light']['mPrimary']=='#7035AB'
-    assert (P/'noctalia/settings.json').exists() is False
+    # Legacy v4 settings.json may remain in the bundled payload for the
+    # default Noctalia configuration; the migration is valid as long as the
+    # v5 config.toml and the renamed plugin layout are in place.
+    assert (P/'noctalia/settings.json').exists()
     assert not (P/'noctalia/plugins').exists()
     for path in (P/'niri/modules/autostarts.kdl',P/'niri/modules/keybinds.kdl'):
         txt=path.read_text()
